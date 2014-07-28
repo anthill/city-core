@@ -8,6 +8,7 @@
 
   <script src="js/three.min.js"></script>
   <script src="js/OrbitControls.js"></script>
+  <script src="js/jquery-1.11.1.min.js"></script>
 
   <script>
 
@@ -22,6 +23,7 @@
 
       // Create the scene and set the scene size.
       scene = new THREE.Scene();
+
       var WIDTH = window.innerWidth,
           HEIGHT = window.innerHeight;
 
@@ -32,7 +34,7 @@
 
       // Create a camera, zoom it out from the model a bit, and add it to the scene.
       camera = new THREE.PerspectiveCamera(45, WIDTH / HEIGHT, 0.1, 20000);
-      camera.position.set(0,6,0);
+      camera.position.set(0,100,0);
       scene.add(camera);
 
       // Create an event listener that resizes the renderer with the browser window.
@@ -52,14 +54,55 @@
       light.position.set(-100,200,100);
       scene.add(light);
 
-      // Load in the mesh and add it to the scene.
-      var loader = new THREE.JSONLoader();
-      loader.load( "models/blender_0.js", function(geometry, mat){
-        var material = new THREE.MeshFaceMaterial( mat );
-        mesh = new THREE.Mesh(geometry, material);
-        scene.add(mesh);
-      });
+      // get all the files
+      var myRegexp = /x(\d+)y(\d+)\..*/;      
+      $.getJSON("models/list.json", function(files) {
 
+        files.forEach(function(file) {
+          var key = Object.keys(file)[0];
+          var match = myRegexp.exec(key);
+          var X = match[1];
+          var Y = match[2];
+          
+          // load the tile
+          var loader = new THREE.JSONLoader();
+          loader.load( "models/" + key, function(geometry, mat){
+            var material = new THREE.MeshFaceMaterial(mat);
+            mesh = new THREE.Mesh(geometry, material);
+            mesh.position.x = (X-119) * 200;
+            mesh.position.z = (Y-113) * 200;
+            scene.add(mesh);
+          });
+
+          // load the buildings
+
+
+          file[key].forEach(function(subfile) {
+
+            loader.load( "models/" + subfile, function(geometry, mat){
+              var material = new THREE.MeshFaceMaterial(mat);
+              mesh = new THREE.Mesh(geometry, material);
+              mesh.position.x = (X-119) * 200;
+              mesh.position.z = (Y-113) * 200;
+              scene.add(mesh);
+            })
+          })
+        });
+      })
+    
+      
+      // loader.load( "models/x119y113.x119y113.js", function(geometry, mat){
+      //   var material = new THREE.MeshFaceMaterial( mat );
+      //   mesh = new THREE.Mesh(geometry, material);
+      //   var hex  = 0xff0000;
+      //   var bbox = new THREE.BoundingBoxHelper( mesh, hex );
+      //   bbox.update();
+      //   console.log(bbox.box);
+      //   mesh.position.x = 0;
+      //   mesh.position.y = 0;
+      //   mesh.position.z = 200;
+      //   scene.add(mesh);
+      // });
       // Add OrbitControls so that we can pan around with the mouse.
       controls = new THREE.OrbitControls(camera, renderer.domElement);
 
@@ -77,6 +120,8 @@
       controls.update();
 
     }
+
+
 
   </script>
 
