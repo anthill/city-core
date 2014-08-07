@@ -33,6 +33,8 @@ for tile in output_file_list:
 
 			# change the vertices to have longitude latitude
 			vertices = np.array(building["vertices"]).reshape((-1,3)).T  
+			xx = map(lambda x: x + X * 200, vertices[0])
+			yy = map(lambda y: y + Y * 200, vertices[2])
 			modified_vertices = np.array([xx, vertices[1], yy]) 
 			building["vertices"] = list(modified_vertices.T.flatten())
 
