@@ -26,7 +26,7 @@ def export(inputfile, outputdir):
 		o.select = False
 	for o in bpy.data.objects:
 		o.select = True
-		if o.name[0] != "$":
+		if o.name[0] not in set(["$","L","C"]):
 			toThree(bpy.ops.export_mesh, bpy.context, outputdir + o.name + ".js", option_all_meshes=False)
 
 			if o.name[0] == "x":
@@ -54,13 +54,19 @@ bpy.data.objects.remove(ob)
 
 
 output_file_list = []
-files = glob.glob("/Users/vallette/Desktop/RL/tile_x*y*/tile_x*y*.3ds")
-for inputfile in files[:3]:
-	print ("Processing " + inputfile)
-	outputdir = "front/models/"
-	outfile = export(inputfile, outputdir)
-	output_file_list += [outfile]
-	directory = "/".join(inputfile.split("/")[:-1])
-	os.system("cp %s/*.jpg front/models/" % directory)
-	with open('front/models/list.json', 'w') as the_file: the_file.write(json.dumps(output_file_list))
+files = glob.glob("/Users/vallette/Desktop/BORDEAUX/RL/tile_x*y*/tile_x*y*.3ds")
+for inputfile in files:
+	# if inputfile in set([
+	# 	"/Users/vallette/Desktop/BORDEAUX/RL/tile_x121y115/tile_x121y115.3ds", 
+	# 	"/Users/vallette/Desktop/BORDEAUX/RL/tile_x121y116/tile_x121y116.3ds",
+	# 	"/Users/vallette/Desktop/BORDEAUX/RL/tile_x122y115/tile_x122y115.3ds", 
+	# 	"/Users/vallette/Desktop/BORDEAUX/RL/tile_x122y116/tile_x122y116.3ds"
+	# 	]):
+		print ("Processing " + inputfile)
+		outputdir = "front/models/"
+		outfile = export(inputfile, outputdir)
+		output_file_list += [outfile]
+		directory = "/".join(inputfile.split("/")[:-1])
+		os.system("cp %s/*.jpg front/models/" % directory)
+		with open('front/models/list.json', 'w') as the_file: the_file.write(json.dumps(output_file_list))
 

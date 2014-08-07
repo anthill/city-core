@@ -8,7 +8,11 @@ convert:
 	@rm -fr front/models/
 	@mkdir front/models/
 	$(BLENDER_DIR)/Contents/MacOS/blender --background --python scripts/blender_converter.py
+	python scripts/to_mongo.py
 
 
 server:
 	cd front && python -m SimpleHTTPServer 8000
+
+build:
+	cd front/js && tsc *.ts --sourcemap -w

@@ -1,2 +1,4 @@
 front/models
+front/js/*.js*
 .DS_Store
+target
