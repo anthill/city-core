@@ -4,11 +4,7 @@
 
 declare var dat;
 declare var Promise;
-// declare module THREE {
-//   export class OrbitControls{
-//     constructor(camera, domElement)
-//   }
-// }
+declare var myJsonParser;
 
 
 (function(){
@@ -93,8 +89,8 @@ declare var Promise;
       loadTiles(linY(south), linY(north), linX(east), linX(west));
     };
 
-    geoCode("grand theatre bordeaux").then(coords => {
-      moveCamera(invLinX(coords.lon), 500, invLinY(coords.lat));
+    geoCode("peyberland bordeaux").then(coords => {
+      moveCamera(invLinX(coords.lon), 300, invLinY(coords.lat));
     })
 
     
@@ -216,6 +212,7 @@ declare var Promise;
       var result = loader.parse( object3d.data, "../models/" )
       var material = new THREE.MeshFaceMaterial(result.materials);
       var mesh = new THREE.Mesh(result.geometry, material);
+      mesh.position.set(object3d.X * 200, 0, object3d.Y * 200)
       mesh.castShadow = true;
       mesh.receiveShadow = true;
       scene.add(mesh);
