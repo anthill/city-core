@@ -31,7 +31,7 @@
       function parseGeom(data) {
 
         var geometry = new THREE.Geometry();
-        var buffer = new DataView(data);
+        var buffer = new DataView(data.buffer);
         var offset = 0;
 
         var verticesNb = buffer.getUint16(offset);
@@ -76,6 +76,9 @@
           color: 0xaaaaaa,
           wireframe: false
         }));
+
+        mesh.position.set(data.X * 200, data.Y * 200, 0);
+        console.log(data.X * 200, data.Y * 200);
         scene.add(mesh);
       }
 
@@ -147,7 +150,9 @@
 
       // Create a camera, zoom it out from the model a bit, and add it to the scene.
       camera = new THREE.PerspectiveCamera( 30, WIDTH / HEIGHT, 1, 5000 );
-      camera.position.set(0, 0, 300);
+      camera.position.set(20000, 21600, 300);
+      camera.up.set(0, 0, 1);
+      camera.lookAt(new THREE.Vector3( 20000, 21600, 0 ));
       scene.add(camera);
 
 

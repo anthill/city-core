@@ -74,7 +74,9 @@ fs.readFile("data/metadata.json", 'utf8', function (err,data) {
   var jsondata = JSON.parse(data);
   Object.keys(jsondata).forEach(function(file) {
   	var building = jsondata[file];
-  	var item = [building.xmin, building.ymin, building.xmax, building.ymax, {name: file}];
+  	var X = building.X;
+  	var Y = building.Y;
+  	var item = [building.xmin + X*200, building.ymin + Y*200, building.xmax + X*200, building.ymax+ Y*200, {name: file, X:X, Y:Y}];
 	tree.insert(item);
   });
 
@@ -104,13 +106,13 @@ io.on('connection', function (socket) {
 
 app.get('/within', function(req, res) {
 	var results = tree.search([req.param("west"), req.param("south"), req.param("east"), req.param("north")]);
-
+	console.log(results.length);
 	// sending the binary
 	var buildings = results.map(function(result) {
-		var path = "data/antsBin/" + result[4].name
+		var path = "data/" + result[4].name
 
-	    fs.readFile(path, function (err,data) {
-	    	clients.get(req.param("s")).emit("building", data);
+	    fs.readFile(path, function (err, buffer) {
+	    	clients.get(req.param("s")).emit("building", {buffer : buffer, X : result[4].X, Y : result[4].Y});
 	    });
 
 	});
