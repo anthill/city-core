@@ -2,3 +2,5 @@ front/models
 front/js/*.js*
 .DS_Store
 target
+backend-node/data
+backend-node/node_modules
