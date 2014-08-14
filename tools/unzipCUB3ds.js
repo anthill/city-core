@@ -1,8 +1,8 @@
 "use strict";
 
 var path = require('path');
-var fs = require('graceful-fs');
 //var fs = require('fs');
+var fs = require('graceful-fs');
 
 var program = require('commander');
 var unzip = require('unzip');
@@ -13,6 +13,7 @@ var containingCube = require('../src/containingCube.js');
 var computeMeshVolume = require('../src/computeMeshVolume.js');
 var _3dsFormatToAntsBinaryBuffer = require('../src/3dsFormatToAntsBinaryBuffer.js');
 var parse3ds = require('../src/parse3ds.js');
+
 
 function tmpdir(){
     var def = Q.defer();
@@ -31,17 +32,12 @@ var readFile = Q.nfbind(fs.readFile);
 var writeFile = Q.nfbind(fs.writeFile);
 var lstat = Q.nfbind(fs.lstat);
 
-/*function isDir(path){
-    return lstat(path_string).then(function(stat){
-        return stat.isDirectory();
-    })
-}*/
-//var tmpdir = Q.nfbind(tmp.dir);
 
-
+/*
+    Takes an Array<T> and a function(x: T) => Promise<U>
+    Processes each array element in sequence.
+*/
 function allInSequence(arr, f){
-    //console.log('allInSequence', arr.length);
-    
     if(arr.length === 0){
         var def = Q.defer();
         def.resolve([]);
@@ -50,8 +46,6 @@ function allInSequence(arr, f){
     
     if(arr.length === 1){
         return f(arr[0]).then(function(res){
-            //console.log("Object.keys(res).length", Object.keys(res).length);
-            
             return [res];
         })
     }
@@ -60,9 +54,7 @@ function allInSequence(arr, f){
         var tail = arr.slice(1);
         
         return f(first).then(function(res){
-            //console.log('first res', tail.length, res)
             return allInSequence(tail, f).then(function(tailRes){
-                //console.log("Object.keys(tailRes).length", Object.keys(tailRes).length, res.length);
                 tailRes.push(res);
                 return tailRes;
             });
@@ -73,10 +65,10 @@ function allInSequence(arr, f){
 
 
 program
-.version('0.0.1')
-.option('--zip [path]', 'path to zip file')
-.option('--out [path]', 'output directory')
-.parse(process.argv);
+    .version('0.0.1')
+    .option('--zip [path]', 'path to zip file')
+    .option('--out [path]', 'output directory')
+    .parse(process.argv);
 
 if(!program.zip || !program.out)
     throw new Error('--zip and --out parameters are compulsory');
@@ -100,7 +92,7 @@ function extractBuildings(_3dsPath, x, y){
 
         var objects = data.getObjects();
         var meshes = objects.map(function(o){
-            try{
+            try{ // sometimes o.meshes.faces fails because of an apparently misformed file.
                 return {
                     id: o.name,
                     vertices: o.meshes.vertices,
@@ -117,7 +109,28 @@ function extractBuildings(_3dsPath, x, y){
                 };
             }
         });
-
+        
+        /*
+            Working around https://github.com/anthill/bordeaux3d/issues/11
+        */
+        // looking for xXXXyYYY object. There is only one per 3ds file
+        var xyObject = meshes.filter(function(m){ return !!m.id.match(/x(\d{1,4})y(\d{1,4})/) })[0]; 
+        var xyContainingCube = containingCube(xyObject);
+        
+        // xyContainingCube.xmax and xyContainingCube.ymax should be +100. Finding the translation.
+        var deltaX = 100 - xyContainingCube.xmax;
+        var deltaY = 100 - xyContainingCube.ymax;
+        
+        if(deltaX !== 0 || deltaY !== 0){
+            // apply translation to all tile objects
+            meshes.forEach(function(m){
+                m.vertices.forEach(function(v){
+                    v.x += deltaX;
+                    v.y += deltaY;
+                });
+            });
+        }
+        
         var buildingBuffers = Object.create(null);
         meshes.forEach(function(m, i){
             buildingBuffers[m.id] = _3dsFormatToAntsBinaryBuffer(m);

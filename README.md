@@ -15,7 +15,7 @@ Right now the data has to be downloaded via the [dedicated GUI](http://data.lacu
 1. Extract all the buildings and metadata in `front/data`:
 
 ```bash
-node tools/unzipCUB3ds.js --zip path/to/3Ddata/BATI3D_NT.zip --out front/data/
+node tools/unzipCUB3ds.js --out front/data/ --zip path/to/3Ddata/BATI3D_NT.zip
 ```
 
 It should take about 5 minutes in normal hardware. This will extract all the buildings and other 3d objects from the open data in [.3ds format](http://en.wikipedia.org/wiki/.3ds). It will create thousands of binary files in `front/data/` as well as a file names `metadata.json`.
