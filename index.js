@@ -7,8 +7,8 @@ var fs = require("fs");
 var Map = require('es6-map');
 
 // defs
-var server = "//localhost"
-var port = 3000
+var server = "//localhost";
+var PORT = 3000;
 
 
 // polyfill
@@ -69,7 +69,7 @@ function randomString(length){
 var tree = rbush(100000);
 
 // reading the file describing the position of each buildings and inserting in rtree
-fs.readFile("data/metadata.json", 'utf8', function (err,data) {
+fs.readFile("front/data/metadata.json", 'utf8', function (err,data) {
   if (err) console.log(err);
   var jsondata = JSON.parse(data);
   Object.keys(jsondata).forEach(function(file) {
@@ -85,9 +85,9 @@ fs.readFile("data/metadata.json", 'utf8', function (err,data) {
 
 // websocket: when a user connects we create a token
 var io = require('socket.io')(http);
-app.use("/ext", require('express').static(__dirname + '/ext'));
+app.use("/ext", require('express').static(__dirname + '/front/ext'));
 app.get('/', function(req, res){
-  res.sendfile('index.html');
+  res.sendfile('front/index.html');
 });
 
 
@@ -97,13 +97,16 @@ var clients = Map();
 io.on('connection', function (socket) {
 	// create token
 	var token = randomString(12);
-	var address = server + ":" + port.toString() + "/within?s=" + token;
+	var address = server + ":" + PORT.toString() + "/within?s=" + token; // TODO: use 'url' module
 	socket.emit('endpoint', address);
 	clients.set(token, socket);
 });
 
 
-
+/*
+    TODO: extract parameters
+    If parameters are well-understood (request understood), 
+*/
 app.get('/within', function(req, res) {
 	var results = tree.search([req.param("west"), req.param("south"), req.param("east"), req.param("north")]);
   console.log(req.param("west"), req.param("south"), req.param("east"), req.param("north"));
@@ -120,6 +123,6 @@ app.get('/within', function(req, res) {
   	res.send("ok");
 });
 
-http.listen(3000, function () {
-    console.log('listening on *:3000');
+http.listen(PORT, function () {
+    console.log('listening http://localhost:'+PORT);
 });
