@@ -114,9 +114,9 @@ app.get('/within', function(req, res) {
   // results = results.slice(0,100);
 	// sending the binary
 	var buildings = results.map(function(result) {
-		var path = "data/" + result[4].name
-	    fs.readFile(path, function (err, buffer) {
-	    	clients.get(req.param("s")).emit("building", {buffer : buffer, X : result[4].X, Y : result[4].Y});
+		var path = "front/data/" + result[4].name
+	    fs.readFile(path, function (err, data) {
+	    	clients.get(req.param("s")).emit("building", {buffer : data, X : result[4].X, Y : result[4].Y});
 	    });
 	});
 	
