@@ -1,0 +1,33 @@
+{
+  "name": "backend-node",
+  "version": "0.0.0",
+  "description": "A simple implementation of the backend for the bordeaux3d project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "es6-map": "^0.1.0",
+    "es6-promise": "^1.0.0",
+    "express": "^4.8.3",
+    "rbush": "^1.3.2",
+    "socket.io": "^1.0.6",
+    "three": "^0.68.0"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-concat": "^0.5.0",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-contrib-uglify": "^0.5.1",
+    "grunt-contrib-watch": "^0.6.1",
+    "typescript": "^1.0.1",
+    "unzip": "~0.1.9",
+    "commander": "~2.3.0",
+    "tmp": "0.0.24",
+    "q": "~1.0.1",
+    "glob": "~4.0.5",
+    "graceful-fs": "~3.0.2"
+  }
+}
