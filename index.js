@@ -109,15 +109,15 @@ io.on('connection', function (socket) {
 */
 app.get('/within', function(req, res) {
 	var results = tree.search([req.param("west"), req.param("south"), req.param("east"), req.param("north")]);
+  console.log(req.param("west"), req.param("south"), req.param("east"), req.param("north"));
 	console.log(results.length);
+  // results = results.slice(0,100);
 	// sending the binary
 	var buildings = results.map(function(result) {
 		var path = "data/" + result[4].name
-
 	    fs.readFile(path, function (err, buffer) {
 	    	clients.get(req.param("s")).emit("building", {buffer : buffer, X : result[4].X, Y : result[4].Y});
 	    });
-
 	});
 	
   	res.send("ok");

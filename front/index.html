@@ -11,6 +11,7 @@
   <script src="ext/OrbitControls.js"></script>
   <script src="ext/socket.io.js"></script>
   <script src="ext/jquery-1.11.1.min.js"></script>
+  <script src="ext/dat.gui.min.js"></script>
 
   <script>
 
@@ -21,8 +22,8 @@
           return 2*x*nbx/4095-nbx;
       }
 
-      var nbz1 = -10;
-      var nbz2 = 117;
+      var nbz1 = -75;
+      var nbz2 = 115;
       // we'll transform z ranging from nbz1 to nbz2 in 255 int values
       function transformZ(z) {
           return (z - 255)*(nbz2-nbz1)/255 +nbz2;
@@ -93,7 +94,11 @@
 
     // when receiving a building parse it
     socket.on('building', function(msg){
+      try {
         parseGeom(msg);
+      } catch (e) {
+        console.error(e);
+      }
     });
 
     // Set up the scene, camera, and renderer as global variables.
@@ -104,8 +109,43 @@
     var seasonsMonth = [7, 11];
     var curMonth = seasonsMonth[0];
 
+    var camx, camy, camz;
+    var endpoint;
+
+    // setup the gui
+    var guiControls = {
+      address : "Place Peyberland, Bordeaux",
+      altitude : 500,
+      hour : 14,
+      winter : false
+    };
+    var gui = new dat.GUI();
+    var addressControl = gui.add(guiControls, 'address');
+    var altitudeControler = gui.add(guiControls, 'altitude',100,3000);
+
     init();
     animate();
+
+    function geoCode(address) {
+      var url="http://maps.googleapis.com/maps/api/geocode/json?address=";
+      
+      return new Promise(function(resolve) {
+        $.getJSON(url+address,function(json){
+            var lon = json.results[0].geometry.location.lng;
+            var lat = json.results[0].geometry.location.lat;
+            console.log(lon,lat);
+            resolve({lon : lon, lat : lat});
+          });
+      });
+    }
+
+    function invLinX(x) {
+      return (x + 0.575803)*(123*200-125*200)/(-0.575803+0.570726) + 123*200;
+    }
+    function invLinY(y) {
+      return (y - 44.839642)*(112*200 - 113*200)/(44.841441 - 44.839642) + 113*200;
+    }
+
 
     // Sets up the scene.
     function init() {
@@ -136,23 +176,18 @@
       // Set the background color of the scene.
       renderer.setClearColorHex(0x333F47, 1);
 
-
-      function loadTiles(endpoint, south, north, east, west) {
-          console.log("query", south, north, east, west);
-          $.getJSON(endpoint + "&west="+west.toString()+"&south="+south.toString()+"&east="+east.toString()+"&north="+north.toString(), function(data) {console.log("eee")});
-      }
-
-      
-      endpointP.then(function(endpoint) {
-        loadTiles(endpoint, -100000,100000,100000,-100000);
+      endpointP.then(function(ep) {
+        endpoint = ep;
+        geoCode("peyberland bordeaux").then(function(coords) {
+          console.log("moving to",invLinX(coords.lon), invLinY(coords.lat), 300);
+          moveCamera(invLinX(coords.lon), invLinY(coords.lat), 300);
+        })
       });
 
 
       // Create a camera, zoom it out from the model a bit, and add it to the scene.
       camera = new THREE.PerspectiveCamera( 30, WIDTH / HEIGHT, 1, 5000 );
-      camera.position.set(20000, 21600, 300);
-      camera.up.set(0, 0, 1);
-      camera.lookAt(new THREE.Vector3( 20000, 21600, 0 ));
+      camera.up.set(0, 1, 0);
       scene.add(camera);
 
 
@@ -164,9 +199,49 @@
       light.shadowMapHeight = 2048;
       light.position.set(0,0,400);
       scene.add(light);
+
+
+      function loadTiles(endpoint, south, north, east, west) {
+          console.log("query", south, north, east, west);
+          $.getJSON(endpoint + "&west="+west.toString()+"&south="+south.toString()+"&east="+east.toString()+"&north="+north.toString(), function(data) {console.log("eee")});
+      }
+      function moveCamera(ncamx, ncamy, ncamz) {
+        camx = ncamx;
+        camy = ncamy;
+        camz = ncamz
+        camera.position.x = camx;
+        camera.position.y = camy;
+        camera.position.z = camz;
+        camera.lookAt(new THREE.Vector3( camx, camy, 0 ));
+
+        // visible bounding box
+        var L = 2 * camz * Math.tan(3.14*camera.fov/(2*180));
+        var l = L * WIDTH / HEIGHT;
+        // console.log(camera.position.x,camera.position.z);
+        // console.log(L, l);
+        // console.log("----------");
+        var south = camera.position.y - l/2;
+        var north = camera.position.y + l/2;
+        var west = camera.position.x - L/2;
+        var east = camera.position.x + L/2;
+        loadTiles(endpoint, south, north, east, west);
+        renderer.render(scene, camera);
+      };
+
+      addressControl.onFinishChange(function(value) {
+        geoCode(value).then(function(coords) {
+          console.log("moving to", invLinX(coords.lon), invLinY(coords.lat), camz)
+          moveCamera(invLinX(coords.lon), invLinY(coords.lat), camz);
+        })
+      });
+
+      altitudeControler.onFinishChange(function(value) {
+        camz = guiControls.altitude;
+        moveCamera(camx, camy, camz);
+      });
     
       // Add OrbitControls so that we can pan around with the mouse.
-      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      // controls = new THREE.OrbitControls(camera, renderer.domElement);
 
     }
 
@@ -179,7 +254,7 @@
       
       // Render the scene.
       renderer.render(scene, camera);
-      controls.update();
+      // controls.update();
 
     }
 
