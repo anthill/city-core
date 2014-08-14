@@ -9,6 +9,7 @@ var Map = require('es6-map');
 // defs
 var server = "//localhost";
 var PORT = 3000;
+var MAXY = 170;
 
 
 // polyfill
@@ -76,7 +77,7 @@ fs.readFile("front/data/metadata.json", 'utf8', function (err,data) {
   	var building = jsondata[file];
   	var X = building.X;
   	var Y = building.Y;
-  	var item = [building.xmin + X*200, building.ymin + Y*200, building.xmax + X*200, building.ymax+ Y*200, {name: file, X:X, Y:Y}];
+  	var item = [building.xmin + X*200, building.ymin + (MAXY-Y)*200, building.xmax + X*200, building.ymax+ (MAXY-Y)*200, {name: file, X:X, Y:Y}];
 	tree.insert(item);
   });
 

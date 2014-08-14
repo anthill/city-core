@@ -14,6 +14,7 @@
   <script src="ext/dat.gui.min.js"></script>
 
   <script>
+      var MAXY = 170;
 
       // useful functions
       // we'll transform x,y ranging from -nbx to nbx in 4096 int values
@@ -78,8 +79,7 @@
           wireframe: false
         }));
 
-        mesh.position.set(data.X * 200, data.Y * 200, 0);
-        console.log(data.X * 200, data.Y * 200);
+        mesh.position.set(data.X * 200, (MAXY - data.Y) * 200, 0);
         scene.add(mesh);
       }
 
@@ -143,7 +143,7 @@
       return (x + 0.575803)*(123*200-125*200)/(-0.575803+0.570726) + 123*200;
     }
     function invLinY(y) {
-      return (y - 44.839642)*(112*200 - 113*200)/(44.841441 - 44.839642) + 113*200;
+      return (y - 44.839642)*((MAXY - 112)*200 - (MAXY - 113)*200)/(44.841441 - 44.839642) + (MAXY - 113)*200;
     }
 
 
@@ -220,12 +220,11 @@
         // console.log(camera.position.x,camera.position.z);
         // console.log(L, l);
         // console.log("----------");
-        var south = camera.position.y - l/2;
-        var north = camera.position.y + l/2;
-        var west = camera.position.x - L/2;
-        var east = camera.position.x + L/2;
+        var south = camera.position.y - L/2;
+        var north = camera.position.y + L/2;
+        var west = camera.position.x - l/2;
+        var east = camera.position.x + l/2;
         loadTiles(endpoint, south, north, east, west);
-        renderer.render(scene, camera);
       };
 
       addressControl.onFinishChange(function(value) {
@@ -238,6 +237,7 @@
       altitudeControler.onFinishChange(function(value) {
         camz = guiControls.altitude;
         moveCamera(camx, camy, camz);
+        // camera.position.z = camz;
       });
     
       // Add OrbitControls so that we can pan around with the mouse.
