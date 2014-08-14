@@ -9,10 +9,10 @@ var unzip = require('unzip');
 var tmp = require('tmp');
 var Q = require('q');
 
-var containingCube = require('./src/containingCube.js');
-var computeMeshVolume = require('./src/computeMeshVolume.js');
-var _3dsFormatToAntsBinaryBuffer = require('./src/3dsFormatToAntsBinaryBuffer.js');
-var parse3ds = require('./src/parse3ds.js');
+var containingCube = require('../src/containingCube.js');
+var computeMeshVolume = require('../src/computeMeshVolume.js');
+var _3dsFormatToAntsBinaryBuffer = require('../src/3dsFormatToAntsBinaryBuffer.js');
+var parse3ds = require('../src/parse3ds.js');
 
 function tmpdir(){
     var def = Q.defer();
