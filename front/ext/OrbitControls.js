@@ -17,13 +17,13 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.center = new THREE.Vector3();
 
 	this.userZoom = true;
-	this.userZoomSpeed = 1.0;
+	this.userZoomSpeed = 0.0001;
 
 	this.userRotate = true;
 	this.userRotateSpeed = 1.0;
 
 	this.userPan = true;
-	this.userPanSpeed = 2.0;
+	this.userPanSpeed = 200.0;
 
 	this.autoRotate = false;
 	this.autoRotateSpeed = 2.0; // 30 seconds per round when fps is 60
@@ -187,7 +187,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		position.copy( this.center ).add( offset );
 
-		this.object.lookAt( this.center );
+		// this.object.lookAt( this.center );
 
 		thetaDelta = 0;
 		phiDelta = 0;
