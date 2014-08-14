@@ -85,7 +85,7 @@ fs.readFile("data/metadata.json", 'utf8', function (err,data) {
 
 // websocket: when a user connects we create a token
 var io = require('socket.io')(http);
-app.use("/ext", require('express').static(__dirname + '/ext'));
+app.use("/ext", require('express').static(__dirname + '/front/ext'));
 app.get('/', function(req, res){
   res.sendfile('index.html');
 });

@@ -1,18 +1,189 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <title>Bordeaux 3d</title>
+  <title>bordeaux3d</title>
   <meta charset="utf-8">
 </head>
 <body style="margin: 0;">
 
-  <script src="js/ext/three.min.js"></script>
-  <script src="js/ext/jquery-1.11.1.min.js"></script>
-  <script src="js/ext/dat.gui.min.js"></script>
 
-  <script src="js/PanZoomControls.js"></script>
-  <script src="js/SunPosition.js"></script>
-  <script src="js/fromApi.js"></script>
+  <script src="ext/three.js"></script>
+  <script src="ext/OrbitControls.js"></script>
+  <script src="ext/socket.io.js"></script>
+  <script src="ext/jquery-1.11.1.min.js"></script>
+
+  <script>
+
+      // useful functions
+      // we'll transform x,y ranging from -nbx to nbx in 4096 int values
+      var nbx = 150;
+      function transform(x) {
+          return 2*x*nbx/4095-nbx;
+      }
+
+      var nbz1 = -10;
+      var nbz2 = 117;
+      // we'll transform z ranging from nbz1 to nbz2 in 255 int values
+      function transformZ(z) {
+          return (z - 255)*(nbz2-nbz1)/255 +nbz2;
+      }
+
+      function parseGeom(data) {
+
+        var geometry = new THREE.Geometry();
+        var buffer = new DataView(data.buffer);
+        var offset = 0;
+
+        var verticesNb = buffer.getUint16(offset);
+        offset += 2;
+   
+        for(var i = 0 ; i < verticesNb ; i++){
+
+          var b1 = buffer.getUint8(offset);
+          offset++;
+          var b2 = buffer.getUint8(offset);
+          offset++;
+          var b3 = buffer.getUint8(offset);
+          offset++;
+
+          var x = transform(((b1 & 0xFF) << 4) + ((b2 & 0xF0) >> 4));
+          var y = transform(((b2 & 0x0F) << 8) + ((b3 & 0xFF) >> 0));
+
+          var z = transformZ( buffer.getUint8(offset) );
+          offset++;
+
+          // decompress en x, y, z
+          geometry.vertices.push(new THREE.Vector3(x, y, z));
+        }
+
+
+        var facesNb = buffer.getUint16(offset);
+        offset += 2;
+
+        var faces = [];
+        for(var i = 0 ; i < facesNb ; i++){
+          var a = buffer.getUint16(offset);
+          offset += 2;
+          var b = buffer.getUint16(offset);
+          offset += 2;
+          var c = buffer.getUint16(offset);
+          offset += 2;
+          geometry.faces.push(new THREE.Face3(a, b, c));
+        }
+
+        geometry.computeFaceNormals();
+        mesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({
+          color: 0xaaaaaa,
+          wireframe: false
+        }));
+
+        mesh.position.set(data.X * 200, data.Y * 200, 0);
+        console.log(data.X * 200, data.Y * 200);
+        scene.add(mesh);
+      }
+
+    //socket
+    var socket = io();
+    var endpointP = new Promise(function(resolve){
+      socket.on('endpoint', function(msg){
+        console.log("endpoint", msg);
+        resolve(msg);
+      });
+    });
+
+    // when receiving a building parse it
+    socket.on('building', function(msg){
+        parseGeom(msg);
+    });
+
+    // Set up the scene, camera, and renderer as global variables.
+    var scene, camera, renderer;
+
+    // global variables for time
+    var curHour = 10;
+    var seasonsMonth = [7, 11];
+    var curMonth = seasonsMonth[0];
+
+    init();
+    animate();
+
+    // Sets up the scene.
+    function init() {
+
+      // Create the scene and set the scene size.
+      scene = new THREE.Scene();
+
+      var WIDTH = window.innerWidth,
+          HEIGHT = window.innerHeight;
+
+      // Create a renderer and add it to the DOM.
+      renderer = new THREE.WebGLRenderer({antialias:true});
+      renderer.setSize(WIDTH, HEIGHT);
+      renderer.shadowMapEnabled = true;
+      renderer.shadowMapSoft = true;
+      document.body.appendChild(renderer.domElement);
+
+
+      // Create an event listener that resizes the renderer with the browser window.
+      window.addEventListener('resize', function() {
+        var WIDTH = window.innerWidth,
+            HEIGHT = window.innerHeight;
+        renderer.setSize(WIDTH, HEIGHT);
+        camera.aspect = WIDTH / HEIGHT;
+        camera.updateProjectionMatrix();
+      });
+
+      // Set the background color of the scene.
+      renderer.setClearColorHex(0x333F47, 1);
+
+
+      function loadTiles(endpoint, south, north, east, west) {
+          console.log("query", south, north, east, west);
+          $.getJSON(endpoint + "&west="+west.toString()+"&south="+south.toString()+"&east="+east.toString()+"&north="+north.toString(), function(data) {console.log("eee")});
+      }
+
+      
+      endpointP.then(function(endpoint) {
+        loadTiles(endpoint, -100000,100000,100000,-100000);
+      });
+
+
+      // Create a camera, zoom it out from the model a bit, and add it to the scene.
+      camera = new THREE.PerspectiveCamera( 30, WIDTH / HEIGHT, 1, 5000 );
+      camera.position.set(20000, 21600, 300);
+      camera.up.set(0, 0, 1);
+      camera.lookAt(new THREE.Vector3( 20000, 21600, 0 ));
+      scene.add(camera);
+
+
+      var light = new THREE.DirectionalLight(0xffffff, 1);
+      light.lookAt([0,0,0]);
+      light.castShadow = true;
+      light.shadowDarkness = 0.6;
+      light.shadowMapWidth = 2048;
+      light.shadowMapHeight = 2048;
+      light.position.set(0,0,400);
+      scene.add(light);
+    
+      // Add OrbitControls so that we can pan around with the mouse.
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+    }
+
+
+    // Renders the scene and updates the render as needed.
+    function animate() {
+
+      // Read more about requestAnimationFrame at http://www.paulirish.com/2011/requestanimationframe-for-smart-animating/
+      requestAnimationFrame(animate);
+      
+      // Render the scene.
+      renderer.render(scene, camera);
+      controls.update();
+
+    }
+
+  </script>
 
 </body>
 </html>
