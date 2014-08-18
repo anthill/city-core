@@ -1,3 +1,5 @@
 .DS_Store
 front/data
 node_modules
+
+data/

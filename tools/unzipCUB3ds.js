@@ -283,7 +283,7 @@ unzipInTmpDir(zipAbsolutePath)
             })
         });
 
-        //console.log('nb of metadata keys', Object.keys(metadata).length);
+        console.log('nb of metadata keys', Object.keys(metadata).length);
 
         return writeFile(path.join(outAbsolutePath, 'metadata.json'), JSON.stringify(metadata, null, 3));
 
