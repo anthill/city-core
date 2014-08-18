@@ -9,7 +9,7 @@ var fs = require("fs");
 */
 
 var chunkUtils = (function(){
-    
+
     var chunkIds = {
         "Main": 0x4d4d,
         "M3D Version": 0x0002,
@@ -27,7 +27,7 @@ var chunkUtils = (function(){
         "Camera": 0x4700,
         "Material Block": 0xAFFF
     };
-    
+
     var children = {
         "Main" : [
             chunkIds["M3D Version"],
@@ -96,7 +96,7 @@ var chunkUtils = (function(){
         var value = chunkIds[name];
         chunkNameById[value] = name;
     });
-    
+
     return {
         getChunkName: function(id){
             return chunkNameById[id];
@@ -108,7 +108,7 @@ var chunkUtils = (function(){
             return chunkIds[name];
         }
     }
-    
+
 })();
 
 
@@ -121,31 +121,45 @@ var chunkUtils = (function(){
 // buff only contains the content (length and type have been stripped out)
 function Chunk(buff, type){
     //if(type === "Vertices List")
-      //  console.log('Creating Vertices List chunk', buff.length)
-    
+    //  console.log('Creating Vertices List chunk', buff.length)
+
     var children = [];
-    
+
     var childTypeValue, childType;
     var childLength;
-    
+
     var childrenIds = chunkUtils.getPotentialChildrenIds(type);
-    
+
     // search for own data
     var ownDataLength = 0;    
     var cursor = 0;
-    
-    while(cursor < buff.length - 2){
-        childTypeValue = buff.readUInt16LE(cursor);
-        if(childrenIds.indexOf(childTypeValue) !== -1)
-            break;
-        cursor += 1;
+
+    if(type === "Vertices List" || type === "Faces Description"){
+        if(type === "Vertices List"){
+            var verticesNumber = buff.readUInt16LE(cursor);   
+            ownDataLength = 2 + 12*verticesNumber;
+        }
+        if(type === "Faces Description"){
+            var facesNumber = buff.readUInt16LE(cursor);   
+            ownDataLength = 2 + 8*facesNumber;
+        }
+        
+        cursor = ownDataLength;
     }
-    
-    ownDataLength = cursor < buff.length - 2 ? cursor : buff.length;
-    
+    else{
+        while(cursor < buff.length - 2){
+            childTypeValue = buff.readUInt16LE(cursor);
+            if(childrenIds.indexOf(childTypeValue) !== -1)
+                break;
+            cursor += 1;
+        }
+
+        ownDataLength = cursor < buff.length - 2 ? cursor : buff.length;
+    }
+
     if(ownDataLength > buff.length)
         throw new RangeError();
-    
+
     // look for children
     while(cursor < buff.length -2){
         childTypeValue = buff.readUInt16LE(cursor);
@@ -155,7 +169,7 @@ function Chunk(buff, type){
 
         if(childrenIds.indexOf(childTypeValue) !== -1){
             //if(type === "Triangular Mesh")
-              //  console.log(type, 'creating child chunk of length from',  cursor + 6, 'to', cursor + childLength)
+            //  console.log(type, 'creating child chunk of length from',  cursor + 6, 'to', cursor + childLength)
             children.push(Chunk(buff.slice(cursor + 6, cursor + childLength), childType));
         }
         else{
@@ -163,7 +177,7 @@ function Chunk(buff, type){
         }
         cursor += childLength;
     }
-    
+
     var ret = {
         get type(){
             return type;
@@ -172,19 +186,19 @@ function Chunk(buff, type){
             return buff.slice(0, ownDataLength);
         },
         children : children,
-        
+
         toString: function(indent){
             indent = indent || 0;
-            
+
             var spaces = '';
             for(var i = 0; i < indent ; i++)
                 spaces += ' ';
-            
+
             return spaces + this.type + ' ' + (ownDataLength) + ' ' + (buff.length) + '\n' +
                 this.children.map(function(chunk){ return chunk.toString(indent+2); }).join('');
         }
     };
-    
+
     // TODO make mixins for these and move this code away
     if(type === "Object Block"){
         Object.defineProperty(ret, "meshes", {
@@ -223,77 +237,78 @@ function Chunk(buff, type){
                 var data = this.ownData;
 
                 var cursor = 0;
-                
+
                 var verticesNumber = data.readUInt16LE(cursor);
                 cursor += 2;
-                
+
                 //console.log(verticesNumber);
                 var vertices = [];
-                
-                while(cursor < data.length){
+
+                while(verticesNumber > 0){
                     vertices.push({
                         x: data.readFloatLE(cursor),
                         y: data.readFloatLE(cursor+4),
                         z: data.readFloatLE(cursor+8)
                     });
-                    
+
                     cursor += 12;
+                    verticesNumber--;
                 }
-                
+
                 return vertices;
             }
         });
     }
-    
+
     if(type === "Faces Description"){
         Object.defineProperty(ret, "faces", {
             get: function(){
                 var data = this.ownData;
 
                 var cursor = 0;
-                
+
                 var facesNumber = data.readUInt16LE(cursor);
                 cursor += 2;
-                
+
                 var faces = [];
                 var flags;
-                
+
                 while(facesNumber > 0){
                     faces.push({
                         a: data.readUInt16LE(cursor),
                         b: data.readUInt16LE(cursor+2),
                         c: data.readUInt16LE(cursor+4)
                     });
-                    
+
                     // pasing flags, but not using them.
                     flags = data.readUInt16LE(cursor+6);
-                    
+
                     cursor += 8;
                     facesNumber--;
                 }
-                
+
                 return faces;
             }
         });
     }
-    
-    
-    
+
+
+
     return ret;
 }
 
 function Parsed3DSFile(buff){
-    
+
     var typeValue = buff.readUInt16LE(0);
     var type = chunkUtils.getChunkName(typeValue);
     if(type !== "Main"){
         throw new Error('First chunk should be "Main". It is '+type+' (0x'+typeValue.toString(16)+')')
     }
     var length = buff.readUInt32LE(2);
-    
+
     return {
         "Main": Chunk(buff.slice(6, length), type),
-        
+
         toString: function(){
             return this["Main"].toString();
         },
@@ -301,11 +316,11 @@ function Parsed3DSFile(buff){
             var editorChunk = this["Main"].children[1];
             if(editorChunk.type !== "3D Editor Chunk")
                 throw new Error();
-            
+
             return editorChunk.children.filter(function(c){
                 return c.type === "Object Block"
             })
-            
+
         }
     }
 }
