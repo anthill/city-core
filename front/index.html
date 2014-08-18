@@ -3,18 +3,23 @@
 <head>
   <title>bordeaux3d</title>
   <meta charset="utf-8">
-</head>
-<body style="margin: 0;">
-
-
+  <script src="ext/harmony-collections.js"></script>
   <script src="ext/three.js"></script>
   <script src="ext/OrbitControls.js"></script>
   <script src="ext/socket.io.js"></script>
   <script src="ext/jquery-1.11.1.min.js"></script>
   <script src="ext/dat.gui.min.js"></script>
+  <script src="ext/rbush.js"></script>
+</head>
+<body style="margin: 0;">
 
   <script>
+    (function(global){
+      'use strict';
+
       var MAXY = 170;
+      var buildingMap = new Map();
+      var rTree = rbush(100000);
 
       // useful functions
       // we'll transform x,y ranging from -nbx to nbx in 4096 int values
@@ -74,13 +79,13 @@
         }
 
         geometry.computeFaceNormals();
-        mesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({
+        var mesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({
           color: 0xaaaaaa,
           wireframe: false
         }));
-
-        mesh.position.set(data.X * 200, (MAXY - data.Y) * 200, 0);
+        mesh.position.set(jsondata[data.id]["X"] * 200, (MAXY - jsondata[data.id]["Y"]) * 200, 0);
         scene.add(mesh);
+        return mesh;
       }
 
     //socket
@@ -95,7 +100,9 @@
     // when receiving a building parse it
     socket.on('building', function(msg){
       try {
-        parseGeom(msg);
+        var mesh = parseGeom(msg);
+        // add to map
+        buildingMap.set(msg.id, {mesh:mesh, visible:true});
       } catch (e) {
         console.error(e);
       }
@@ -110,7 +117,8 @@
     var curMonth = seasonsMonth[0];
 
     var camx, camy, camz;
-    var endpoint;
+    var token;
+    var jsondata;
 
     // setup the gui
     var guiControls = {
@@ -176,8 +184,20 @@
       // Set the background color of the scene.
       renderer.setClearColorHex(0x333F47, 1);
 
-      endpointP.then(function(ep) {
-        endpoint = ep;
+      endpointP.then(function(msg) {
+        token = msg.token;
+
+        // fill the rtree
+        jsondata = JSON.parse(msg.metadata);
+
+        Object.keys(jsondata).forEach(function(id) {
+          var building = jsondata[id];
+          var X = building.X;
+          var Y = building.Y;
+          var item = [building.xmin + X*200, building.ymin + (MAXY-Y)*200, building.xmax + X*200, building.ymax+ (MAXY-Y)*200, {id: id, X:X, Y:Y}];
+          rTree.insert(item);
+        });
+
         geoCode("peyberland bordeaux").then(function(coords) {
           console.log("moving to",invLinX(coords.lon), invLinY(coords.lat), 300);
           moveCamera(invLinX(coords.lon), invLinY(coords.lat), 300);
@@ -201,10 +221,35 @@
       scene.add(light);
 
 
-      function loadTiles(endpoint, south, north, east, west) {
+      function loadTiles(south, north, east, west) {
           console.log("query", south, north, east, west);
-          $.getJSON(endpoint + "&west="+west.toString()+"&south="+south.toString()+"&east="+east.toString()+"&north="+north.toString(), function(data) {console.log("eee")});
+          // query the rtree to know what building are needed
+          var results = rTree.search([west, south, east, north]);
+
+          //remove all buildings from scene
+          buildingMap.forEach(function(building){
+            building.visible = false;
+            scene.remove(building.mesh);
+          });
+
+          results.forEach(function(result) {
+            if (buildingMap.has(result[4].id) === false){
+              // not in the map => ask the backend
+              socket.emit('object', {token : token, id : result[4].id});
+            } else { // in the map
+              var entry = buildingMap.get(result[4].id);
+              // if not visible, added back to the scene
+              scene.add(entry.mesh);
+              entry.visible = true;
+            }
+            
+          });
+
+          var buildings = results.forEach(function(result) {
+            
+          });
       }
+
       function moveCamera(ncamx, ncamy, ncamz) {
         camx = ncamx;
         camy = ncamy;
@@ -224,7 +269,7 @@
         var north = camera.position.y + L/2;
         var west = camera.position.x - l/2;
         var east = camera.position.x + l/2;
-        loadTiles(endpoint, south, north, east, west);
+        loadTiles(south, north, east, west);
       };
 
       addressControl.onFinishChange(function(value) {
@@ -241,8 +286,8 @@
     
       // add controls
       var keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40, ROTATE: 65, ZOOM: 83, PAN: 68 };
-      userPanSpeed = 200.0;
-      pan = function ( distance ) {
+      var userPanSpeed = 200.0;
+      function pan ( distance ) {
         camx = camera.position.x + distance.x*userPanSpeed;
         camy = camera.position.y + distance.y*userPanSpeed;
         moveCamera(camx, camy, camz);
@@ -295,6 +340,8 @@
 
     }
 
+
+    })(window);
   </script>
 
 </body>
