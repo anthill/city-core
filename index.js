@@ -101,21 +101,13 @@ var metadataP = new Promise(function(resolve, reject){
         
         resolve(data);
     });
-})
-
-var clients = Map();
-
+});
 
 io.on('connection', function (socket) {
-	
-    var token = randomString(12);
-    // sending metadata + token
     
     metadataP.then(function(metadataString){
-        socket.emit('endpoint', {token: token, metadata : metadataString});
+        socket.emit('endpoint', {metadata : metadataString});
     });
-  
-	clients.set(token, socket);
 
     //when receiving queries send back the data
     socket.on('object', function (msg) {
@@ -123,7 +115,7 @@ io.on('connection', function (socket) {
       
         //console.log('asked object', msg.id);
         fs.readFile(path, function (err, data) {
-            clients.get(msg.token).emit("building", {id : msg.id, buffer : data});
+            socket.emit("building", {id : msg.id, buffer : data});
         });
 
     });
