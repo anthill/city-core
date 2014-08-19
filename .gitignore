@@ -3,3 +3,4 @@ front/data
 node_modules
 
 data/
+front/app.js

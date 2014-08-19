@@ -1,14 +1,20 @@
 "use strict";
 
+var path = require('path');
+var fs = require("fs");
+
+var Map = require('es6-map');
+var Promise = require('es6-promise').Promise;
+
 var app = require('express')();
 var http = require('http').createServer(app);
-var fs = require("fs");
-var Map = require('es6-map');
 
 // defs
 var server = "//localhost";
 var PORT = 3000;
 var MAXY = 170;
+
+process.title = 'Bdx3d server';
 
 
 // polyfill
@@ -67,33 +73,52 @@ function randomString(length){
 
 // websocket: when a user connects we create a token
 var io = require('socket.io')(http);
-app.use("/ext", require('express').static(__dirname + '/front/ext'));
+//app.use("/ext", require('express').static(__dirname + '/front/ext'));
 app.get('/', function(req, res){
-  res.sendfile('front/index.html');
+  res.sendFile(path.join(__dirname, 'front/index.html'));
+});
+app.get('/app.js', function(req, res){
+  res.sendFile(path.join(__dirname, 'front/app.js'));
 });
 
 
+var metadataP = new Promise(function(resolve, reject){
+    fs.readFile("front/data/metadata.json", 'utf8', function (err, data){
+        if(err){
+            reject(err);
+            return;
+        }
+        
+        var dataObj = JSON.parse(data);
+        
+        dataObj = Object.keys(dataObj).reduce(function(acc, k){
+            acc[k] = dataObj[k];
+            return acc;
+        }, {})
+        
+        data = JSON.stringify(dataObj);
+        console.log('metadata length', data.length);
+        
+        resolve(data);
+    });
+});
 
-
-var clients = Map();
 io.on('connection', function (socket) {
-	// create token
-	var token = randomString(12);
-  // sending metadata + tocken
-  fs.readFile("front/data/metadata.json", 'utf8', function (err, data) {
-    if (err) console.log(err);
-  	socket.emit('endpoint', {token: token, metadata : data});
-  });
-	clients.set(token, socket);
-
-  //when receiving queries send back the data
-  socket.on('object', function (msg) {
-    var path = "front/data/" + msg.id
-    fs.readFile(path, function (err, data) {
-      clients.get(msg.token).emit("building", {id : msg.id, buffer : data});
+    
+    metadataP.then(function(metadataString){
+        socket.emit('endpoint', {metadata : metadataString});
     });
 
-  });
+    //when receiving queries send back the data
+    socket.on('object', function (msg) {
+        var path = "front/data/" + msg.id;
+      
+        //console.log('asked object', msg.id);
+        fs.readFile(path, function (err, data) {
+            socket.emit("building", {id : msg.id, buffer : data});
+        });
+
+    });
 
 });
 
