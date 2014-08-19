@@ -91,7 +91,7 @@ var metadataP = new Promise(function(resolve, reject){
         
         var dataObj = JSON.parse(data);
         
-        dataObj = Object.keys(dataObj).slice(40000, 50000).reduce(function(acc, k){
+        dataObj = Object.keys(dataObj).reduce(function(acc, k){
             acc[k] = dataObj[k];
             return acc;
         }, {})
