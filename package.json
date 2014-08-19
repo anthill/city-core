@@ -13,7 +13,10 @@
     "es6-promise": "^1.0.0",
     "express": "^4.8.3",
     "socket.io": "^1.0.6",
-    "three": "^0.68.0"
+    "three": "~0.68.0",
+    "harmony-collections": "~0.3.8",
+    "socket.io-client": "~1.0.6",
+    "dat-gui": "~0.5.0"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
