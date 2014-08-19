@@ -1,14 +1,17 @@
 'use strict';
 
+var THREE = require('three');
+var moveCamera = require('./moveCamera.js');
+
 module.exports = function(camera){
 
     // add controls
     var keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40, ROTATE: 65, ZOOM: 83, PAN: 68 };
-    var userPanSpeed = 200.0;
+    var userPanSpeed = 50.0;
     function pan ( distance ) {
         var camx = camera.position.x + distance.x*userPanSpeed;
         var camy = camera.position.y + distance.y*userPanSpeed;
-        moveCamera(camx, camy, camz);
+        moveCamera(camera)(camx, camy, undefined);
     };
 
     function onKeyDown( event ) {
@@ -28,19 +31,6 @@ module.exports = function(camera){
         }
     }
 
-    function onKeyUp( event ) {
-
-        switch ( event.keyCode ) {
-
-            case keys.ROTATE:
-            case keys.ZOOM:
-            case keys.PAN:
-                state = STATE.NONE;
-                break;
-        }
-
-    }
-    window.addEventListener( 'keydown', onKeyDown, false );
-    window.addEventListener( 'keyup', onKeyUp, false );
+    window.addEventListener( 'keydown', onKeyDown );
 }
 

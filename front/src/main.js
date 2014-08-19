@@ -29,8 +29,9 @@ var moveCamera = require('./moveCamera.js')(camera, function(camera){
     loadTiles(south, north, east, west);
 });
 
-var MAX_Y = require('./MAX_Y');
+var MAX_Y = require('./MAX_Y.js');
 
+var GeoConverter = require('./geoConverter.js');
 
 // TODO change values on resize
 var WIDTH = window.innerWidth,
@@ -45,12 +46,14 @@ window.addEventListener('resize', function() {
     camera.updateProjectionMatrix();
 });
 
-function invLinX(x) {
-    return (x + 0.575803)*(123*200-125*200)/(-0.575803+0.570726) + 123*200;
-}
-function invLinY(y) {
-    return (y - 44.839642)*((MAX_Y - 112)*200 - (MAX_Y - 113)*200)/(44.841441 - 44.839642) + (MAX_Y - 113)*200;
-}
+// initialise the geoconverter that will pass from a shifted lambert cc 45 to lon, lat and reverse
+// the map is shifted
+// -0.583232, 44.839270 corresponds to 1416800.1046884255, 4188402.562212417 in lambert 45
+// and to (X=119) * 200 + (x=100), (MAX_Y-(Y=115))*200 + (y=100) in the map
+var deltaX = 1416800.1046884255 - 119*200 - 100;
+var deltaY = 4188402.562212417 - (MAX_Y-115)*200 - 100;
+var geoConverter = new GeoConverter(45, deltaX, deltaY);
+
 
 serverCommunication.metadataP.then(function(metadata) {
 
@@ -63,15 +66,17 @@ serverCommunication.metadataP.then(function(metadata) {
     });
 
     geoCode("peyberland bordeaux").then(function(coords) {
-        console.log("moving to", invLinX(coords.lon), invLinY(coords.lat), 300);
-        moveCamera(invLinX(coords.lon), invLinY(coords.lat), 300);
+        var newPosition = geoConverter.toLambert(coords.lon, coords.lat);
+        console.log("moving to", newPosition);
+        moveCamera(newPosition.X, newPosition.Y, 300);
     })
 });
 
 gui.addressControler.onFinishChange(function(value) {
     geoCode(value).then(function(coords) {
-        console.log("moving to", invLinX(coords.lon), invLinY(coords.lat), camz)
-        moveCamera(invLinX(coords.lon), invLinY(coords.lat), camz);
+        var newPosition = geoConverter.toLambert(coords.lon, coords.lat);
+        console.log("moving to", newPosition);
+        moveCamera(newPosition.X, newPosition.Y, 300);
     })
 });
 
