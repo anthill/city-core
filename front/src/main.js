@@ -32,7 +32,7 @@ var moveCamera = require('./moveCamera.js')(camera, function(camera){// visible 
 var MAX_Y = require('./MAX_Y.js');
 
 var GeoConverter = require('./geoConverter.js');
-var sunCalculator = require('./sunPosition.js');
+var SunCalc = require('suncalc');
 
 // TODO change values on resize
 var WIDTH = window.innerWidth,
@@ -83,22 +83,19 @@ gui.altitudeControler.onFinishChange(function(value) {
     moveCamera(undefined, undefined, camz);
 });
 
-var sunPosition = new sunCalculator(-0.6056232, 44.8272294);
 
 gui.hourControler.onChange(function(value) {
-    var curHour = guiControls.hour;
-    var seasonsMonth = [7, 11];
-    var curMonth = guiControls.winter ? seasonsMonth[1] : seasonsMonth[0];
+    // get today's sunlight times for Bordeaux
+    var date = new Date();
+    date.setHours(value);
 
-    var date = new Date(2014, curMonth, 5, curHour, 0, 0);
-    var pos = sunPosition(date);
-    var radius = 300;
-    var lightX = radius * Math.cos(pos.azimuth);
-    var lightY = radius * Math.sin(pos.azimuth);
-    var lightZ = radius * Math.tan(pos.altitude);
+    var sunPos = SunCalc.getPosition(date, -0.573781, 44.840484);
+
+    var radius = 30000;
+    var lightX = radius * Math.cos(sunPos.azimuth);
+    var lightY = radius * Math.sin(sunPos.azimuth);
+    var lightZ = radius * Math.tan(sunPos.altitude);
     light.position.set(lightX, lightY, lightZ);
 });
 
-gui.seasonControler.onChange(function(value) {
-});
 
