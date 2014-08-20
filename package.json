@@ -15,7 +15,9 @@
     "socket.io": "^1.0.6",
     "socket.io-client": "~1.0.6",
     "suncalc": "^1.5.2",
-    "three": "~0.68.0"
+    "three": "~0.68.0",
+    "event-emitter": "~0.3.1",
+    "es6-map": "~0.1.0"
   },
   "devDependencies": {
     "grunt": "^0.4.5",

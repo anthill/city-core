@@ -2,6 +2,8 @@
 
 var THREE = require('three');
 
+var CameraProxy = require('./CameraProxy');
+
 // global variables for time
 var curHour = 10;
 var seasonsMonth = [7, 11];
@@ -57,7 +59,7 @@ scene.add(light);
 
 module.exports = {
     scene: scene,
-    camera: camera,
+    camera: CameraProxy(camera),
     light: light,
     renderer: renderer
 };

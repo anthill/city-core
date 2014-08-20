@@ -1,7 +1,6 @@
 'use strict';
 
 var THREE = require('three');
-var moveCamera = require('./moveCamera.js');
 
 module.exports = function(camera){
 
@@ -11,10 +10,14 @@ module.exports = function(camera){
     function pan ( distance ) {
         var camx = camera.position.x + distance.x*userPanSpeed;
         var camy = camera.position.y + distance.y*userPanSpeed;
-        moveCamera(camera)(camx, camy, undefined);
+        camera.position.x = camx;
+        camera.position.y = camy;
+        
+        camera.lookAtVector = new THREE.Vector3( camx, camy, 0 );
     };
 
     function onKeyDown( event ) {
+        event.preventDefault();
         switch ( event.keyCode ) {
             case keys.UP:
                 pan( new THREE.Vector3( 0, 1, 0 ) );
