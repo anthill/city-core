@@ -10,10 +10,8 @@
   "license": "MIT",
   "dependencies": {
     "dat-gui": "~0.5.0",
-    "es6-map": "^0.1.0",
     "es6-promise": "^1.0.0",
     "express": "^4.8.3",
-    "harmony-collections": "~0.3.8",
     "socket.io": "^1.0.6",
     "socket.io-client": "~1.0.6",
     "suncalc": "^1.5.2",
