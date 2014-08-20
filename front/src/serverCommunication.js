@@ -25,6 +25,8 @@ socket.on('building', function(msg){
         scene.add(mesh);
         
         buildingMap.set(msg.id, {mesh:mesh, visible:true});
+    }).catch(function(err){
+        console.error(err);
     });
 
 });
