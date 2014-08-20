@@ -5,15 +5,15 @@ var THREE = require('three');
 
 module.exports = function(camera, cameraMovedCallback){
     
-    return function moveCamera(ncamx, ncamy, ncamz) {
-        if(typeof ncamx === 'number')
-            camera.position.x = ncamx;
+    return function moveObject(x, y, z) {
+        if(typeof x === 'number')
+            camera.position.x = x;
         
-        if(typeof ncamy === 'number')
-            camera.position.y = ncamy;
+        if(typeof y === 'number')
+            camera.position.y = y;
         
-        if(typeof ncamz === 'number')
-            camera.position.z = ncamz;
+        if(typeof z === 'number')
+            camera.position.z = z;
         
         camera.lookAt(new THREE.Vector3( camera.position.x, camera.position.y, 0 ));
         if(cameraMovedCallback)

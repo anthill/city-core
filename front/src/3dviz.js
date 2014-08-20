@@ -34,7 +34,7 @@ scene.add(camera);
 
 
 var light = new THREE.DirectionalLight(0xffffff, 1);
-light.lookAt([0,0,0]);
+light.lookAt([10000,24100,0]);
 light.castShadow = true;
 light.shadowDarkness = 0.6;
 light.shadowMapWidth = 2048;
@@ -58,5 +58,6 @@ scene.add(light);
 module.exports = {
     scene: scene,
     camera: camera,
+    light: light,
     renderer: renderer
 };
