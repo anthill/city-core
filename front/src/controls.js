@@ -4,6 +4,8 @@ var THREE = require('three');
 
 module.exports = function(camera){
 
+    var moveCamera = _moveCamera(camera);
+    
     // add controls
     var keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40, ROTATE: 65, ZOOM: 83, PAN: 68 };
     var userPanSpeed = 50.0;
@@ -38,6 +40,10 @@ module.exports = function(camera){
         }
     }
 
+<<<<<<< HEAD
     window.addEventListener( 'keydown', onKeyDown );
+=======
+    window.addEventListener( 'keypress', onKeyDown );
+>>>>>>> first shot at first-person controls
 }
 
