@@ -12,11 +12,11 @@ var loadTiles = require('./loadTiles.js');
 var _3dviz = require('./3dviz.js');
 var scene = _3dviz.scene;
 var camera = _3dviz.camera;
+var light = _3dviz.light;
 var renderer = _3dviz.renderer;
 
 var controls = require('./controls.js')(camera);
-var moveCamera = require('./moveCamera.js')(camera, function(camera){
-    // visible bounding box
+var moveCamera = require('./moveCamera.js')(camera, function(camera){// visible bounding box
     var L = 2 * camera.position.z * Math.tan(3.14*camera.fov/(2*180));
     var l = L * WIDTH / HEIGHT;
     // console.log(camera.position.x,camera.position.z);
@@ -32,6 +32,7 @@ var moveCamera = require('./moveCamera.js')(camera, function(camera){
 var MAX_Y = require('./MAX_Y.js');
 
 var GeoConverter = require('./geoConverter.js');
+var sunCalculator = require('./sunPosition.js');
 
 // TODO change values on resize
 var WIDTH = window.innerWidth,
@@ -65,17 +66,14 @@ serverCommunication.metadataP.then(function(metadata) {
         rTree.insert(item);
     });
 
-    geoCode("peyberland bordeaux").then(function(coords) {
+    geoCode(guiControls.address).then(function(coords) {
         var newPosition = geoConverter.toLambert(coords.lon, coords.lat);
-        console.log("moving to", newPosition);
-        moveCamera(newPosition.X, newPosition.Y, 300);
-    })
+        moveCamera(newPosition.X, newPosition.Y, 300); })
 });
 
 gui.addressControler.onFinishChange(function(value) {
     geoCode(value).then(function(coords) {
         var newPosition = geoConverter.toLambert(coords.lon, coords.lat);
-        console.log("moving to", newPosition);
         moveCamera(newPosition.X, newPosition.Y, 300);
     })
 });
@@ -85,6 +83,22 @@ gui.altitudeControler.onFinishChange(function(value) {
     moveCamera(undefined, undefined, camz);
 });
 
+var sunPosition = new sunCalculator(-0.6056232, 44.8272294);
 
+gui.hourControler.onChange(function(value) {
+    var curHour = guiControls.hour;
+    var seasonsMonth = [7, 11];
+    var curMonth = guiControls.winter ? seasonsMonth[1] : seasonsMonth[0];
 
+    var date = new Date(2014, curMonth, 5, curHour, 0, 0);
+    var pos = sunPosition(date);
+    var radius = 300;
+    var lightX = radius * Math.cos(pos.azimuth);
+    var lightY = radius * Math.sin(pos.azimuth);
+    var lightZ = radius * Math.tan(pos.altitude);
+    light.position.set(lightX, lightY, lightZ);
+});
+
+gui.seasonControler.onChange(function(value) {
+});
 

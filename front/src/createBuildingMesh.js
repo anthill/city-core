@@ -73,6 +73,8 @@ module.exports = function createBuildingMesh(buffer, X, Y) {
     }));
     
     mesh.position.set(X*200, (MAXY - Y)*200, 0);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
     
     return mesh;
 }

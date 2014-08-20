@@ -12,9 +12,13 @@ var guiControls = {
 var gui = new dat.GUI();
 var addressControler = gui.add(guiControls, 'address');
 var altitudeControler = gui.add(guiControls, 'altitude',100,3000);
+var hourControler = gui.add(guiControls, 'hour',0, 24);
+var seasonControler = gui.add(guiControls, 'winter',false);
 
 module.exports = {
     guiControls: guiControls,
     addressControler: addressControler,
-    altitudeControler: altitudeControler
+    altitudeControler: altitudeControler,
+    hourControler: hourControler,
+    seasonControler: seasonControler
 };

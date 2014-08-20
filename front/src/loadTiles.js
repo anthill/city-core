@@ -10,8 +10,6 @@ module.exports = function loadTiles(south, north, east, west) {
     // query the rtree to know what building are needed
     var results = rTree.search([west, south, east, north]);
 
-    console.log("query results", results);
-
     //remove all buildings from scene
     buildingMap.forEach(function(building){
         building.visible = false;
