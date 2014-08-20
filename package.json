@@ -1,7 +1,8 @@
 {
-  "name": "backend-node",
+  "name": "Bordeaux-3d",
   "version": "0.0.0",
   "description": "A simple implementation of the backend for the bordeaux3d project",
+  "repository": "https://github.com/anthill/bordeaux3d",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -16,7 +17,9 @@
     "three": "~0.68.0",
     "harmony-collections": "~0.3.8",
     "socket.io-client": "~1.0.6",
-    "dat-gui": "~0.5.0"
+    "dat-gui": "~0.5.0",
+    "rbush": "~1.3.2",
+    "event-emitter": "~0.3.1"
   },
   "devDependencies": {
     "grunt": "^0.4.5",

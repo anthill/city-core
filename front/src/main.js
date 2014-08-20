@@ -14,7 +14,10 @@ var scene = _3dviz.scene;
 var camera = _3dviz.camera;
 var renderer = _3dviz.renderer;
 
-var controls = require('./controls.js')(camera);
+//var controls = require('./controls.js')(camera);
+var controls = require('./FirstPersonControls.js')(camera, renderer.domElement);
+
+
 var moveCamera = require('./moveCamera.js')(camera, function(camera){
     // visible bounding box
     var L = 2 * camera.position.z * Math.tan(3.14*camera.fov/(2*180));
@@ -62,10 +65,12 @@ serverCommunication.metadataP.then(function(metadata) {
         rTree.insert(item);
     });
 
-    geoCode("peyberland bordeaux").then(function(coords) {
+    // load unconditionnally
+    loadTiles(11065.111059952906, 11270.186327486968, 24849.239355716505, 24233.21091018855);
+    /*geoCode("peyberland bordeaux").then(function(coords) {
         console.log("moving to", invLinX(coords.lon), invLinY(coords.lat), 300);
         moveCamera(invLinX(coords.lon), invLinY(coords.lat), 300);
-    })
+    });*/
 });
 
 gui.addressControler.onFinishChange(function(value) {
@@ -79,6 +84,8 @@ gui.altitudeControler.onFinishChange(function(value) {
     var camz = guiControls.altitude;
     moveCamera(undefined, undefined, camz);
 });
+
+
 
 
 
