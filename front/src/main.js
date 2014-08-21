@@ -4,6 +4,7 @@ var SunCalc = require('suncalc');
 var THREE = require('three');
 
 var serverCommunication = require('./serverCommunication.js');
+var weakMap = serverCommunication.weakMap;
 var gui = require('./gui.js');
 var guiControls = gui.guiControls;
 
@@ -17,6 +18,8 @@ var scene = _3dviz.scene;
 var camera = _3dviz.camera;
 var light = _3dviz.light;
 var renderer = _3dviz.renderer;
+
+var raycasting = require('./raycasting.js')(camera, scene);
 
 var controls = require('./controls.js')(camera);
 
@@ -90,6 +93,13 @@ gui.hourControler.onChange(function(value) {
     var lightZ = radius * Math.tan(sunPos.altitude);
     light.position.set(lightX, lightY, lightZ);
 });
+
+window.addEventListener( 'meshClicked', function onMeshClicked(event){
+    var detail = event.detail;
+    console.log('Id', weakMap.get(detail.mesh).id);
+    console.log('Intersection: X=',  detail.point.x, 'Y=', detail.point.y, 'Z=', detail.point.z);
+} );
+
 
 
 
