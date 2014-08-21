@@ -60,7 +60,7 @@ serverCommunication.metadataP.then(function(metadata) {
     geoCode(guiControls.address).then(function(coords) {
         var newPosition = geoConverter.toLambert(coords.lon, coords.lat);
         camera.position = new THREE.Vector3(newPosition.X, newPosition.Y, 300);
-        camera.lookAtVector = new THREE.Vector3(newPosition.X, newPosition.Y, 0);
+        camera.lookAt( new THREE.Vector3(newPosition.X, newPosition.Y, 0) );
     })
 });
 
@@ -68,7 +68,7 @@ gui.addressControler.onFinishChange(function(value) {
     geoCode(value).then(function(coords) {
         var newPosition = geoConverter.toLambert(coords.lon, coords.lat);
         camera.position = new THREE.Vector3(newPosition.X, newPosition.Y, 300);
-        camera.lookAtVector = new THREE.Vector3(newPosition.X, newPosition.Y, 0);
+        camera.lookAt( new THREE.Vector3(newPosition.X, newPosition.Y, 0) );
     })
 });
 

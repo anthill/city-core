@@ -13,7 +13,7 @@ module.exports = function(camera){
         camera.position.x = camx;
         camera.position.y = camy;
         
-        camera.lookAtVector = new THREE.Vector3( camx, camy, 0 );
+        camera.lookAt( new THREE.Vector3( camx, camy, 0 ) );
     };
 
     function onKeyDown( event ) {

@@ -10,6 +10,13 @@ var proxies = new (this.WeakSet || Set)(); // should be a WeakSet, but not suppo
 
 /*
     camera is a THREE.Camera
+    
+    A CameraProxy is like a THREE.Camera object with a few differences:
+    * It's an event emitter (API on, off, once, emit). It emits a `cameraviewchange` event anytime the camera view changes
+    * A frozen {x, y, z} copy of the "lookAt vector" is available via the lookAtVector getter
+    * The up getter returns a frozen {x, y, z} copy
+    * camera.position is a VectorProxy which allows to track changes to the vector directly
+    
 */
 module.exports = function(camera){
     if(Object(camera) !== camera)
@@ -56,7 +63,7 @@ module.exports = function(camera){
         get position(){
             return positionProxy;
         }, 
-        set lookAtVector(v){
+        lookAt: function(v){
             camera.lookAt(v);
             lookAtVector = v;
             
