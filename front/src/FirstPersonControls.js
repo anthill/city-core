@@ -17,6 +17,7 @@ var cos = Math.cos,
     sin = Math.sin;
 
 var DISTANCE = 20;
+var MAX_X_SPEED = Math.PI/120;
 
 module.exports = function(camera, domElement){
     camera.up.set(0, 0, 1); // Looking up
@@ -34,8 +35,6 @@ module.exports = function(camera, domElement){
     var rotation = 0;
     
     function moveCamera(){
-        
-        console.log('rotation', rotation, lookAtPoint.x, lookAtPoint.y, camera.position);
         lookAtPoint.x = camera.position.x +
             ((lookAtPoint.x - camera.position.x)*cos(alpha) - (lookAtPoint.y - camera.position.y)*sin(alpha));
         lookAtPoint.y = camera.position.y +
@@ -52,7 +51,9 @@ module.exports = function(camera, domElement){
         var deltaX = e.clientX - canvasBoundingRect.width/2;
         
         if(Math.abs(deltaX) > canvasBoundingRect.width/10){
-            alpha = Math.PI/400;
+            alpha = MAX_X_SPEED*
+                (Math.abs(deltaX) - canvasBoundingRect.width/10)/
+                (canvasBoundingRect.width/2 - canvasBoundingRect.width/10);
             if(deltaX > 0)
                 alpha = -alpha;
             
