@@ -73,13 +73,14 @@ function randomString(length){
 
 // websocket: when a user connects we create a token
 var io = require('socket.io')(http);
-//app.use("/ext", require('express').static(__dirname + '/front/ext'));
+app.use("/polyfills", require('express').static(__dirname + '/front/src/polyfills'));
 app.get('/', function(req, res){
   res.sendFile(path.join(__dirname, 'front/index.html'));
 });
 app.get('/app.js', function(req, res){
   res.sendFile(path.join(__dirname, 'front/app.js'));
 });
+
 
 
 var metadataP = new Promise(function(resolve, reject){

@@ -1,5 +1,8 @@
 'use strict';
 
+var SunCalc = require('suncalc');
+var THREE = require('three');
+
 var serverCommunication = require('./serverCommunication.js');
 var weakMap = serverCommunication.weakMap;
 var gui = require('./gui.js');
@@ -19,23 +22,11 @@ var renderer = _3dviz.renderer;
 var raycasting = require('./raycasting.js')(camera, scene);
 
 var controls = require('./controls.js')(camera);
-var moveCamera = require('./moveCamera.js')(camera, function(camera){// visible bounding box
-    var L = 2 * camera.position.z * Math.tan(3.14*camera.fov/(2*180));
-    var l = L * WIDTH / HEIGHT;
-    // console.log(camera.position.x,camera.position.z);
-    // console.log(L, l);
-    // console.log("----------");
-    var south = camera.position.y - L/2;
-    var north = camera.position.y + L/2;
-    var west = camera.position.x - l/2;
-    var east = camera.position.x + l/2;
-    loadTiles(south, north, east, west);
-});
 
 var MAX_Y = require('./MAX_Y.js');
 
 var GeoConverter = require('./geoConverter.js');
-var SunCalc = require('suncalc');
+
 
 // TODO change values on resize
 var WIDTH = window.innerWidth,
@@ -71,19 +62,21 @@ serverCommunication.metadataP.then(function(metadata) {
 
     geoCode(guiControls.address).then(function(coords) {
         var newPosition = geoConverter.toLambert(coords.lon, coords.lat);
-        moveCamera(newPosition.X, newPosition.Y, 300); })
+        camera.position = new THREE.Vector3(newPosition.X, newPosition.Y, 300);
+        camera.lookAt( new THREE.Vector3(newPosition.X, newPosition.Y, 0) );
+    })
 });
 
 gui.addressControler.onFinishChange(function(value) {
     geoCode(value).then(function(coords) {
         var newPosition = geoConverter.toLambert(coords.lon, coords.lat);
-        moveCamera(newPosition.X, newPosition.Y, 300);
+        camera.position = new THREE.Vector3(newPosition.X, newPosition.Y, 300);
+        camera.lookAt( new THREE.Vector3(newPosition.X, newPosition.Y, 0) );
     })
 });
 
 gui.altitudeControler.onFinishChange(function(value) {
-    var camz = guiControls.altitude;
-    moveCamera(undefined, undefined, camz);
+    camera.position.z = guiControls.altitude; // value?
 });
 
 
@@ -109,3 +102,17 @@ window.addEventListener( 'meshClicked', function onMeshClicked(event){
 
 
 
+
+camera.on('cameraviewchange', function(){// visible bounding box
+    var L = 2 * camera.position.z * Math.tan(3.14*camera.fov/(2*180));
+    var l = L * WIDTH / HEIGHT;
+    // console.log(camera.position.x,camera.position.z);
+    // console.log(L, l);
+    // console.log("----------");
+    var south = camera.position.y - L/2;
+    var north = camera.position.y + L/2;
+    var west = camera.position.x - l/2;
+    var east = camera.position.x + l/2;
+    
+    loadTiles(south, north, east, west);
+});
