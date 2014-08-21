@@ -6,7 +6,7 @@ var ee = require('event-emitter');
 var VectorProxy = require('./VectorProxy.js');
 
 var targetToProxy = new WeakMap();
-var proxies = new (eval('this.WeakSet') || Set)(); // should be a WeakSet, but not supported everywhere and no good polyfill yet
+var proxies = new (this.WeakSet || Set)(); // should be a WeakSet, but not supported everywhere and no good polyfill yet
 
 /*
     camera is a THREE.Camera
@@ -75,10 +75,14 @@ module.exports = function(camera){
             scheduleChangeEvent();
         },
         
-        get fov(){
-            return camera.fov;
-        }
+        /* other properties proxying */
+        get fov(){ return camera.fov; },
+        get aspect(){ return camera.aspect; },
+        set aspect(v){ camera.aspect = v; },
         
+        updateProjectionMatrix: function(){
+            camera.updateProjectionMatrix.apply(camera, arguments);
+        }
     });
     
     

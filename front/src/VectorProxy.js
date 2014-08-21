@@ -3,7 +3,7 @@
 var ee = require('event-emitter');
 
 var targetToProxy = new WeakMap();
-var proxies = new (eval('this.WeakSet') || Set)(); // should be a WeakSet, but not supported everywhere and no good polyfill yet
+var proxies = new (this.WeakSet || Set)(); // should be a WeakSet, but not supported everywhere and no good polyfill yet
 
 module.exports = function(vector){
     if(Object(vector) !== vector)

@@ -29,7 +29,6 @@ var GeoConverter = require('./geoConverter.js');
 var WIDTH = window.innerWidth,
     HEIGHT = window.innerHeight;
 
-throw 'shim what is needed for the rsize handler'
 // Create an event listener that resizes the renderer with the browser window.
 window.addEventListener('resize', function() {
     WIDTH = window.innerWidth,

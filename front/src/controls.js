@@ -17,19 +17,23 @@ module.exports = function(camera){
     };
 
     function onKeyDown( event ) {
-        event.preventDefault();
+        
         switch ( event.keyCode ) {
             case keys.UP:
                 pan( new THREE.Vector3( 0, 1, 0 ) );
+                event.preventDefault();
                 break;
             case keys.BOTTOM:
                 pan( new THREE.Vector3( 0, - 1, 0 ) );
+                event.preventDefault();
                 break;
             case keys.LEFT:
                 pan( new THREE.Vector3( - 1, 0, 0 ) );
+                event.preventDefault();
                 break;
             case keys.RIGHT:
                 pan( new THREE.Vector3( 1, 0, 0 ) );
+                event.preventDefault();
                 break;
         }
     }
