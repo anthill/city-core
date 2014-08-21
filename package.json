@@ -17,6 +17,7 @@
     "socket.io": "^1.0.6",
     "socket.io-client": "~1.0.6",
     "suncalc": "^1.5.2",
+    "rbush": "^1.3.2",
     "three": "~0.68.0"
   },
   "devDependencies": {
