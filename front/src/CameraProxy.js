@@ -86,6 +86,8 @@ module.exports = function(camera){
         get fov(){ return camera.fov; },
         get aspect(){ return camera.aspect; },
         set aspect(v){ camera.aspect = v; },
+        get projectionMatrix(){ return camera.projectionMatrix; },
+        get matrixWorld(){ return camera.matrixWorld; },
         
         updateProjectionMatrix: function(){
             camera.updateProjectionMatrix.apply(camera, arguments);
