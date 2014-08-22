@@ -21,9 +21,11 @@ var renderer = _3dviz.renderer;
 
 
 var raycasting = require('./raycasting.js')(camera, scene);
-//var controls = require('./controls.js')(camera);
-var controls = require('./FirstPersonControls.js')(camera, renderer.domElement);
 
+var INITIAL_ALTITUDE = 300;
+
+var cityControls = require('./CityControls.js')(camera, renderer.domElement);
+cityControls.switchToSkyView(24541.22, 11167.65, INITIAL_ALTITUDE);
 
 /*var moveCamera = require('./moveCamera.js')(camera, function(camera){
     // visible bounding box
@@ -81,7 +83,7 @@ serverCommunication.metadataP.then(function(metadata) {
     loadTiles(11065.111059952906, 11270.186327486968, 24849.239355716505, 24233.21091018855);
     /*geoCode("peyberland bordeaux").then(function(coords) {
         console.log("moving to", invLinX(coords.lon), invLinY(coords.lat), 300);
-        moveCamera(invLinX(coords.lon), invLinY(coords.lat), 300);
+        //cityControls.switchToSkyView(invLinX(coords.lon), invLinY(coords.lat), 300);
     });*/
 });
 
@@ -120,6 +122,8 @@ window.addEventListener( 'meshClicked', function onMeshClicked(event){
 
 
 camera.on('cameraviewchange', function(){// visible bounding box
+    console.log('camera', camera.position.x, camera.position.y, camera.position.z, camera.lookAtVector);
+    
     var L = 2 * camera.position.z * Math.tan(3.14*camera.fov/(2*180));
     var l = L * WIDTH / HEIGHT;
     // console.log(camera.position.x,camera.position.z);

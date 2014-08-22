@@ -29,7 +29,6 @@ renderer.setClearColorHex(0x333F47, 1);
 
 // Create a camera, zoom it out from the model a bit, and add it to the scene.
 var camera = new THREE.PerspectiveCamera( 30, WIDTH / HEIGHT, 1, 5000 );
-camera.up.set(0, 1, 0);
 scene.add(camera);
 
 

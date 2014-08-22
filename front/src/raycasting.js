@@ -45,7 +45,7 @@ module.exports = function(camera, scene){
 	        		'point': out[0].point 
 	        	}
 	        });
-	        window.dispatchEvent(newEvent);
+	        //window.dispatchEvent(newEvent);
 
 	        // Color/uncolor the selected/unselected building
 	        if (old == out[0].object)
@@ -56,7 +56,7 @@ module.exports = function(camera, scene){
 	        old = out[0].object;
 
 	        //var data = wm.get(out[0])
-	        camera.lookAt(new THREE.Vector3( out[0].point.x, out[0].point.y, out[0].point.z ));
+	        //camera.lookAt(new THREE.Vector3( out[0].point.x, out[0].point.y, out[0].point.z ));
 	    }
 	}
 
