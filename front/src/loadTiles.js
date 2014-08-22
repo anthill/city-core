@@ -11,10 +11,10 @@ module.exports = function loadTiles(south, north, east, west) {
     var results = rTree.search([west, south, east, north]);
 
     //remove all buildings from scene
-    /*buildingMap.forEach(function(building){
+    buildingMap.forEach(function(building){
         building.visible = false;
         scene.remove(building.mesh);
-    });*/
+    });
 
     console.log(results.length);
     
@@ -23,10 +23,10 @@ module.exports = function loadTiles(south, north, east, west) {
             // not in the map => ask the backend
             socket.emit('object', {id : result[4].id});
         } else { // in the map
-            /*var entry = buildingMap.get(result[4].id);
+            var entry = buildingMap.get(result[4].id);
             // if not visible, added back to the scene
             scene.add(entry.mesh);
-            entry.visible = true;*/
+            entry.visible = true;
         }
 
     });
