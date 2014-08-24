@@ -5,7 +5,7 @@ var dat = require('dat-gui');
 // setup the gui
 var guiControls = {
     address : "Place Peyberland, Bordeaux",
-    altitude : 500,
+    altitude : 200,
     hour : 14
 };
 var gui = new dat.GUI();

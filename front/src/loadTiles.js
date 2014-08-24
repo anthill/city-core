@@ -15,8 +15,6 @@ module.exports = function loadTiles(south, north, east, west) {
         building.visible = false;
         scene.remove(building.mesh);
     });
-
-    console.log(results.length);
     
     results.forEach(function(result) {
         if (buildingMap.has(result[4].id) === false){

@@ -2,40 +2,77 @@
 
 var SkyViewControls = require('./controls/SkyViewControls.js');
 var FirstPersonControls = require('./controls/FirstPersonControls.js');
+var loadTiles = require('./loadTiles.js');
+var meshToBuilding = require('./meshToBuilding');
 
 var desactivateCurrentControls = function(){};
 var lastAltitude;
 
 
-module.exports = function(camera, domElement, weakMap){
+module.exports = function(camera, domElement){
     var skyViewControls = SkyViewControls(camera, domElement);
     var firstPersonControls = FirstPersonControls(camera, domElement);
+    
+    function onCameraViewChangeSky(){
+        var L = 2 * camera.position.z * Math.tan(3.14*camera.fov/(2*180));
+        var l = L * window.innerWidth / window.innerHeight;
+
+        var south = camera.position.y - L/2;
+        var north = camera.position.y + L/2;
+        var west = camera.position.x - l/2;
+        var east = camera.position.x + l/2;
+
+        loadTiles(south, north, east, west);
+    }
+
+    function onCameraViewChangeFirstPerson(){
+        var south = camera.position.y - 300;
+        var north = camera.position.y + 300;
+        var west = camera.position.x - 300;
+        var east = camera.position.x + 300;
+
+        loadTiles(south, north, east, west);
+    }
+    
+    function onMeshClicked(event){
+        var detail = event.detail;
+        console.log('Id', meshToBuilding.get(detail.mesh).id);
+        console.log('Intersection point', detail.point.x, detail.point.y, detail.point.z);
+        
+        ret.switchToFirstPersonView(detail.point.x, detail.point.y);
+    }
+    
+    function onKeyPressFirstPerson(e){
+        console.log('key press while first person', e.keyCode);
+        if(e.keyCode === 27){ // escape
+            e.preventDefault();
+            ret.switchToSkyView(camera.position.x, camera.position.y);
+        }
+    }
+    
     
     var ret = {
         switchToFirstPersonView: function(x, y){
             desactivateCurrentControls();
+            window.removeEventListener('meshClicked', onMeshClicked);
+            camera.off('cameraviewchange', onCameraViewChangeSky);
+            camera.on('cameraviewchange', onCameraViewChangeFirstPerson);
+            document.addEventListener('keypress', onKeyPressFirstPerson);
+            
             lastAltitude = camera.position.z;
+            
             desactivateCurrentControls = firstPersonControls(x, y);
         },
         switchToSkyView: function(x, y, altitude){
-            console.log('switchToSkyView', x, y, altitude);
             desactivateCurrentControls();
+            window.addEventListener( 'meshClicked', onMeshClicked);
+            camera.off('cameraviewchange', onCameraViewChangeFirstPerson);
+            camera.on('cameraviewchange', onCameraViewChangeSky);
+            document.removeEventListener('keypress', onKeyPressFirstPerson);
+            
             desactivateCurrentControls = skyViewControls(x, y, altitude || lastAltitude);
         }
     };
-    
-    window.addEventListener( 'meshClicked', function onMeshClicked(event){
-        var detail = event.detail;
-        console.log('Id', weakMap.get(detail.mesh).id);
-        console.log('Intersection point', detail.point.x, detail.point.y, detail.point.z);
-        
-        ret.switchToFirstPersonView(detail.point.x, detail.point.y);
-        
-        window.removeEventListener('meshClicked', onMeshClicked);
-        
-    } );
-    
-    
     
     return ret;
 }
