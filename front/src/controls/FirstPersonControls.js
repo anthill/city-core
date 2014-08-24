@@ -91,7 +91,8 @@ module.exports = function(camera, domElement){
         camera.position.y = y; // 11167.65;
         camera.position.z = HEIGHT;
 
-        lookAtPoint = new THREE.Vector3( camera.position.x, camera.position.y - DISTANCE, camera.position.z )
+        // Looking north
+        lookAtPoint = new THREE.Vector3( camera.position.x, camera.position.y + DISTANCE, camera.position.z )
         camera.lookAt( lookAtPoint );
 
         domElement.addEventListener('mousemove', mouseMoveListener);

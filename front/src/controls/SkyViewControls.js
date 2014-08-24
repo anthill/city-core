@@ -45,10 +45,27 @@ module.exports = function(camera, domElement){
         }
     }
     
+    var ZOOM_BY_DELTA = 25;
+    
+    // hack to normalize deltaY values across browsers.
+    var minDeltaY;
+    function onScroll(e){
+        if (minDeltaY > Math.abs(e.deltaY) || !minDeltaY) {
+          minDeltaY = Math.abs(e.deltaY);
+        }
+        
+        var deltaY = e.deltaY/minDeltaY;
+        
+        e.preventDefault();
+        camera.position.z += deltaY*ZOOM_BY_DELTA;
+    }
+    
     
     return function(x, y, altitude){
         camera.near = 1;
         camera.far = 5000;
+        
+        camera.up = new THREE.Vector3(0, 1, 0);
         
         camera.position.x = x; // 24541.22;
         camera.position.y = y; // 11167.65;
@@ -56,13 +73,14 @@ module.exports = function(camera, domElement){
 
         camera.lookAt( new THREE.Vector3( x, y, 0 ) );
         // looking North (y=1)
-        camera.up = new THREE.Vector3(0, 1, 0);
         
         window.addEventListener( 'keydown', onKeyDown );
+        window.addEventListener( 'wheel', onScroll );
 
         return function desactivate(){
             // In Chrome listening to keypress doesn't work for whatever reason
             window.removeEventListener( 'keydown', onKeyDown );
+            window.removeEventListener( 'wheel', onScroll );
         };
     }
     

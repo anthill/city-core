@@ -80,10 +80,6 @@ gui.addressControler.onFinishChange(function(value) {
     moveTo(value);
 });
 
-gui.altitudeControler.onFinishChange(function(value) {
-    camera.position.z = guiControls.altitude; // value?
-});
-
 
 gui.hourControler.onChange(function(value) {
     // get today's sunlight times for Bordeaux
