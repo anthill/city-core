@@ -1,5 +1,6 @@
 'use strict';
 
+var THREE = require('three');
 var ee = require('event-emitter');
 
 var targetToProxy = new WeakMap();
@@ -30,6 +31,10 @@ module.exports = function(vector){
         set z(v){
             vector.z = v;
             this.emit('change');
+        },
+        
+        distanceTo: function(){
+            return vector.distanceTo.apply(vector, arguments);
         }
     });
     

@@ -7,14 +7,19 @@
 */
 
 var THREE = require('three');
+var _getFloorHeight = require('../distanceToFloor.js');
 
 var cos = Math.cos,
     sin = Math.sin;
 
+var HEIGHT = 4;
+
 var DISTANCE = 20;
 var MAX_X_SPEED = Math.PI/120;
 
-module.exports = function(camera, domElement){
+module.exports = function(camera, scene, domElement){
+    
+    var getFloorHeight = _getFloorHeight(scene);
     
     var alpha;
     var animationFrame;
@@ -69,9 +74,17 @@ module.exports = function(camera, domElement){
             lookAtPoint.x     += SPEED*moveVector.x;
             camera.position.y += SPEED*moveVector.y;
             lookAtPoint.y     += SPEED*moveVector.y;
-
+            
+            var distanceToFloor = getFloorHeight(camera.position);
+            console.log("distanceToFloor", distanceToFloor)
+            if(distanceToFloor !== undefined){
+                camera.position.z += HEIGHT - distanceToFloor;
+            }
+            
             moveAnimationFrame = requestAnimationFrame(moveForward);
-        })
+        });
+        
+        
     }
 
     function mouseUpListener(){
@@ -79,17 +92,19 @@ module.exports = function(camera, domElement){
         moveAnimationFrame = undefined;
     }
     
-    var HEIGHT = 10;
     
     return function(x, y){
         camera.up = new THREE.Vector3(0, 0, 1);
         camera.near = 1;
         camera.far = 50;
         
+        var distanceToFloor = getFloorHeight(camera.position);
+        console.log('distance to floor', distanceToFloor, camera.position.z + HEIGHT - distanceToFloor)
+        
         // init camera
-        camera.position.x = x; // 24541.22;
-        camera.position.y = y; // 11167.65;
-        camera.position.z = HEIGHT;
+        camera.position.x = x;
+        camera.position.y = y;
+        camera.position.z = distanceToFloor !== undefined ? camera.position.z + HEIGHT - distanceToFloor : HEIGHT;
 
         // Looking north
         lookAtPoint = new THREE.Vector3( camera.position.x, camera.position.y + DISTANCE, camera.position.z )
@@ -103,6 +118,8 @@ module.exports = function(camera, domElement){
             domElement.removeEventListener('mousemove', mouseMoveListener);
             domElement.removeEventListener('mousedown', mouseDownListener);
             domElement.removeEventListener('mouseup', mouseUpListener);
+            cancelAnimationFrame(moveAnimationFrame);
+            moveAnimationFrame = undefined;
         };
     }
     

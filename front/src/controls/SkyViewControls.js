@@ -2,8 +2,8 @@
 
 /*
     * Keys up/down/right/left: move camera
-    
     * Scroll up/down: zoom in/out
+    
     * Click: center view on building
 */
 
@@ -58,6 +58,7 @@ module.exports = function(camera, domElement){
         
         e.preventDefault();
         camera.position.z += deltaY*ZOOM_BY_DELTA;
+        // TODO send a ray in mouse direction and move camera.position.x/y in this direction
     }
     
     

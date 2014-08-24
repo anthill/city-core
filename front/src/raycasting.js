@@ -14,7 +14,7 @@ module.exports = function(camera, scene){
 
 	var old;
 
-	function onClick (event){
+	function onClick(event){
 	    
 		// Get the mouse X and Y screen positions, and scale them to [-1, 1] ranges, position (-1, 1) being the upper left side of the screen.
 	    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;

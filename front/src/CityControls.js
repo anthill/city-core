@@ -9,9 +9,9 @@ var desactivateCurrentControls = function(){};
 var lastAltitude;
 
 
-module.exports = function(camera, domElement){
+module.exports = function(camera, scene, domElement){
     var skyViewControls = SkyViewControls(camera, domElement);
-    var firstPersonControls = FirstPersonControls(camera, domElement);
+    var firstPersonControls = FirstPersonControls(camera, scene, domElement);
     
     function onCameraViewChangeSky(){
         var L = 2 * camera.position.z * Math.tan(3.14*camera.fov/(2*180));

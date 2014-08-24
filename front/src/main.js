@@ -23,7 +23,7 @@ var raycasting = require('./raycasting.js')(camera, scene);
 
 var INITIAL_ALTITUDE = 200;
 
-var cityControls = require('./CityControls.js')(camera, renderer.domElement);
+var cityControls = require('./CityControls.js')(camera, scene, renderer.domElement);
 cityControls.switchToSkyView(24541.22, 11167.65, INITIAL_ALTITUDE);
 
 
@@ -96,6 +96,4 @@ gui.hourControler.onChange(function(value) {
 });
 
 
-camera.on('cameraviewchange', function(){
-    console.log('camera', camera.position.x, camera.position.y, camera.position.z, camera.lookAtVector, camera.up);
-});
+//camera.on('cameraviewchange', function(){ var pos = camera.position; console.log('camera', pos.x, pos.y, pos.z, camera.lookAtVector, camera.up); });
