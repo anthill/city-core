@@ -5,7 +5,7 @@ var buildingMap = require('./buildingMap.js');
 var createBuildingMesh = require('./createBuildingMesh.js');
 var scene = require('./3dviz').scene;
 
-var weakMap = new WeakMap();
+var meshToBuilding = require('./meshToBuilding');
 
 //socket
 var socket = io();
@@ -25,7 +25,7 @@ socket.on('building', function(msg){
         var buildingMetadata = metadata[msg.id];
         var mesh = createBuildingMesh(new DataView(msg.buffer), buildingMetadata.X, buildingMetadata.Y);
         
-        weakMap.set(mesh, {id: msg.id, metadata: buildingMetadata, buffer: msg.buffer});
+        meshToBuilding.set(mesh, {id: msg.id, metadata: buildingMetadata, buffer: msg.buffer});
         scene.add(mesh);
         
         buildingMap.set(msg.id, {mesh:mesh, visible:true});
@@ -36,6 +36,5 @@ socket.on('building', function(msg){
 
 module.exports = {
     metadataP: metadataP,
-    socket: socket,
-    weakMap: weakMap
+    socket: socket
 }

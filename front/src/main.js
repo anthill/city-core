@@ -4,7 +4,6 @@ var SunCalc = require('suncalc');
 var THREE = require('three');
 
 var serverCommunication = require('./serverCommunication.js');
-var weakMap = serverCommunication.weakMap;
 var gui = require('./gui.js');
 var guiControls = gui.guiControls;
 
@@ -22,9 +21,9 @@ var renderer = _3dviz.renderer;
 
 var raycasting = require('./raycasting.js')(camera, scene);
 
-var INITIAL_ALTITUDE = 300;
+var INITIAL_ALTITUDE = 200;
 
-var cityControls = require('./CityControls.js')(camera, renderer.domElement, weakMap);
+var cityControls = require('./CityControls.js')(camera, renderer.domElement);
 cityControls.switchToSkyView(24541.22, 11167.65, INITIAL_ALTITUDE);
 
 
@@ -100,16 +99,7 @@ gui.hourControler.onChange(function(value) {
     light.position.set(lightX, lightY, lightZ);
 });
 
-camera.on('cameraviewchange', function(){// visible bounding box
+
+camera.on('cameraviewchange', function(){
     console.log('camera', camera.position.x, camera.position.y, camera.position.z, camera.lookAtVector, camera.up);
-    
-    var L = 2 * camera.position.z * Math.tan(3.14*camera.fov/(2*180));
-    var l = L * WIDTH / HEIGHT;
-    
-    var south = camera.position.y - L/2;
-    var north = camera.position.y + L/2;
-    var west = camera.position.x - l/2;
-    var east = camera.position.x + l/2;
-    
-    loadTiles(south, north, east, west);
 });
