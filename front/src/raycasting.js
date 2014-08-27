@@ -14,13 +14,11 @@ module.exports = function(camera, scene){
 
 	var old;
 
-	function onClick (event){
+	function onClick(event){
 	    
 		// Get the mouse X and Y screen positions, and scale them to [-1, 1] ranges, position (-1, 1) being the upper left side of the screen.
 	    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
 	    mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
-	    
-	    console.log('Mouse screen position X: ' + mouse.x + ' | Y: ' + mouse.y);
 	    
 	    // Create Vector3 from mouse position, with Z = 0
 	    var mousePos = new THREE.Vector3(mouse.x, mouse.y, 0);
@@ -48,15 +46,15 @@ module.exports = function(camera, scene){
 	        window.dispatchEvent(newEvent);
 
 	        // Color/uncolor the selected/unselected building
-	        if (old == out[0].object)
+	        /*if (old == out[0].object)
 	        	out[0].object.material.color.setHex(0xaaaaaa);
 	        else
-	        	out[0].object.material.color.setHex(0xff0000);
+	        	out[0].object.material.color.setHex(0xff0000);*/
 
 	        old = out[0].object;
 
 	        //var data = wm.get(out[0])
-	        camera.lookAt(new THREE.Vector3( out[0].point.x, out[0].point.y, out[0].point.z ));
+	        //camera.lookAt(new THREE.Vector3( out[0].point.x, out[0].point.y, out[0].point.z ));
 	    }
 	}
 

@@ -21,7 +21,7 @@ node tools/unzipCUB3ds.js --out front/data/ --zip path/to/3Ddata/BATI3D_NT.zip
 
 It should take about 5 minutes in normal hardware. This will extract all the buildings and other 3d objects from the open data in [.3ds format](http://en.wikipedia.org/wiki/.3ds). It will create thousands of binary files in `front/data/` as well as a file names `metadata.json`.
 
-1. `browserify front/src/main.js  -o front/app.js`
+1. `browserify front/src/main.js  -o front/app.js -d`
 
 1. Start the server
 
@@ -35,7 +35,7 @@ node index.js
 
 1. `npm install -g watchify`
 
-> watchify front/src/main.js  -o front/app.js -v -d
+> watchify front/src/main.js  -o front/app.js -d -v
 
 
 # Licence
