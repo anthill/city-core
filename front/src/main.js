@@ -1,6 +1,5 @@
 'use strict';
 
-var SunCalc = require('suncalc');
 var THREE = require('three');
 
 var serverCommunication = require('./serverCommunication.js');
@@ -18,6 +17,7 @@ var camera = _3dviz.camera;
 var light = _3dviz.light;
 var renderer = _3dviz.renderer;
 
+var SunPosition = require('./SunPosition.js');
 
 var raycasting = require('./raycasting.js')(camera, scene);
 
@@ -56,7 +56,7 @@ var geoConverter = new GeoConverter(45, deltaX, deltaY);
 function moveTo(place){
     geoCode(place).then(function(coords) {
         var newPosition = geoConverter.toLambert(coords.lon, coords.lat);
-        camera.position = new THREE.Vector3(newPosition.X, newPosition.Y, 300);
+        camera.position = new THREE.Vector3(newPosition.X, newPosition.Y, INITIAL_ALTITUDE);
         camera.lookAt( new THREE.Vector3(newPosition.X, newPosition.Y, 0) );
     });
 }
@@ -72,28 +72,20 @@ serverCommunication.metadataP.then(function(metadata) {
         rTree.insert(item);
     });
 
-    moveTo("peyberland bordeaux")
-    
+    moveTo(guiControls.address)
 });
 
 gui.addressControler.onFinishChange(function(value) {
     moveTo(value);
 });
 
-
-gui.hourControler.onChange(function(value) {
-    // get today's sunlight times for Bordeaux
-    var date = new Date();
-    date.setHours(value);
-
-    var sunPos = SunCalc.getPosition(date, -0.573781, 44.840484);
-
-    var radius = 30000;
-    var lightX = radius * Math.cos(sunPos.azimuth);
-    var lightY = radius * Math.sin(sunPos.azimuth);
-    var lightZ = radius * Math.tan(sunPos.altitude);
-    light.position.set(lightX, lightY, lightZ);
+camera.on('cameraviewchange', function(){ 
+    var pos = camera.position; 
+    light.position.x = pos.x;
+    light.position.y = pos.y;
+    light.position.z = 300;
+    var sunPos = SunPosition(light);
+    light.target.position.set(pos.x + sunPos[0], pos.y + sunPos[1], 0);
 });
 
-
-//camera.on('cameraviewchange', function(){ var pos = camera.position; console.log('camera', pos.x, pos.y, pos.z, camera.lookAtVector, camera.up); });
+// camera.on('cameraviewchange', function(){ var pos = camera.position; console.log('camera', pos.x, pos.y, pos.z, camera.lookAtVector, camera.up); });
