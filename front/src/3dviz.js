@@ -15,8 +15,26 @@ var scene = new THREE.Scene();
 var WIDTH = window.innerWidth,
     HEIGHT = window.innerHeight;
 
+// skysphere
+var geometry = new THREE.SphereGeometry(100000, 60, 40);
+var uniforms = {
+  texture: { type: 't', value: THREE.ImageUtils.loadTexture('../img/sky.jpg') }
+};
+
+var material = new THREE.ShaderMaterial( {
+  uniforms:       uniforms,
+  vertexShader:   document.getElementById('sky-vertex').textContent,
+  fragmentShader: document.getElementById('sky-fragment').textContent
+});
+
+var skyBox = new THREE.Mesh(geometry, material);
+skyBox.scale.set(-1, 1, 1);
+skyBox.eulerOrder = 'XZY';
+skyBox.renderDepth = 1000.0;
+scene.add(skyBox);
+
 // Create a camera, zoom it out from the model a bit, and add it to the scene.
-var camera = new THREE.PerspectiveCamera( 60, WIDTH / HEIGHT, 1, 5000 );
+var camera = new THREE.PerspectiveCamera( 60, WIDTH / HEIGHT, 1, 500000 );
 scene.add(camera);
 
 

@@ -74,6 +74,7 @@ function randomString(length){
 // websocket: when a user connects we create a token
 var io = require('socket.io')(http);
 app.use("/polyfills", require('express').static(__dirname + '/front/src/polyfills'));
+app.use("/img", require('express').static(__dirname + '/front/img'));
 app.get('/', function(req, res){
   res.sendFile(path.join(__dirname, 'front/index.html'));
 });
