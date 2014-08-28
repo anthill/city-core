@@ -122,6 +122,8 @@ var chunkUtils = (function(){
 function Chunk(buff, type){
     //if(type === "Vertices List")
     //  console.log('Creating Vertices List chunk', buff.length)
+    if(type === "Mapping Coordinates List")
+      console.log('Creating Mapping Coordinates List chunk', buff.length)
 
     var children = [];
 
@@ -134,14 +136,18 @@ function Chunk(buff, type){
     var ownDataLength = 0;    
     var cursor = 0;
 
-    if(type === "Vertices List" || type === "Faces Description"){
+    if(type === "Vertices List" || type === "Faces Description" || type === "Mapping Coordinates List"){
         if(type === "Vertices List"){
             var verticesNumber = buff.readUInt16LE(cursor);   
-            ownDataLength = 2 + 12*verticesNumber;
+            ownDataLength = 2 + (3*4)*verticesNumber;
         }
         if(type === "Faces Description"){
             var facesNumber = buff.readUInt16LE(cursor);   
-            ownDataLength = 2 + 8*facesNumber;
+            ownDataLength = 2 + (3*2+2)*facesNumber;
+        }
+        if(type === "Mapping Coordinates List"){
+            var uvsNumber = buff.readUInt16LE(cursor);   
+            ownDataLength = 2 + (2*4)*uvsNumber;
         }
         
         cursor = ownDataLength;
@@ -230,6 +236,13 @@ function Chunk(buff, type){
                 })[0].faces; // singleton
             }
         });
+        Object.defineProperty(ret, "uvs", {
+            get: function(){
+                return this.children.filter(function(c){
+                    return c.type === "Mapping Coordinates List";
+                })[0].uvs; // singleton
+            }
+        });
     }
     if(type === "Vertices List"){
         Object.defineProperty(ret, "vertices", {
@@ -292,7 +305,33 @@ function Chunk(buff, type){
         });
     }
 
+    if(type === "Mapping Coordinates List"){
+        Object.defineProperty(ret, "uvs", {
+            get: function(){
+                var data = this.ownData;
 
+                var cursor = 0;
+
+                var uvsNumber = data.readUInt16LE(cursor);
+                cursor += 2;
+
+                var uvs = [];
+
+                while(uvsNumber > 0){
+                    uvs.push({
+                        a: data.readFloatLE(cursor),
+                        b: data.readFloatLE(cursor+4)
+                    });
+
+
+                    cursor += 8;
+                    uvsNumber--;
+                }
+
+                return uvs;
+            }
+        });
+    }
 
     return ret;
 }
