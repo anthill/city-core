@@ -1,22 +1,21 @@
 'use strict';
 
-var MIN_X = -150,
-    MAX_X = 150,
+function xTo12bitsInt(x, MIN_X, MAX_X){
+    if(x < MIN_X || x > MAX_X)
+        throw new RangeError( ['x should be between', MIN_X, 'and', MAX_X, '(',x.toFixed(2),')'].join(' ')  );
     
-    MIN_Y = -150,
-    MAX_Y = 150, 
-    
-    MIN_Z = -75,
-    MAX_Z = 115;
-
-
-function xTo12bitsInt(x){
     return Math.round( (x - MIN_X) * ((1 << 12)-1) / (MAX_X - MIN_X));
 }
-function yTo12bitsInt(y){
+function yTo12bitsInt(y, MIN_Y, MAX_Y){
+    if(y < MIN_Y || y > MAX_Y)
+        throw new RangeError( ['y should be between', MIN_Y, 'and', MAX_Y, '(',y.toFixed(2),')'].join(' ')  );
+    
     return Math.round( (y - MIN_Y) * ((1 << 12)-1) / (MAX_Y - MIN_Y));
 }                
-function zTo8bitsInt(z){
+function zTo8bitsInt(z, MIN_Z, MAX_Z){
+    if(z < MIN_Z || z > MAX_Z)
+        throw new RangeError( ['z should be between', MIN_Z, 'and', MAX_Z, '(',z.toFixed(2),')'].join(' ')  );
+    
     return Math.round( (z - MIN_Z) * ((1 << 8)-1) / (MAX_Z - MIN_Z));
 }
 
@@ -52,8 +51,14 @@ function encodeVertex(x, y, z){
     fi : | a(16 bits) | b(16 bits)| c(16 bits) | // indices in vertices array
     
     Number are encoded with big endianness
+    
+    boundingBox : {
+        minX,
+        maxX,
+        
+    }
 */
-module.exports = function(_3dsObject){
+module.exports = function(_3dsObject, boundingBox){
     var nbVertices = _3dsObject.vertices.length;
     var nbFaces = _3dsObject.faces.length;
     
@@ -72,18 +77,20 @@ module.exports = function(_3dsObject){
     
     _3dsObject.vertices.forEach(function(v){
         //console.log(v.x, v.y, v.z, encodeVertex(v.x, v.y, v.z), offset);
-        var xUint12 = xTo12bitsInt(v.x);
-        var yUint12 = yTo12bitsInt(v.y);
+        var xUint12 = xTo12bitsInt(v.x, boundingBox.minX, boundingBox.maxX);
+        var yUint12 = yTo12bitsInt(v.y, boundingBox.minY, boundingBox.maxY);
         
         buffer.writeUInt8( ((xUint12 & 0xFF0) >> 4), offset );
         buffer.writeUInt8( ((xUint12 & 0x00F) << 4) + ((yUint12 & 0xF00) >> 8), offset+1);
         buffer.writeUInt8( ((yUint12 & 0x0FF) ), offset+2);
         try{
-            buffer.writeUInt8( zTo8bitsInt(v.z), offset+3);
+            buffer.writeUInt8( zTo8bitsInt(v.z, boundingBox.minZ, boundingBox.maxZ), offset+3);
         }
         catch(e){
-            console.log('error trying to write z', e, v.z, zTo8bitsInt(v.z));
+            console.error(v.z, boundingBox.minZ, boundingBox.maxZ, zTo8bitsInt(v.z, boundingBox.minZ, boundingBox.maxZ))
+            throw e;
         }
+        
         offset += 4;
     });
     

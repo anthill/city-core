@@ -23,11 +23,11 @@ module.exports = function(mesh){
     var zs = vertices.map(function(v){return v.z});
     
     return {
-        xmin: Math.min.apply(undefined, xs),
-        xmax: Math.max.apply(undefined, xs),
-        ymin: Math.min.apply(undefined, ys),
-        ymax: Math.max.apply(undefined, ys),
-        zmin: Math.min.apply(undefined, zs),
-        zmax: Math.max.apply(undefined, zs)
+        minX: Math.min.apply(undefined, xs),
+        maxX: Math.max.apply(undefined, xs),
+        minY: Math.min.apply(undefined, ys),
+        maxY: Math.max.apply(undefined, ys),
+        minZ: Math.min.apply(undefined, zs),
+        maxZ: Math.max.apply(undefined, zs)
     };
 };
