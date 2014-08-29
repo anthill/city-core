@@ -2,7 +2,7 @@
 
 var THREE = require('three');
 
-module.exports = function(camera, scene){
+module.exports = function(camera, scene, domElement){
 
 	var ray = new THREE.Raycaster(),
 	    projector = new THREE.Projector();
@@ -58,6 +58,6 @@ module.exports = function(camera, scene){
 	    }
 	}
 
-	window.addEventListener( 'click', onClick );
+	domElement.addEventListener( 'click', onClick );
 	
 }
