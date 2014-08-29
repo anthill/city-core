@@ -8,8 +8,10 @@ var scene = require('./3dviz.js').scene;
 module.exports = function loadTiles(south, north, east, west) {
     //console.log("query", south, north, east, west);
     // query the rtree to know what building are needed
-    var results = rTree.search([west, south, east, north]);
-
+    var results = rTree.search([west-200, south-200, east+200, north+200]);
+    
+    //console.log(west, south, east, north)
+    
     //remove all buildings from scene
     buildingMap.forEach(function(building){
         building.visible = false;

@@ -66,9 +66,15 @@ serverCommunication.metadataP.then(function(metadata) {
 
     Object.keys(metadata).forEach(function(id) {
         var building = metadata[id];
-        var X = building.X;
-        var Y = building.Y;
-        var item = [building.xmin + X*200, building.ymin + (MAX_Y-Y)*200, building.xmax + X*200, building.ymax+ (MAX_Y-Y)*200, {id: id, X:X, Y:Y}];
+        var X = building.tile.X;
+        var Y = building.tile.Y;
+        var item = [
+            building.x + X*200,
+            building.y + (MAX_Y-Y)*200,
+            building.x + X*200,
+            building.y + (MAX_Y-Y)*200,
+            {id: id, X:X, Y:Y}
+        ];
         rTree.insert(item);
     });
 

@@ -3,18 +3,14 @@
 var THREE = require('three');
 var MAXY = require('./MAX_Y');
 
-// useful functions
-// we'll transform x,y ranging from -nbx to nbx in 4096 int values
-var nbx = 150;
-function transform(x) {
-    return 2*x*nbx/4095-nbx;
+function xFrom12bitsInt(x, MIN_X, MAX_X){
+    return x*(MAX_X - MIN_X)/(((1 << 12)-1)) + MIN_X;
 }
-
-var nbz1 = -75;
-var nbz2 = 115;
-// we'll transform z ranging from nbz1 to nbz2 in 255 int values
-function transformZ(z) {
-    return (z - 255)*(nbz2-nbz1)/255 +nbz2;
+function yFrom12bitsInt(y, MIN_Y, MAX_Y){
+    return y*(MAX_Y - MIN_Y)/(((1 << 12)-1)) + MIN_Y;
+}                
+function zFrom8bitsInt(z, MIN_Z, MAX_Z){
+    return z*(MAX_Z - MIN_Z)/(((1 << 8)-1)) + MIN_Z;
 }
 
 /*
@@ -23,7 +19,7 @@ function transformZ(z) {
     data is a DataView
     @returns a THREE.Mesh
 */
-module.exports = function createBuildingMesh(buffer, X, Y) {
+module.exports = function createBuildingMesh(buffer, tile) {
 
     var geometry = new THREE.Geometry();
     var offset = 0;
@@ -40,10 +36,10 @@ module.exports = function createBuildingMesh(buffer, X, Y) {
         var b3 = buffer.getUint8(offset);
         offset++;
 
-        var x = transform(((b1 & 0xFF) << 4) + ((b2 & 0xF0) >> 4));
-        var y = transform(((b2 & 0x0F) << 8) + ((b3 & 0xFF) >> 0));
+        var x = xFrom12bitsInt(((b1 & 0xFF) << 4) + ((b2 & 0xF0) >> 4), tile.minX, tile.maxX);
+        var y = yFrom12bitsInt(((b2 & 0x0F) << 8) + ((b3 & 0xFF) >> 0), tile.minY, tile.maxY);
 
-        var z = transformZ( buffer.getUint8(offset) );
+        var z = zFrom8bitsInt( buffer.getUint8(offset), tile.minZ, tile.maxZ);
         offset++;
 
         // decompress en x, y, z
@@ -72,7 +68,7 @@ module.exports = function createBuildingMesh(buffer, X, Y) {
         wireframe: false
     }));
     
-    mesh.position.set(X*200, (MAXY - Y)*200, 0);
+    mesh.position.set(tile.X*200, (MAXY - tile.Y)*200, 0);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
     
