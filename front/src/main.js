@@ -19,7 +19,7 @@ var renderer = _3dviz.renderer;
 
 var SunPosition = require('./SunPosition.js');
 
-var raycasting = require('./raycasting.js')(camera, scene);
+var raycasting = require('./raycasting.js')(camera, scene, renderer.domElement);
 
 var INITIAL_ALTITUDE = 200;
 
