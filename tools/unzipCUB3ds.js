@@ -117,9 +117,9 @@ function extractBuildings(_3dsPath, x, y){
         var xyObject = meshes.filter(function(m){ return !!m.id.match(/x(\d{1,4})y(\d{1,4})/) })[0]; 
         var xyContainingCube = containingCube(xyObject);
         
-        // xyContainingCube.xmax and xyContainingCube.ymax should be +100. Finding the translation.
-        var deltaX = 100 - xyContainingCube.xmax;
-        var deltaY = 100 - xyContainingCube.ymax;
+        // Ideally, xyContainingCube.xmax and xyContainingCube.ymax should be +100. Finding the translation.
+        var deltaX = 100 - xyContainingCube.maxX;
+        var deltaY = 100 - xyContainingCube.maxY;
         
         if(deltaX !== 0 || deltaY !== 0){
             // apply translation to all tile objects
@@ -131,31 +131,72 @@ function extractBuildings(_3dsPath, x, y){
             });
         }
         
+        
+        // Find tile bounding box
+        var containingCubes = meshes.map(containingCube);
+        // create a fake mesh based on the cubes descriptions
+        var fakeCombiningMesh = {
+            vertices: containingCubes.reduce(function(acc, cubeDesc){
+                acc.push({
+                    x: cubeDesc.minX,
+                    y: cubeDesc.minY,
+                    z: cubeDesc.minZ,
+                });
+                acc.push({
+                    x: cubeDesc.maxX,
+                    y: cubeDesc.maxY,
+                    z: cubeDesc.maxZ,
+                });
+
+                return acc;
+            }, [])
+        };
+        var tileContainingCube = containingCube(fakeCombiningMesh);
+        
+        var minZ = Math.floor(tileContainingCube.minZ);
+        var maxZ = Math.ceil(tileContainingCube.maxZ);
+        if(minZ === maxZ){ // happens for flat floor objects
+            maxZ = minZ + 1;
+        }
+        
+        // integer approximation
+        var tileMetadata = {
+            X: x,
+            Y: y,
+            minX: Math.floor(tileContainingCube.minX),
+            maxX: Math.ceil(tileContainingCube.maxX),
+            minY: Math.floor(tileContainingCube.minY),
+            maxY: Math.ceil(tileContainingCube.maxY),
+            minZ: minZ,
+            maxZ: maxZ,
+            objects: Object.create(null)
+        };
+        
+        
         var buildingBuffers = Object.create(null);
         meshes.forEach(function(m, i){
-            buildingBuffers[m.id] = _3dsFormatToAntsBinaryBuffer(m);
+            try{
+            buildingBuffers[m.id] = _3dsFormatToAntsBinaryBuffer(m, tileMetadata);
+            }
+            catch(e){
+                console.error('compacting error', x, y, e)
+            }
         });
-
-        var metadata = Object.create(null);
+        
         meshes.forEach(function(m){
-            var tilePosition = containingCube(m);
+            var objectCube = containingCube(m);
 
-            metadata[m.id] = {
-                X: x,
-                Y: y,
-                xmin: tilePosition.xmin,
-                xmax: tilePosition.xmax,
-                ymin: tilePosition.ymin,
-                ymax: tilePosition.ymax,
-                zmin: tilePosition.zmin,
-                zmax: tilePosition.zmax,
-                volume: computeMeshVolume(m)
+            tileMetadata.objects[m.id] = {
+                x: Math.round( (objectCube.minX + objectCube.maxX)/2 ),
+                y: Math.round( (objectCube.minY + objectCube.maxY)/2 )
             };
         });
+        
+        //console.log('tileMetadata', tileMetadata);
 
         def.resolve({
             buildingBuffers: buildingBuffers,
-            metadata :metadata
+            tileMetadata : tileMetadata
         })
 
     });
@@ -225,14 +266,14 @@ function processSelectionDirectory(selectionZipDirPath){
 
                         return extractBuildings(tile3dsPath, x, y).then(function(res){
                             var buildingBuffers = res.buildingBuffers;
-                            var metadata = res.metadata;
+                            var tileMetadata = res.tileMetadata;
 
                             return Q.all(Object.keys(buildingBuffers).map(function(id){
                                 var buildingOutPath = path.join(outAbsolutePath, id);
                                 return writeFile(buildingOutPath, buildingBuffers[id]);
                             })).then(function(){
                                 // metadata is returned when all building binary files have been written
-                                return metadata;
+                                return tileMetadata;
                             });
 
                         }).fail(function(err){
@@ -270,22 +311,20 @@ unzipInTmpDir(zipAbsolutePath)
             return allInSequence(absoluteZipPaths, processSelectionDirectory);
         });
     })
-    .then(function(allMetadata){
-        //console.log('final result', typeof allMetadata, allMetadata);    
+    .then(function(dallesMetadata){
+        //console.log('final result', typeof tilesMetadata);    
 
-        var metadata = Object.create(null);
+        var tilesMetadata = dallesMetadata.reduce(function(acc, tm){
+            return acc.concat(tm)
+        }, [])
+        
+        var nbObjects = tilesMetadata.reduce(function(acc, tm){
+            return acc + Object.keys(tm.objects).length;
+        }, 0)
 
-        allMetadata.forEach(function(selectionMetadata){
-            selectionMetadata.forEach(function(tileMetadata){
-                Object.keys(tileMetadata).forEach(function(k){
-                    metadata[k] = tileMetadata[k];
-                });
-            })
-        });
+        console.log('nb of objects', nbObjects);
 
-        console.log('nb of metadata keys', Object.keys(metadata).length);
-
-        return writeFile(path.join(outAbsolutePath, 'metadata.json'), JSON.stringify(metadata, null, 3));
+        return writeFile(path.join(outAbsolutePath, 'metadata.json'), JSON.stringify(tilesMetadata));
 
     })
     .then(function(){
