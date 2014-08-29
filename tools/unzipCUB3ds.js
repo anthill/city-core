@@ -8,6 +8,7 @@ var program = require('commander');
 var unzip = require('unzip');
 var tmp = require('tmp');
 var Q = require('q');
+var Map = require('es6-map');
 
 var containingCube = require('../src/containingCube.js');
 var computeMeshVolume = require('../src/computeMeshVolume.js');
@@ -79,6 +80,9 @@ var outAbsolutePath = path.resolve(process.cwd(), program.out);
 console.log(zipAbsolutePath, outAbsolutePath);
 
 
+// name => next nb to use to append to the name to make it unique
+var ids = new Map();
+
 // in : one archive
 // out : a bunch of binaries + metadata
 
@@ -92,22 +96,28 @@ function extractBuildings(_3dsPath, x, y){
 
         var objects = data.getObjects();
         var meshes = objects.map(function(o){
-            try{ // sometimes o.meshes.faces fails because of an apparently misformed file.
-                return {
-                    id: o.name,
-                    vertices: o.meshes.vertices,
-                    faces: o.meshes.faces
-                };
+            // Generate unique ids since the data producers may fail to do so
+            var id;
+            if(!ids.has(o.name)){
+                id = o.name;
+                ids.set(o.name, 1);
             }
-            catch(e){
-                console.log('Error with object', o.name, 'skipping.', e);
-                return {
-                    id: o.name,
-                    vertices: [],
-                    faces: [],
-                    error: String(e)
-                };
-            }
+            else{
+                var nb = ids.get(o.name);
+                id = o.name + '-' + nb;
+                while(ids.has(id)){
+                    nb++;
+                    id = o.name + '-' + nb;
+                }
+                ids.set(o.name, nb+1);
+            }   
+            
+            return {
+                id: id,
+                vertices: [],
+                faces: []
+            };
+            
         });
         
         /*
