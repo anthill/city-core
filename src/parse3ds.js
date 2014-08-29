@@ -122,8 +122,6 @@ var chunkUtils = (function(){
 function Chunk(buff, type){
     //if(type === "Vertices List")
     //  console.log('Creating Vertices List chunk', buff.length)
-    if(type === "Mapping Coordinates List")
-      console.log('Creating Mapping Coordinates List chunk', buff.length)
 
     var children = [];
 
