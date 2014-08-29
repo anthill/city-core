@@ -114,8 +114,8 @@ function extractBuildings(_3dsPath, x, y){
             
             return {
                 id: id,
-                vertices: [],
-                faces: []
+                vertices: o.meshes.vertices,
+                faces: o.meshes.faces
             };
             
         });
@@ -182,7 +182,6 @@ function extractBuildings(_3dsPath, x, y){
             objects: Object.create(null)
         };
         
-        
         var buildingBuffers = Object.create(null);
         meshes.forEach(function(m, i){
             try{
@@ -201,8 +200,6 @@ function extractBuildings(_3dsPath, x, y){
                 y: Math.round( (objectCube.minY + objectCube.maxY)/2 )
             };
         });
-        
-        //console.log('tileMetadata', tileMetadata);
 
         def.resolve({
             buildingBuffers: buildingBuffers,
@@ -322,7 +319,7 @@ unzipInTmpDir(zipAbsolutePath)
         });
     })
     .then(function(dallesMetadata){
-        //console.log('final result', typeof tilesMetadata);    
+        //console.log('final result', dallesMetadata);    
 
         var tilesMetadata = dallesMetadata.reduce(function(acc, tm){
             return acc.concat(tm)
