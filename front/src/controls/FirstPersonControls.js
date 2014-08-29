@@ -64,19 +64,19 @@ module.exports = function(camera, scene, domElement){
     var SPEED = 0.1;
 
     function mouseDownListener(){
-        var moveVector = {
-            x : lookAtPoint.x - camera.position.x,
-            y : lookAtPoint.y - camera.position.y,
-        };
 
         moveAnimationFrame = requestAnimationFrame(function moveForward(){
+
+            var moveVector = {
+                x : lookAtPoint.x - camera.position.x,
+                y : lookAtPoint.y - camera.position.y,
+            };
             camera.position.x += SPEED*moveVector.x;
             lookAtPoint.x     += SPEED*moveVector.x;
             camera.position.y += SPEED*moveVector.y;
             lookAtPoint.y     += SPEED*moveVector.y;
             
             var distanceToFloor = getFloorHeight(camera.position);
-            console.log("distanceToFloor", distanceToFloor)
             if(distanceToFloor !== undefined){
                 camera.position.z += HEIGHT - distanceToFloor;
             }
