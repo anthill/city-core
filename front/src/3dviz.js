@@ -55,6 +55,8 @@ sunlight.shadowCameraBottom   = -200;
 
 scene.add(sunlight);
 
+var ambientLight = new THREE.AmbientLight( "#333329" ); 
+scene.add( ambientLight );
 
 // Create a renderer and add it to the DOM.
 var renderer = new THREE.WebGLRenderer({antialias:true});
