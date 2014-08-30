@@ -237,8 +237,7 @@ function unzipInTmpDir(pathToZip){
 function processSelectionDirectory(selectionZipDirPath){
     //console.log('processSelectionDirectory', selectionZipDirPath);
 
-    var matches = selectionZipDirPath.match(/\/?([^\/]+)\.zip/);
-    var selectionName = matches[1]; // assumed 2 letters like "RL"
+    var selectionName = path.basename(selectionZipDirPath, '.zip'); // assumed 2 letters like "RL"
 
     return unzipInTmpDir(selectionZipDirPath)
         .then(function(selectionDir){
