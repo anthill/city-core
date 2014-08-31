@@ -44,7 +44,7 @@ function allInSequence(arr, f){
         def.resolve([]);
         return def.promise;
     }
-    
+
     if(arr.length === 1){
         return f(arr[0]).then(function(res){
             return [res];
@@ -53,13 +53,13 @@ function allInSequence(arr, f){
     else{
         var first = arr[0];
         var tail = arr.slice(1);
-        
+
         return f(first).then(function(res){
             return allInSequence(tail, f).then(function(tailRes){
                 tailRes.push(res);
                 return tailRes;
             });
-        });   
+        });
     }
 }
 
@@ -110,27 +110,27 @@ function extractBuildings(_3dsPath, x, y){
                     id = o.name + '-' + nb;
                 }
                 ids.set(o.name, nb+1);
-            }   
-            
+            }
+
             return {
                 id: id,
                 vertices: o.meshes.vertices,
                 faces: o.meshes.faces
             };
-            
+
         });
-        
+
         /*
             Working around https://github.com/anthill/bordeaux3d/issues/11
         */
         // looking for xXXXyYYY object. There is only one per 3ds file
-        var xyObject = meshes.filter(function(m){ return !!m.id.match(/x(\d{1,4})y(\d{1,4})/) })[0]; 
+        var xyObject = meshes.filter(function(m){ return !!m.id.match(/x(\d{1,4})y(\d{1,4})/) })[0];
         var xyContainingCube = containingCube(xyObject);
-        
+
         // Ideally, xyContainingCube.xmax and xyContainingCube.ymax should be +100. Finding the translation.
         var deltaX = 100 - xyContainingCube.maxX;
         var deltaY = 100 - xyContainingCube.maxY;
-        
+
         if(deltaX !== 0 || deltaY !== 0){
             // apply translation to all tile objects
             meshes.forEach(function(m){
@@ -140,8 +140,8 @@ function extractBuildings(_3dsPath, x, y){
                 });
             });
         }
-        
-        
+
+
         // Find tile bounding box
         var containingCubes = meshes.map(containingCube);
         // create a fake mesh based on the cubes descriptions
@@ -162,13 +162,13 @@ function extractBuildings(_3dsPath, x, y){
             }, [])
         };
         var tileContainingCube = containingCube(fakeCombiningMesh);
-        
+
         var minZ = Math.floor(tileContainingCube.minZ);
         var maxZ = Math.ceil(tileContainingCube.maxZ);
         if(minZ === maxZ){ // happens for flat floor objects
             maxZ = minZ + 1;
         }
-        
+
         // integer approximation
         var tileMetadata = {
             X: x,
@@ -181,7 +181,7 @@ function extractBuildings(_3dsPath, x, y){
             maxZ: maxZ,
             objects: Object.create(null)
         };
-        
+
         var buildingBuffers = Object.create(null);
         meshes.forEach(function(m, i){
             try{
@@ -191,7 +191,7 @@ function extractBuildings(_3dsPath, x, y){
                 console.error('compacting error', x, y, e)
             }
         });
-        
+
         meshes.forEach(function(m){
             var objectCube = containingCube(m);
 
@@ -220,7 +220,7 @@ function unzipInTmpDir(pathToZip){
 
         var extractWriteStream = unzip.Extract({ path: tmpDir })
         readStream.pipe(extractWriteStream);
-        
+
         extractWriteStream.on('close', function(e){ // 'close' event, unlike 'finish' guarantees all writes to disk are finished
             //console.log('close');
             def.resolve(tmpDir);
@@ -236,21 +236,20 @@ function unzipInTmpDir(pathToZip){
 */
 function processSelectionDirectory(selectionZipDirPath){
     //console.log('processSelectionDirectory', selectionZipDirPath);
-    
-    var matches = selectionZipDirPath.match(/\/?([^\/]+)\.zip/); 
-    var selectionName = matches[1]; // assumed 2 letters like "RL"
+
+    var selectionName = path.basename(selectionZipDirPath, '.zip'); // assumed 2 letters like "RL"
 
     return unzipInTmpDir(selectionZipDirPath)
         .then(function(selectionDir){
             //console.log('unzipped', selectionName, selectionDir);
-            
+
             var selectionPath = path.join(selectionDir, selectionName);
             return readdir(selectionPath)
                 .then(function(selectionFiles){
                     //selectionFiles = selectionFiles.slice(0, 4);
 
                     //console.log("selectionFiles", selectionFiles);
-                    
+
                     var tile3dsPathsAndxy = selectionFiles
                         .filter(function(f){
                             return f.indexOf('.') === -1; // weak test
@@ -306,25 +305,25 @@ unzipInTmpDir(zipAbsolutePath)
             //console.log("selectionZips", selectionZips);
 
             //selectionZips = selectionZips.slice(0, 3);
-            
+
             var absoluteZipPaths = selectionZips.map(function(zipPath){
                 return path.join(tmpDir, zipPath);
             });
 
             //console.log(absoluteZipPaths);
-            
+
             //return Q.all(absoluteZipPaths.map(processSelectionDirectory));
-            
+
             return allInSequence(absoluteZipPaths, processSelectionDirectory);
         });
     })
     .then(function(dallesMetadata){
-        //console.log('final result', dallesMetadata);    
+        //console.log('final result', dallesMetadata);
 
         var tilesMetadata = dallesMetadata.reduce(function(acc, tm){
             return acc.concat(tm)
         }, [])
-        
+
         var nbObjects = tilesMetadata.reduce(function(acc, tm){
             return acc + Object.keys(tm.objects).length;
         }, 0)
