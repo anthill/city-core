@@ -1,6 +1,6 @@
 {
   "name": "Bordeaux-3d",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A simple implementation of the backend for the bordeaux3d project",
   "repository": "https://github.com/anthill/bordeaux3d",
   "main": "index.js",
