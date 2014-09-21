@@ -5,7 +5,8 @@
   "repository": "https://github.com/anthill/bordeaux3d",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "watchify front/src/main.js -o front/app.js -d -v"
   },
   "author": "",
   "license": "MIT",
@@ -34,6 +35,7 @@
     "tmp": "0.0.24",
     "q": "~1.0.1",
     "glob": "~4.0.5",
-    "graceful-fs": "~3.0.2"
+    "graceful-fs": "~3.0.2",
+    "watchify": "^1.0.2"
   }
 }
