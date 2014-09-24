@@ -6,3 +6,7 @@ data/
 front/app.js
 
 notes.md
+
+XML.zip
+*.geoxml
+tilesAltitudes.json

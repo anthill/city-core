@@ -15,6 +15,14 @@ var computeMeshVolume = require('../src/computeMeshVolume.js');
 var _3dsFormatToAntsBinaryBuffer = require('../src/3dsFormatToAntsBinaryBuffer.js');
 var parse3ds = require('../src/parse3ds.js');
 
+var tilesAltitudes;
+
+try{
+    tilesAltitudes = require('../data/tilesAltitudes.json');
+}
+catch(e){
+    console.warn('missing data/tilesAltitudes.json file', e);
+}
 
 function tmpdir(){
     var def = Q.defer();
@@ -137,6 +145,21 @@ function extractBuildings(_3dsPath, x, y){
                 m.vertices.forEach(function(v){
                     v.x += deltaX;
                     v.y += deltaY;
+                });
+            });
+        }
+
+
+        if(tilesAltitudes){
+            // correct altitude
+
+            var key = _3dsPath.match(/x\d{1,4}y\d{1,4}/)[0];
+
+            var deltaZ = tilesAltitudes[key];
+
+            meshes.forEach(function(m){
+                m.vertices.forEach(function(v){
+                    v.z += deltaZ;
                 });
             });
         }
