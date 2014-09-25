@@ -63,7 +63,7 @@ module.exports = function createBuildingMesh(buffer, tile) {
 
     geometry.computeFaceNormals();
     
-    var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({
+    var mesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({
         color: 0xaaaaaa,
         wireframe: false
     }));
