@@ -1,27 +1,34 @@
 {
   "name": "Bordeaux-3d",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A simple implementation of the backend for the bordeaux3d project",
   "repository": "https://github.com/anthill/bordeaux3d",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "browserify front/src/main.js -o front/app.js -d",
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "watchify front/src/main.js -o front/app.js -d -v"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "dat-gui": "~0.5.0",
+    "dat-gui": "^0.5.0",
     "es6-map": "~0.1.0",
+    "browserify": "^5.0.0",
     "es6-promise": "^1.0.0",
     "es6-promisify": "^1.1.1",
     "event-emitter": "~0.3.1",
     "express": "^4.8.3",
     "rbush": "~1.3.2",
     "socket.io": "^1.0.6",
-    "socket.io-client": "~1.0.6",
+    "socket.io-client": "^1.0.6",
     "suncalc": "^1.5.2",
-    "three": "~0.68.0",
-    "xmldom": "^0.1.19"
+    "xmldom": "^0.1.19",
+    "three": "^0.68.0",
+    "es6-map": "^0.1.0",
+    "rbush": "^1.3.2",
+    "event-emitter": "^0.3.1"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
@@ -30,11 +37,12 @@
     "grunt-contrib-uglify": "^0.5.1",
     "grunt-contrib-watch": "^0.6.1",
     "typescript": "^1.0.1",
-    "unzip": "~0.1.9",
-    "commander": "~2.3.0",
-    "tmp": "0.0.24",
-    "q": "~1.0.1",
-    "glob": "~4.0.5",
-    "graceful-fs": "~3.0.2"
+    "unzip": "^0.1.9",
+    "commander": "^2.3.0",
+    "tmp": "^0.0.24",
+    "q": "^1.0.1",
+    "glob": "^4.0.5",
+    "graceful-fs": "^3.0.2",
+    "watchify": "^1.0.2"
   }
 }
