@@ -21,6 +21,12 @@ module.exports = function(camera, scene, domElement){
         var north = camera.position.y + L/2;
         var west = camera.position.x - l/2;
         var east = camera.position.x + l/2;
+        
+        // ask for a little extra
+        west -= 200;
+        south -= 200;
+        east += 200;
+        north += 200;
 
         loadObjects(south, north, east, west);
     }

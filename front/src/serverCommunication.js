@@ -47,10 +47,12 @@ socket.on('building', function(msg){
         if(msg.buffer){
             var mesh = createBuildingMesh(new DataView(msg.buffer), buildingMetadata.tile);
 
-            meshToBuilding.set(mesh, {id: msg.id, metadata: buildingMetadata, buffer: msg.buffer});
+            meshToBuilding.set(mesh, {id: msg.id, metadata: buildingMetadata}); 
             scene.add(mesh);
 
-            buildingMap.set(msg.id, {mesh:mesh, visible:true});
+            buildingMap[msg.id] = {mesh:mesh, visible:true};
+            
+            msg = undefined; // loose references to the binary buffer
         }
         else{
             // for whatever reason, sometimes, there is no msg.buffer property. Maybe socket.io messes up or something
