@@ -10,7 +10,6 @@ var app = require('express')();
 var http = require('http').createServer(app);
 
 // defs
-var server = "//localhost";
 var PORT = 3000;
 var MAXY = 170;
 
