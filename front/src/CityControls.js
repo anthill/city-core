@@ -2,7 +2,7 @@
 
 var SkyViewControls = require('./controls/SkyViewControls.js');
 var FirstPersonControls = require('./controls/FirstPersonControls.js');
-var loadTiles = require('./loadTiles.js');
+var loadObjects = require('./loadObjects.js');
 var meshToBuilding = require('./meshToBuilding');
 
 var desactivateCurrentControls = function(){};
@@ -22,7 +22,7 @@ module.exports = function(camera, scene, domElement){
         var west = camera.position.x - l/2;
         var east = camera.position.x + l/2;
 
-        loadTiles(south, north, east, west);
+        loadObjects(south, north, east, west);
     }
 
     function onCameraViewChangeFirstPerson(){
@@ -31,7 +31,7 @@ module.exports = function(camera, scene, domElement){
         var west = camera.position.x - 300;
         var east = camera.position.x + 300;
 
-        loadTiles(south, north, east, west);
+        loadObjects(south, north, east, west);
     }
     
     function onMeshClicked(event){

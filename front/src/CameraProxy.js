@@ -45,7 +45,10 @@ module.exports = function(camera){
     
     var lookAtVector;
     var positionProxy = VectorProxy(camera.position);
+    var rotationProxy = VectorProxy(camera.rotation);
+
     positionProxy.on('change', scheduleChangeEvent);
+    rotationProxy.on('change', scheduleChangeEvent);
     
     var proxy = ee({
         get lookAtVector(){ return lookAtVector ? Object.freeze({
@@ -62,6 +65,9 @@ module.exports = function(camera){
         },
         get position(){
             return positionProxy;
+        }, 
+        get rotation(){
+            return rotationProxy;
         }, 
         lookAt: function(v){
             camera.lookAt(v);
@@ -81,6 +87,19 @@ module.exports = function(camera){
             
             scheduleChangeEvent();
         },
+        set rotation(v){
+            camera.rotation.x = v.x;
+            camera.rotation.y = v.y;
+            camera.rotation.z = v.z;
+            
+            scheduleChangeEvent();
+        },
+        get quaternion(){
+            return camera.quaternion;
+        },
+        set quaternion(q){
+            camera.quaternion = q;
+        },
         
         /* other properties proxying */
         get fov(){ return camera.fov; },
@@ -91,6 +110,9 @@ module.exports = function(camera){
         
         updateProjectionMatrix: function(){
             camera.updateProjectionMatrix.apply(camera, arguments);
+        },
+        applyQuaternion: function(q){
+            camera.lookAt(lookAtVector.applyQuaternion(q));
         }
     });
     
