@@ -37,9 +37,6 @@ scene.add(skyBox);
 var camera = new THREE.PerspectiveCamera( 60, WIDTH / HEIGHT, 1, 500000 );
 scene.add(camera);
 
-camera.useQuaternion = true;
-
-
 var sunlight = new THREE.DirectionalLight(0xffffff, 1);
 
 sunlight.castShadow = true;

@@ -2,6 +2,7 @@
 
 //var THREE = require('three');
 var ee = require('event-emitter');
+var THREE = require('three');
 
 var VectorProxy = require('./VectorProxy.js');
 
@@ -27,6 +28,13 @@ module.exports = function(camera){
     var existingProxy = targetToProxy.get(camera);
     if(existingProxy)
         return existingProxy;
+
+    // var pitchObject = new THREE.Object3D();
+    // pitchObject.add( camera );
+
+    // var yawObject = new THREE.Object3D();
+    // // yawObject.position.y = 10;
+    // yawObject.add( pitchObject );
     
     
     var scheduledChangeEvent = false;
@@ -63,6 +71,12 @@ module.exports = function(camera){
                 z: camera.up.z
             })
         },
+        get direction(){
+            var dir = new THREE.Vector3();
+            dir.subVectors(lookAtVector, camera.position);
+            dir.normalize();
+            return dir;
+        },
         get position(){
             return positionProxy;
         }, 
@@ -84,6 +98,10 @@ module.exports = function(camera){
             camera.position.x = v.x;
             camera.position.y = v.y;
             camera.position.z = v.z;
+            // yawObject.position.x = v.x;
+            // yawObject.position.y = v.y;
+            // yawObject.position.z = v.z;
+
             
             scheduleChangeEvent();
         },
@@ -91,6 +109,9 @@ module.exports = function(camera){
             camera.rotation.x = v.x;
             camera.rotation.y = v.y;
             camera.rotation.z = v.z;
+            // pitchObject.rotation.x = v.x;
+            // yawObject.rotation.y = v.y;
+            // camera.rotation.z = v.z;
             
             scheduleChangeEvent();
         },
@@ -110,10 +131,10 @@ module.exports = function(camera){
         
         updateProjectionMatrix: function(){
             camera.updateProjectionMatrix.apply(camera, arguments);
-        },
-        applyQuaternion: function(q){
-            camera.lookAt(lookAtVector.applyQuaternion(q));
         }
+        // applyQuaternion: function(q){
+        //     camera.lookAt(lookAtVector.applyQuaternion(q));
+        // }
     });
     
     

@@ -19,6 +19,7 @@ var DISTANCE_TO_LOOK_AT = 20;
 var MAX_HORI_SPEED = Math.PI/100;
 var MAX_VERTI_SPEED = Math.PI/120;
 
+
 module.exports = function(camera, scene, domElement){
     
     var getFloorHeight = _getFloorHeight(scene);
@@ -32,7 +33,7 @@ module.exports = function(camera, scene, domElement){
 
 
     var movementX, movementY;
-    var PI_2 = Math.PI / 2;
+    var PI = Math.PI;
 
 
     // TACTILE VERSION    
@@ -115,17 +116,33 @@ module.exports = function(camera, scene, domElement){
         var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
         var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
 
-        var quaternion = new THREE.Quaternion();
-        quaternion.setFromAxisAngle( new THREE.Vector3(0,1,0), -movementX * 0.002);
-        quaternion.setFromAxisAngle( new THREE.Vector3(1,0,0), -movementY * 0.002);
+        var yawQuat = new THREE.Quaternion(0,0,0,1);
+        var pitchQuat = new THREE.Quaternion(0,0,0,1);
+        var combinedQuat = new THREE.Quaternion(0,0,0,1);
 
-        camera.quaternion = quaternion;
-        // camera.applyQuaternion(quaternion);
+        var axis = new THREE.Vector3();
+        axis.crossVectors(camera.direction, camera.up);
+
+        yawQuat.setFromAxisAngle( camera.up, -movementX * 0.005);
+        pitchQuat.setFromAxisAngle( axis, -movementY * 0.005);
+
+        combinedQuat.multiplyQuaternions(yawQuat, pitchQuat);
+
+        // camera.quaternion = quaternion;
+        var direction = camera.direction;
+        direction.applyQuaternion(combinedQuat);
+
+        var newLookAt = new THREE.Vector3(0,0,0);
+
+        newLookAt.addVectors(camera.position, direction);
+        console.log("Temp: " + newLookAt.x + " | " + newLookAt.y + " | " + newLookAt.z);
+
+        camera.lookAt(newLookAt);
 
         // camera.rotation.y -= movementX * 0.002;
         // camera.rotation.x -= movementY * 0.002;
 
-        // camera.rotation.x = Math.max( - PI_2, Math.min( PI_2, camera.rotation.x ) );
+        // camera.rotation.x = Math.max( - PI, Math.min( PI, camera.rotation.x ) );
     }
 
     // TACTILE VERSION
