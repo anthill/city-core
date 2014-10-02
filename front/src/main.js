@@ -9,7 +9,6 @@ var guiControls = gui.guiControls;
 //var parseGeometry = require('./parseGeometry.js');
 var rTree = require('./rTree.js');
 var geoCode = require('./geoCode.js');
-var loadTiles = require('./loadTiles.js');
 
 var _3dviz = require('./3dviz.js');
 var scene = _3dviz.scene;

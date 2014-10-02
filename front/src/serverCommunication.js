@@ -35,23 +35,41 @@ var metadataP = new Promise(function(resolve){
     });
 });
 
+function getCityObject(id){
+    socket.emit('object', {id : id});
+}
+
 // when receiving a building parse it
 socket.on('building', function(msg){
     
     metadataP.then(function(metadata){
         var buildingMetadata = metadata[msg.id];
-        var mesh = createBuildingMesh(new DataView(msg.buffer), buildingMetadata.tile);
-        
-        meshToBuilding.set(mesh, {id: msg.id, metadata: buildingMetadata, buffer: msg.buffer});
-        scene.add(mesh);
-        
-        buildingMap.set(msg.id, {mesh:mesh, visible:true});
+        if(msg.buffer){
+            var mesh = createBuildingMesh(new DataView(msg.buffer), buildingMetadata.tile);
+
+            meshToBuilding.set(mesh, {id: msg.id, metadata: buildingMetadata}); 
+            scene.add(mesh);
+
+            buildingMap[msg.id] = {mesh:mesh, visible:true};
+            
+            msg = undefined; // loose references to the binary buffer
+        }
+        else{
+            // for whatever reason, sometimes, there is no msg.buffer property. Maybe socket.io messes up or something
+            // anyway, usually, retrying getting the object works
+            // In case it doesn't work, this will create a really bad infinite loop
+            setTimeout(function(){
+                getCityObject(msg.id);
+            }, 100); // arbitrary amount of time
+        }
     }).catch(function(err){
         console.error(err);
     });
 });
 
+
+
 module.exports = {
     metadataP: metadataP,
-    socket: socket
+    getCityObject: getCityObject
 }
