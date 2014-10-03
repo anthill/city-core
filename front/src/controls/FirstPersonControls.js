@@ -16,11 +16,16 @@ var cos = Math.cos,
 var HEIGHT = 6;
 
 var DISTANCE_TO_LOOK_AT = 20;
-var MAX_HORI_SPEED = Math.PI/100;
-var MAX_VERTI_SPEED = Math.PI/120;
+// var MAX_HORI_SPEED = Math.PI/100;
+// var MAX_VERTI_SPEED = Math.PI/120;
+
+var PITCH_SPEED = 0.005;
+var YAW_SPEED = 0.005;
 
 
 module.exports = function(camera, scene, domElement){
+
+    
     
     var getFloorHeight = _getFloorHeight(scene);
     
@@ -113,36 +118,33 @@ module.exports = function(camera, scene, domElement){
 
     function moveCallback(event) {
 
+        // Get mouse differential movements
         var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
         var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
 
+        // Create pitch axis
+        var axis = new THREE.Vector3();
+        axis.crossVectors(camera.direction, camera.up);
+
+        // Create quaternions for pitch and yaw, then combine them
         var yawQuat = new THREE.Quaternion(0,0,0,1);
         var pitchQuat = new THREE.Quaternion(0,0,0,1);
         var combinedQuat = new THREE.Quaternion(0,0,0,1);
 
-        var axis = new THREE.Vector3();
-        axis.crossVectors(camera.direction, camera.up);
-
-        yawQuat.setFromAxisAngle( camera.up, -movementX * 0.005);
-        pitchQuat.setFromAxisAngle( axis, -movementY * 0.005);
+        yawQuat.setFromAxisAngle( camera.up, -movementX * YAW_SPEED);
+        pitchQuat.setFromAxisAngle( axis, -movementY * PITCH_SPEED);
 
         combinedQuat.multiplyQuaternions(yawQuat, pitchQuat);
 
-        // camera.quaternion = quaternion;
+        // Apply rotation to camera's direction vector
         var direction = camera.direction;
         direction.applyQuaternion(combinedQuat);
 
+        // Create new LookAt point
         var newLookAt = new THREE.Vector3(0,0,0);
-
         newLookAt.addVectors(camera.position, direction);
-        console.log("Temp: " + newLookAt.x + " | " + newLookAt.y + " | " + newLookAt.z);
 
         camera.lookAt(newLookAt);
-
-        // camera.rotation.y -= movementX * 0.002;
-        // camera.rotation.x -= movementY * 0.002;
-
-        // camera.rotation.x = Math.max( - PI, Math.min( PI, camera.rotation.x ) );
     }
 
     // TACTILE VERSION
@@ -208,27 +210,31 @@ module.exports = function(camera, scene, domElement){
     //     // camera.lookAt( new THREE.Vector3( camx, camy, 0 ) );
     // }
 
-    function onKeyDown( event ) {
-        console.log('keypress', event.keyCode);
-        switch ( event.keyCode ) {
-            case keys.UP:
-                pan( new THREE.Vector3( 0, 1, 0 ) );
-                event.preventDefault();
-                break;
-            case keys.BOTTOM:
-                pan( new THREE.Vector3( 0, - 1, 0 ) );
-                event.preventDefault();
-                break;
-            case keys.LEFT:
-                pan( new THREE.Vector3( - 1, 0, 0 ) );
-                event.preventDefault();
-                break;
-            case keys.RIGHT:
-                pan( new THREE.Vector3( 1, 0, 0 ) );
-                event.preventDefault();
-                break;
-        }
-    }
+    // function onKeyDown( event ) {
+    //     console.log('keypress', event.keyCode);
+    //     switch ( event.keyCode ) {
+    //         case keys.UP:
+    //             pan( new THREE.Vector3( 0, 1, 0 ) );
+    //             event.preventDefault();
+    //             break;
+    //         case keys.BOTTOM:
+    //             pan( new THREE.Vector3( 0, - 1, 0 ) );
+    //             event.preventDefault();
+    //             break;
+    //         case keys.LEFT:
+    //             pan( new THREE.Vector3( - 1, 0, 0 ) );
+    //             event.preventDefault();
+    //             break;
+    //         case keys.RIGHT:
+    //             pan( new THREE.Vector3( 1, 0, 0 ) );
+    //             event.preventDefault();
+    //             break;
+    //     }
+    // }
+
+    // function changeCallback(event){
+    //     switchToSkyView(camera.position.x, camera.position.y);
+    // }
     
     
     return function(x, y){
@@ -236,13 +242,13 @@ module.exports = function(camera, scene, domElement){
         'mozPointerLockElement' in document ||
         'webkitPointerLockElement' in document;
 
-        console.log("PointerLock: " + havePointerLock);
-
         document.body.requestPointerLock = document.body.requestPointerLock ||
             document.body.mozRequestPointerLock ||
             document.body.webkitRequestPointerLock;
         // Ask the browser to lock the pointer
         document.body.requestPointerLock();
+
+        
 
         camera.up = new THREE.Vector3(0, 0, 1);
         camera.near = 1;
@@ -265,7 +271,7 @@ module.exports = function(camera, scene, domElement){
         // domElement.addEventListener('mousemove', mouseMoveListener);
         // domElement.addEventListener('mousedown', mouseDownListener);
         // domElement.addEventListener('mouseup', mouseUpListener);
-        window.addEventListener('keydown', onKeyDown);
+        // window.addEventListener('keydown', onKeyDown);
 
         document.body.addEventListener("mousemove", moveCallback, false);
 
@@ -292,7 +298,7 @@ module.exports = function(camera, scene, domElement){
             // domElement.removeEventListener('mousemove', mouseMoveListener);
             // domElement.removeEventListener('mousedown', mouseDownListener);
             // domElement.removeEventListener('mouseup', mouseUpListener);
-            window.removeEventListener('keydown', onKeyDown);
+            // window.removeEventListener('keydown', onKeyDown);
 
             document.body.removeEventListener("mousemove", moveCallback, false);
             document.exitPointerLock();
