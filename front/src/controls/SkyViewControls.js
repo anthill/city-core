@@ -14,6 +14,10 @@ module.exports = function(camera, domElement){
     var keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
     var userPanSpeed = 50.0;
 
+    var alpha;
+    var beta;
+    var animationFrame;
+
     function pan ( direction ) {
         var camx = camera.position.x + direction.x*userPanSpeed;
         var camy = camera.position.y + direction.y*userPanSpeed;
@@ -44,7 +48,62 @@ module.exports = function(camera, domElement){
                 break;
         }
     }
+
+    function sign(x) {
+        return typeof x === 'number' ? x ? x < 0 ? -1 : 1 : x === x ? 0 : NaN : NaN;
+    }
+
+    function moveCamera(){
+        camera.position.x = camera.position.x + alpha;
+        camera.position.y = camera.position.y + beta;
+        // console.log("beta", beta, "alpha", alpha, "newz", newz)
+
+        animationFrame = requestAnimationFrame(moveCamera)
+    }
     
+    function mouseMoveListener(e){
+
+        var canvasBoundingRect = domElement.getBoundingClientRect();
+
+        var deltaX = e.clientX - canvasBoundingRect.width/2;
+        var deltaZ = e.clientY - canvasBoundingRect.height/2;
+
+        var thresX = canvasBoundingRect.width*3/10;
+        var normX = canvasBoundingRect.width/2 - canvasBoundingRect.width*3/10;
+        var thresZ = canvasBoundingRect.height*3/10;
+        var normZ = canvasBoundingRect.height/2 - canvasBoundingRect.height*3/10;
+
+        if(Math.abs(deltaX) > thresX || Math.abs(deltaZ) > thresZ){
+
+            if (Math.abs(deltaX) > thresX){
+                alpha = (Math.abs(deltaX)-thresX)*(Math.abs(deltaX)-thresX) / (normX*normX) * sign(deltaX) * camera.position.z/15;
+            //     alpha = MAX_HORI_SPEED *
+            //         (Math.abs(deltaX) - canvasBoundingRect.width/10)/
+            //         (canvasBoundingRect.width/2 - canvasBoundingRect.width/10);
+            //     if(deltaX > 0)
+            //         alpha = -alpha;
+            }
+            else {alpha = 0;}
+
+            if (Math.abs(deltaZ) > thresZ){
+                beta = - (Math.abs(deltaZ)-thresZ)*(Math.abs(deltaZ)-thresZ) / (normZ*normZ) * sign(deltaZ) * camera.position.z/15;
+            //     beta = MAX_VERTI_SPEED *
+            //         (Math.abs(deltaZ) - canvasBoundingRect.height/20)/
+            //         (canvasBoundingRect.height/2 - canvasBoundingRect.height/20);
+            //     if(deltaZ > 0)
+            //         beta = -beta;
+            }
+            else {beta = 0;}
+
+            if(!animationFrame)
+                animationFrame = requestAnimationFrame(moveCamera)
+        }
+        else{
+            cancelAnimationFrame(animationFrame);
+            animationFrame = undefined;
+        }
+    }
+
     var ZOOM_BY_DELTA = 25;
     
     // hack to normalize deltaY values across browsers.
@@ -77,13 +136,13 @@ module.exports = function(camera, domElement){
         
         window.addEventListener( 'keydown', onKeyDown );
         window.addEventListener( 'wheel', onScroll );
+        window.addEventListener( 'mousemove', mouseMoveListener );
 
         return function desactivate(){
             // In Chrome listening to keypress doesn't work for whatever reason
             window.removeEventListener( 'keydown', onKeyDown );
             window.removeEventListener( 'wheel', onScroll );
+            window.removeEventListener( 'mousemove', mouseMoveListener );
         };
-    }
-    
-    
+    }    
 };
