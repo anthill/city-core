@@ -1,6 +1,6 @@
 "use strict";
 
-var fs = require("fs");
+var fs = require('graceful-fs');
 
 /* Sources:
     http://en.wikipedia.org/wiki/.3ds
