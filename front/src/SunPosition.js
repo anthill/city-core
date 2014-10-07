@@ -15,19 +15,23 @@ function computeDirection(date){
     var lightY = radius * Math.cos(sunPos.altitude) * Math.sin(sunPos.azimuth);
     var lightZ = radius * Math.tan(sunPos.altitude);
     vec = [lightX, lightY, lightZ];
-    return vec
+    return vec;
 }
 
+
 module.exports = function(light){
+    
+    function applyLightTargetAtHour(hour){
+        date.setHours(hour);
+        vec = computeDirection(date)
+        var pos = light.position;
+        light.target.position.set(pos.x + vec[0], pos.y + vec[1], 0)
+    }
+    
+    
+    applyLightTargetAtHour(gui.guiControls.hour);
 
-	gui.hourControler.onChange(function(value) {
-	    
-	    date.setHours(value);
-	    vec = computeDirection(date)
-	    var pos = light.position;
-	    light.target.position.set(pos.x + vec[0], pos.y + vec[1], 0)
-
-	});
+    gui.hourControler.onChange(applyLightTargetAtHour);
 
     vec = computeDirection(date);
 	return vec;

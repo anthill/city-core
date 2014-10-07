@@ -13,13 +13,19 @@ function zFrom8bitsInt(z, MIN_Z, MAX_Z){
     return z*(MAX_Z - MIN_Z)/(((1 << 8)-1)) + MIN_Z;
 }
 
+var material = new THREE.MeshLambertMaterial({
+    color: 0xaaaaaa,
+    wireframe: false,
+    shading: THREE.FlatShading
+});
+
 /*
     Parses a buffer with binary data describing an object to be added to the scene
     
     data is a DataView
     @returns a THREE.Mesh
 */
-module.exports = function createBuildingMesh(buffer, tile) {
+module.exports = function createBuildingMesh(buffer, tile, options) {
 
     var geometry = new THREE.Geometry();
     var offset = 0;
@@ -63,10 +69,7 @@ module.exports = function createBuildingMesh(buffer, tile) {
 
     geometry.computeFaceNormals();
     
-    var mesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({
-        color: 0xaaaaaa,
-        wireframe: false
-    }));
+    var mesh = new THREE.Mesh(geometry, material);
     
     mesh.position.set(tile.X*200, (MAXY - tile.Y)*200, 0);
     mesh.castShadow = true;
