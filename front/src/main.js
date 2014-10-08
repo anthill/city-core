@@ -91,6 +91,6 @@ camera.on('cameraviewchange', function(){
     light.position.z = 300;
     var sunPos = SunPosition(light);
     light.target.position.set(pos.x + sunPos[0], pos.y + sunPos[1], 0);
-});
 
-// camera.on('cameraviewchange', function(){ var pos = camera.position; console.log('camera', pos.x, pos.y, pos.z, camera.lookAtVector, camera.up); });
+    _3dviz.render();
+});
