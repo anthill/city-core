@@ -1,11 +1,7 @@
 'use strict';
 
 var io = require('socket.io-client');
-var buildingMap = require('./buildingMap.js');
-var createBuildingMesh = require('./createBuildingMesh.js');
-var scene = require('./3dviz').scene;
-
-var meshToBuilding = require('./meshToBuilding');
+var ee = require('event-emitter');
 
 //socket
 var socket = io();
@@ -45,12 +41,12 @@ socket.on('building', function(msg){
     metadataP.then(function(metadata){
         var buildingMetadata = metadata[msg.id];
         if(msg.buffer){
-            var mesh = createBuildingMesh(new DataView(msg.buffer), buildingMetadata.tile);
+            var data = {
+                msg: msg,
+                buildingMetadata: buildingMetadata
+            }
 
-            meshToBuilding.set(mesh, {id: msg.id, metadata: buildingMetadata}); 
-            scene.add(mesh);
-
-            buildingMap[msg.id] = {mesh:mesh, visible:true};
+            ret.emit('buildingOk', data);
             
             msg = undefined; // loose references to the binary buffer
         }
@@ -67,9 +63,10 @@ socket.on('building', function(msg){
     });
 });
 
-
-
-module.exports = {
+var ret = ee({
     metadataP: metadataP,
     getCityObject: getCityObject
-}
+});
+
+
+module.exports = ret;

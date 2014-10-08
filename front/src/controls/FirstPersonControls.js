@@ -86,7 +86,7 @@ module.exports = function(camera, scene, domElement){
 
     function mouseDownListener(){
 
-        // moveAnimationFrame = requestAnimationFrame(function moveForward(){
+        moveAnimationFrame = requestAnimationFrame(function moveForward(){
 
             var moveVector = {
                 x : lookAtPoint.x - camera.position.x,
@@ -104,16 +104,16 @@ module.exports = function(camera, scene, domElement){
                 camera.position.z += HEIGHT - distanceToFloor;
             }
             
-            // moveAnimationFrame = requestAnimationFrame(moveForward);
-        // });
+            moveAnimationFrame = requestAnimationFrame(moveForward);
+        });
         
         
     }
 
-    // function mouseUpListener(){
-    //     cancelAnimationFrame(moveAnimationFrame);
-    //     moveAnimationFrame = undefined;
-    // }
+    function mouseUpListener(){
+        cancelAnimationFrame(moveAnimationFrame);
+        moveAnimationFrame = undefined;
+    }
     
     
     return function(x, y){
@@ -137,14 +137,14 @@ module.exports = function(camera, scene, domElement){
 
         domElement.addEventListener('mousemove', mouseMoveListener);
         domElement.addEventListener('mousedown', mouseDownListener);
-        // domElement.addEventListener('mouseup', mouseUpListener);
+        domElement.addEventListener('mouseup', mouseUpListener);
 
         return function desactivate(){
             domElement.removeEventListener('mousemove', mouseMoveListener);
             domElement.removeEventListener('mousedown', mouseDownListener);
-            // domElement.removeEventListener('mouseup', mouseUpListener);
-            // cancelAnimationFrame(moveAnimationFrame);
-            // moveAnimationFrame = undefined;
+            domElement.removeEventListener('mouseup', mouseUpListener);
+            cancelAnimationFrame(moveAnimationFrame);
+            moveAnimationFrame = undefined;
         };
     }
     

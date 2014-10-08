@@ -3,6 +3,9 @@
 var THREE = require('three');
 
 var serverCommunication = require('./serverCommunication.js');
+var createBuildingMesh = require('./createBuildingMesh.js');
+var buildingMap = require('./buildingMap.js');
+var meshToBuilding = require('./meshToBuilding.js');
 var gui = require('./gui.js');
 var guiControls = gui.guiControls;
 
@@ -94,3 +97,15 @@ camera.on('cameraviewchange', function(){
 
     _3dviz.render();
 });
+
+serverCommunication.on('buildingOk', function(event){
+    var mesh = createBuildingMesh(new DataView(event.msg.buffer), event.buildingMetadata.tile);
+
+    meshToBuilding.set(mesh, {id: event.msg.id, metadata: event.buildingMetadata}); 
+    scene.add(mesh);
+
+    buildingMap[event.msg.id] = {mesh:mesh, visible:true};
+
+    _3dviz.render();
+
+})
