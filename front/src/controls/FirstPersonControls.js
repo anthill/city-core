@@ -1,9 +1,7 @@
 'use strict';
 
 /*
-    * Move mouse: look around
-    * Mouse down: move forward
-    * Mouse up: stop moving forward
+    FPS Style
 */
 
 var THREE = require('three');
@@ -50,6 +48,7 @@ module.exports = function(camera, scene, domElement){
         var distanceToFloor = getFloorHeight(rayCasterPosition);
 
         // Position camera above the closest floor
+        // causes problems for lookAt behaviour when jumping on buildings roofs
         if(distanceToFloor !== undefined){
             camera.position.z += HEIGHT - distanceToFloor;
         }
@@ -67,6 +66,7 @@ module.exports = function(camera, scene, domElement){
         deltaPosition.x = 0;
         deltaPosition.y = 0;
 
+        // See headMovement commentaries
         // camera.lookAt(lookAtPoint);
 
         moveAnimationFrame = requestAnimationFrame(updateCamera);
@@ -104,6 +104,10 @@ module.exports = function(camera, scene, domElement){
         newLookAt.addVectors(camera.position, direction);
 
         lookAtPoint = newLookAt;
+
+        // WARNING:
+        // camera.lookAt() should be inside updateCamera() for later requestAnimationFrame optimization purpose.
+        // But if so, the lookAt behaviour is odd... for now camera.lookAt() stays here.
         camera.lookAt(lookAtPoint);
     }
 
