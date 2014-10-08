@@ -13,14 +13,18 @@ var cos = Math.cos,
     sin = Math.sin,
     pow = Math.pow;
 
-var HEIGHT = 6;
+var HEIGHT = 1.8;
 
 var DISTANCE_TO_LOOK_AT = 20;
-// var MAX_HORI_SPEED = Math.PI/100;
-// var MAX_VERTI_SPEED = Math.PI/120;
 
 var PITCH_SPEED = 0.005;
 var YAW_SPEED = 0.005;
+var BODY_SPEED = 4;
+
+var moveForward = false;
+var moveBackward = false;
+var moveLeft = false;
+var moveRight = false;
 
 
 module.exports = function(camera, scene, domElement){
@@ -28,95 +32,48 @@ module.exports = function(camera, scene, domElement){
     
     
     var getFloorHeight = _getFloorHeight(scene);
-    
-    var alpha;
-    var beta;
-    var animationFrame;
-    var rotation = 0;
-    
+    var moveAnimationFrame;
     var lookAtPoint;
-
-
+    var prevTime;
+    var deltaPosition = new THREE.Vector3(0,0,0);
     var movementX, movementY;
-    var PI = Math.PI;
 
 
-    // TACTILE VERSION    
-    // function moveCamera(){
-    //     // var newx = camera.position.x +
-    //     //     ((lookAtPoint.x - camera.position.x)*cos(alpha) - (lookAtPoint.y - camera.position.y)*sin(alpha));
-    //     // var newy = camera.position.y +
-    //     //     ((lookAtPoint.x - camera.position.x)*sin(alpha) + (lookAtPoint.y - camera.position.y)*cos(alpha));
-    //     // var newz = lookAtPoint.z + 20*DISTANCE_TO_LOOK_AT * Math.sin(beta);
+    function updateCamera(){
 
-    //     // lookAtPoint.x = newx;
-    //     // lookAtPoint.y = newy;
-    //     // lookAtPoint.z = newz;
+        // delta is for smoothing movement according to framerate performances.
+        var time = performance.now();
+        var delta = ( time - prevTime ) / 1000;
 
-    //     // camera.lookAt( lookAtPoint );
-    //     // rotation += alpha; 
+        var rayCasterPosition = camera.position;
+        rayCasterPosition.z = 10000;
+        var distanceToFloor = getFloorHeight(rayCasterPosition);
 
-    //     animationFrame = requestAnimationFrame(moveCamera);
-    //     // alpha = 0;
-    //     // beta = 0;
-    // }
+        // Position camera above the closest floor
+        if(distanceToFloor !== undefined){
+            camera.position.z += HEIGHT - distanceToFloor;
+        }
 
-    // TACTILE VERSION
-    // function mouseMoveListener(e){
-    //     var canvasBoundingRect = domElement.getBoundingClientRect();
+        deltaPosition.multiplyScalar(BODY_SPEED * delta);
 
-    //     // var deltaX = e.clientX - canvasBoundingRect.width/2;
-    //     // var deltaZ = e.clientY - canvasBoundingRect.height/2;
+        camera.position.add(deltaPosition);
+        lookAtPoint.add(deltaPosition);
 
-    //     var posX = (e.clientX - canvasBoundingRect.width/2)/canvasBoundingRect.width;
-    //     var posY = (e.clientY - canvasBoundingRect.height/2)/canvasBoundingRect.height;
+        // console.log("Position: x " + camera.position.x + " | y " + camera.position.y + " | z " + camera.position.z);
+        console.log("Direction: x " + camera.direction.x + " | y " + camera.direction.y + " | z " + camera.direction.z);
+        // console.log("lookAt Z: " + camera.lookAtVector.z);
 
-    //     // var deltaX = (Math.abs(posX - lastMouseX) > 0.01) ? lastMouseX - posX : 0;
-    //     // var deltaZ = (Math.abs(posY - lastMouseY) > 0.01) ? lastMouseY - posY : 0;
+        prevTime = time;
+        deltaPosition.x = 0;
+        deltaPosition.y = 0;
 
-    //     if (Math.abs(posX - lastMouseX) > 0.01){
-    //         alpha = lastMouseX - posX;
-    //         beta = posY/10;
-    //     } else {
-    //         alpha = 0;
-    //         beta = 0;
-    //     }
-        
-    //     lastMouseX = posX;
-    //     lastMouseY = posY;
+        // camera.lookAt(lookAtPoint);
 
-    //     // console.log("deltaX: " + posX + " | deltaZ: " + posY);
-
-        
-
-    //     // if(Math.abs(deltaX) > canvasBoundingRect.width*1/10 || Math.abs(deltaZ) > canvasBoundingRect.height*1/10){
-
-    //     //     if (Math.abs(deltaX) > canvasBoundingRect.width*1/10){
-    //     //         alpha = MAX_HORI_SPEED *
-    //     //             (Math.abs(deltaX) - canvasBoundingRect.width*1/10)/
-    //     //             (canvasBoundingRect.width/2 - canvasBoundingRect.width*1/10);
-    //     //         if(deltaX > 0)
-    //     //             alpha = -alpha;
-    //     //     } else {alpha = 0}
-    //     //     if (Math.abs(deltaZ) > canvasBoundingRect.height*1/10){
-    //     //         beta = MAX_VERTI_SPEED *
-    //     //             (Math.abs(deltaZ) - canvasBoundingRect.height*1/10)/
-    //     //             (canvasBoundingRect.height/2 - canvasBoundingRect.height*1/10);
-    //     //         if(deltaZ > 0)
-    //     //             beta = -beta;
-    //     //     } else { beta = 0}
-
-    //         if(!animationFrame)
-    //             animationFrame = requestAnimationFrame(moveCamera)
-    //     // }
-    //     // else{
-    //     //     cancelAnimationFrame(animationFrame);
-    //     //     animationFrame = undefined;
-    //     // }
-    // }
+        moveAnimationFrame = requestAnimationFrame(updateCamera);
+    }
 
 
-    function moveCallback(event) {
+    function headMovement(event) {
 
         // Get mouse differential movements
         var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
@@ -137,105 +94,112 @@ module.exports = function(camera, scene, domElement){
         combinedQuat.multiplyQuaternions(yawQuat, pitchQuat);
 
         // Apply rotation to camera's direction vector
-        var direction = camera.direction;
+        var direction = new THREE.Vector3(0,0,0);
+        direction.subVectors(camera.lookAtVector, camera.position);
+        direction.normalize();
         direction.applyQuaternion(combinedQuat);
 
         // Create new LookAt point
         var newLookAt = new THREE.Vector3(0,0,0);
         newLookAt.addVectors(camera.position, direction);
 
-        camera.lookAt(newLookAt);
+        lookAtPoint = newLookAt;
+        camera.lookAt(lookAtPoint);
     }
 
-    // TACTILE VERSION
-    // function moveCallback(event) {
-        // alpha = e.movementX ||
-        //     e.mozMovementX          ||
-        //     e.webkitMovementX       ||
-        //     0;
-        // beta = e.movementY ||
-        //     e.mozMovementY      ||
-        //     e.webkitMovementY   ||
-        //     0;
-        
-        // if(!animationFrame)
-        //     animationFrame = requestAnimationFrame(moveCamera);
+    function bodyMovement(dir){
+        // t represents the direction to move towards to
+        // t is normalized, so that deltaPosition has 'unitary' values
+        var t = new THREE.Vector3(0, 0, 0);
+        var d = new THREE.Vector3(0, 0, 0);
 
-        // alpha *= -0.004;
-        // beta *= -0.0003;
+        t.crossVectors(camera.direction, camera.up);
+        d.copy(camera.direction);
+        t.normalize();
+        d.normalize();
 
-        // console.log("alpha: " + alpha + " | beta: " + beta);
-    // }
+        if (moveForward) deltaPosition.add(d);
+        if (moveBackward) deltaPosition.sub(d);
+        if (moveLeft) deltaPosition.sub(t);
+        if (moveRight) deltaPosition.add(t);
 
-    var moveAnimationFrame;
-    var SPEED = 0.05;
+        // switch (dir) {
+        // case 'left':
+        //     deltaPosition.sub(t);
+        //     break;
+        // case 'right':
+        //     deltaPosition.add(t);
+        //     break;
+        // case 'up':
+        //     deltaPosition.add(t);
+        //     break;
+        // case 'down':
+        //     deltaPosition.sub(t);
+        //     break;
+        // }
+    }
 
+    var onKeyDown = function ( event ) {
 
-    // TACTILE VERSION
-    // function mouseDownListener(){
+        switch ( event.keyCode ) {
 
-    //     moveAnimationFrame = requestAnimationFrame(function moveForward(){
+            case 38: // up
+            case 87: // w
+                moveForward = true;
+                // bodyMovement('up');
+                break;
 
-    //         var moveVector = {
-    //             x : lookAtPoint.x - camera.position.x,
-    //             y : lookAtPoint.y - camera.position.y,
-    //         };
-    //         camera.position.x += SPEED*moveVector.x;
-    //         lookAtPoint.x     += SPEED*moveVector.x;
-    //         camera.position.y += SPEED*moveVector.y;
-    //         lookAtPoint.y     += SPEED*moveVector.y;
-            
-    //         var rayCasterPosition = camera.position;
-    //         rayCasterPosition.z = 10000;
-    //         var distanceToFloor = getFloorHeight(rayCasterPosition);
-    //         if(distanceToFloor !== undefined){
-    //             camera.position.z += HEIGHT - distanceToFloor;
-    //         }
-            
-    //         moveAnimationFrame = requestAnimationFrame(moveForward);
-    //     });
-    // }
+            case 37: // left
+            case 65: // a
+                moveLeft = true;
+                // bodyMovement('left');
+                break;
 
-    // function mouseUpListener(){
-    //     cancelAnimationFrame(moveAnimationFrame);
-    //     moveAnimationFrame = undefined;
-    // }
+            case 40: // down
+            case 83: // s
+                moveBackward = true;
+                // bodyMovement('down');
+                break;
 
-    // function pan ( direction ) {
-    //     var camx = camera.position.x + direction.x*userPanSpeed;
-    //     var camy = camera.position.y + direction.y*userPanSpeed;
-    //     camera.position.x = camx;
-    //     camera.position.y = camy;
+            case 39: // right
+            case 68: // d
+                moveRight = true;
+                // bodyMovement('right');
+                break;
+            // case 32: // space
+            //     if ( canJump === true ) velocity.y += 350;
+            //     canJump = false;
+            //     break;
+        }
 
-    //     // camera.lookAt( new THREE.Vector3( camx, camy, 0 ) );
-    // }
+        bodyMovement();
+    };
 
-    // function onKeyDown( event ) {
-    //     console.log('keypress', event.keyCode);
-    //     switch ( event.keyCode ) {
-    //         case keys.UP:
-    //             pan( new THREE.Vector3( 0, 1, 0 ) );
-    //             event.preventDefault();
-    //             break;
-    //         case keys.BOTTOM:
-    //             pan( new THREE.Vector3( 0, - 1, 0 ) );
-    //             event.preventDefault();
-    //             break;
-    //         case keys.LEFT:
-    //             pan( new THREE.Vector3( - 1, 0, 0 ) );
-    //             event.preventDefault();
-    //             break;
-    //         case keys.RIGHT:
-    //             pan( new THREE.Vector3( 1, 0, 0 ) );
-    //             event.preventDefault();
-    //             break;
-    //     }
-    // }
+    var onKeyUp = function ( event ) {
 
-    // function changeCallback(event){
-    //     switchToSkyView(camera.position.x, camera.position.y);
-    // }
-    
+        switch ( event.keyCode ) {
+
+            case 38: // up
+            case 87: // w
+                moveForward = false;
+                break;
+
+            case 37: // left
+            case 65: // a
+                moveLeft = false;
+                break;
+
+            case 40: // down
+            case 83: // s
+                moveBackward = false;
+                break;
+
+            case 39: // right
+            case 68: // d
+                moveRight = false;
+                break;
+        }
+    };
     
     return function(x, y){
         var havePointerLock = 'pointerLockElement' in document ||
@@ -259,6 +223,8 @@ module.exports = function(camera, scene, domElement){
         var distanceToFloor = getFloorHeight(rayCasterPosition);
         console.log('distance to floor', distanceToFloor, camera.position.z + HEIGHT - distanceToFloor)
         
+        prevTime = performance.now();
+
         // init camera
         camera.position.x = x;
         camera.position.y = y;
@@ -268,25 +234,12 @@ module.exports = function(camera, scene, domElement){
         lookAtPoint = new THREE.Vector3( camera.position.x, camera.position.y + DISTANCE_TO_LOOK_AT, camera.position.z )
         camera.lookAt( lookAtPoint );
 
-        // domElement.addEventListener('mousemove', mouseMoveListener);
-        // domElement.addEventListener('mousedown', mouseDownListener);
-        // domElement.addEventListener('mouseup', mouseUpListener);
-        // window.addEventListener('keydown', onKeyDown);
+        if(!moveAnimationFrame)
+            moveAnimationFrame = requestAnimationFrame(updateCamera);
 
-        document.body.addEventListener("mousemove", moveCallback, false);
-
-        // if (document.pointerLockElement === document.body ||
-        //     document.mozPointerLockElement === document.body ||
-        //     document.webkitPointerLockElement === document.body) {
-        //     // Pointer was just locked
-        //     // Enable the mousemove listener
-        //     console.log("good");
-        //     document.addEventListener("mousemove", moveCallback, false);
-        // } else {
-        //     console.log("not good");
-        //     document.removeEventListener("mousemove", moveCallback, false);
-        //     unlockHook(document.body);
-        // }
+        window.addEventListener('keydown', onKeyDown);
+        window.addEventListener('keyup', onKeyUp);
+        document.body.addEventListener("mousemove", headMovement, false);
 
         return function desactivate(){
 
@@ -295,12 +248,10 @@ module.exports = function(camera, scene, domElement){
             document.webkitExitPointerLock;
             document.exitPointerLock();
 
-            // domElement.removeEventListener('mousemove', mouseMoveListener);
-            // domElement.removeEventListener('mousedown', mouseDownListener);
-            // domElement.removeEventListener('mouseup', mouseUpListener);
-            // window.removeEventListener('keydown', onKeyDown);
+            window.removeEventListener('keydown', onKeyDown);
+            window.removeEventListener('keyup', onKeyUp);
 
-            document.body.removeEventListener("mousemove", moveCallback, false);
+            document.body.removeEventListener("mousemove", headMovement, false);
             document.exitPointerLock();
 
             cancelAnimationFrame(moveAnimationFrame);

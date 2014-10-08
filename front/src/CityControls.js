@@ -89,6 +89,7 @@ module.exports = function(camera, scene, domElement){
             camera.off('cameraviewchange', onCameraViewChangeFirstPerson);
             camera.on('cameraviewchange', onCameraViewChangeSky);
             // document.removeEventListener('keydown', isEscapePressed);
+            console.log(lastAltitude);
             
             desactivateCurrentControls = skyViewControls(x, y, altitude || lastAltitude);
         }

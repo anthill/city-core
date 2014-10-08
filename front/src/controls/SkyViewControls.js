@@ -16,7 +16,7 @@ module.exports = function(camera, domElement){
 
     var alpha;
     var beta;
-    var animationFrame;
+    var moveAnimationFrame;
 
     function pan ( direction ) {
         var camx = camera.position.x + direction.x*userPanSpeed;
@@ -58,7 +58,7 @@ module.exports = function(camera, domElement){
         camera.position.y = camera.position.y + beta;
         // console.log("beta", beta, "alpha", alpha, "newz", newz)
 
-        animationFrame = requestAnimationFrame(moveCamera)
+        moveAnimationFrame = requestAnimationFrame(moveCamera)
     }
     
     function mouseMoveListener(e){
@@ -95,12 +95,12 @@ module.exports = function(camera, domElement){
             }
             else {beta = 0;}
 
-            if(!animationFrame)
-                animationFrame = requestAnimationFrame(moveCamera)
+            if(!moveAnimationFrame)
+                moveAnimationFrame = requestAnimationFrame(moveCamera)
         }
         else{
-            cancelAnimationFrame(animationFrame);
-            animationFrame = undefined;
+            cancelAnimationFrame(moveAnimationFrame);
+            moveAnimationFrame = undefined;
         }
     }
 
@@ -131,6 +131,8 @@ module.exports = function(camera, domElement){
         camera.position.y = y; // 11167.65;
         camera.position.z = altitude; // 3;
 
+        console.log("cameraZ: " + camera.position.z);
+
         camera.lookAt( new THREE.Vector3( x, y, 0 ) );
         // looking North (y=1)
         
@@ -143,6 +145,8 @@ module.exports = function(camera, domElement){
             window.removeEventListener( 'keydown', onKeyDown );
             window.removeEventListener( 'wheel', onScroll );
             window.removeEventListener( 'mousemove', mouseMoveListener );
+            cancelAnimationFrame(moveAnimationFrame);
+            moveAnimationFrame = undefined;
         };
     }    
 };
