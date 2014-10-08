@@ -1,7 +1,6 @@
 "use strict";
 
 var path = require('path');
-//var fs = require('fs');
 var fs = require('graceful-fs');
 
 var program = require('commander');
@@ -299,7 +298,28 @@ function processSelectionDirectory(selectionZipDirPath){
 
                             return Q.all(Object.keys(buildingBuffers).map(function(id){
                                 var buildingOutPath = path.join(outAbsolutePath, id);
-                                return writeFile(buildingOutPath, buildingBuffers[id]);
+                                
+                                // despite graceful-fs, we see some EMFILE errors in writes
+                                function tryWriteFile(){
+                                    return writeFile(buildingOutPath, buildingBuffers[id]).fail(function(err){
+                                        if(String(err).indexOf('EMFILE') !== -1){
+                                            console.error('tryWriteFile EMFILE', selectionName, x, y, tile3dsPath, err)
+                                            var def = Q.defer();
+                                            
+                                            // retry later
+                                            setTimeout(function(){
+                                                def.resolve(tryWriteFile());
+                                            }, 100);
+
+                                            return def.promise;
+                                        }
+                                        else{// forward error
+                                            throw err;
+                                        }
+                                    })
+                                }
+                                
+                                return tryWriteFile();
                             })).then(function(){
                                 // metadata is returned when all building binary files have been written
                                 return tileMetadata;
