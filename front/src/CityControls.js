@@ -10,8 +10,16 @@ var lastAltitude;
 
 
 module.exports = function(camera, scene, domElement){
+
+    // Hook pointer lock state change events
+    document.addEventListener('pointerlockchange', onKeyPressFirstPerson);
+    document.addEventListener('mozpointerlockchange', onKeyPressFirstPerson);
+    document.addEventListener('webkitpointerlockchange', onKeyPressFirstPerson);
+
     var skyViewControls = SkyViewControls(camera, domElement);
     var firstPersonControls = FirstPersonControls(camera, scene, domElement);
+
+    var escapePressed = false;
     
     function onCameraViewChangeSky(){
         var L = 2 * camera.position.z * Math.tan(3.14*camera.fov/(2*180));
@@ -50,12 +58,24 @@ module.exports = function(camera, scene, domElement){
     
     function onKeyPressFirstPerson(e){
         console.log('key press while first person', e.keyCode);
-        if(e.keyCode === 27){ // escape
-            e.preventDefault();
-            ret.switchToSkyView(camera.position.x, camera.position.y);
-        }
+        
+        // if(e.keyCode === 27){ // escape
+            if (document.pointerLockElement === document.body ||
+                document.mozPointerLockElement === document.body ||
+                document.webkitPointerLockElement === document.body) {
+            } else {
+                e.preventDefault();
+                ret.switchToSkyView(camera.position.x, camera.position.y);
+            }
+        // }
     }
     
+    // function isEscapePressed(e){
+    //     console.log(e.keyCode);
+    //     if (e.keyCode === 27)
+    //         console.log("escapePressed");
+    //         escapePressed = true;
+    // }
     
     var ret = {
         switchToFirstPersonView: function(x, y){
@@ -63,7 +83,7 @@ module.exports = function(camera, scene, domElement){
             window.removeEventListener('meshClicked', onMeshClicked);
             camera.off('cameraviewchange', onCameraViewChangeSky);
             camera.on('cameraviewchange', onCameraViewChangeFirstPerson);
-            document.addEventListener('keydown', onKeyPressFirstPerson);
+            // document.addEventListener('keydown', isEscapePressed);
             
             lastAltitude = camera.position.z;
             
@@ -74,7 +94,8 @@ module.exports = function(camera, scene, domElement){
             window.addEventListener( 'meshClicked', onMeshClicked);
             camera.off('cameraviewchange', onCameraViewChangeFirstPerson);
             camera.on('cameraviewchange', onCameraViewChangeSky);
-            document.removeEventListener('keydown', onKeyPressFirstPerson);
+            // document.removeEventListener('keydown', isEscapePressed);
+            console.log(lastAltitude);
             
             desactivateCurrentControls = skyViewControls(x, y, altitude || lastAltitude);
         }
