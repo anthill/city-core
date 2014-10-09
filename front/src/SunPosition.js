@@ -2,6 +2,7 @@
 
 
 var gui = require('./gui.js');
+var _3dviz = require('./3dviz.js');
 var SunCalc = require('suncalc');
 
 var vec = [0, 0, 0];
@@ -23,9 +24,10 @@ module.exports = function(light){
     
     function applyLightTargetAtHour(hour){
         date.setHours(hour);
-        vec = computeDirection(date)
+        vec = computeDirection(date);
         var pos = light.position;
-        light.target.position.set(pos.x + vec[0], pos.y + vec[1], 0)
+        light.target.position.set(pos.x + vec[0], pos.y + vec[1], 0);
+        _3dviz.render();
     }
     
     
