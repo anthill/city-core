@@ -3,6 +3,9 @@
 var THREE = require('three');
 
 var serverCommunication = require('./serverCommunication.js');
+var createBuildingMesh = require('./createBuildingMesh.js');
+var buildingMap = require('./buildingMap.js');
+var meshToBuilding = require('./meshToBuilding.js');
 var gui = require('./gui.js');
 var guiControls = gui.guiControls;
 
@@ -91,6 +94,18 @@ camera.on('cameraviewchange', function(){
     light.position.z = 300;
     var sunPos = SunPosition(light);
     light.target.position.set(pos.x + sunPos[0], pos.y + sunPos[1], 0);
+
+    _3dviz.render();
 });
 
-// camera.on('cameraviewchange', function(){ var pos = camera.position; console.log('camera', pos.x, pos.y, pos.z, camera.lookAtVector, camera.up); });
+serverCommunication.on('buildingOk', function(event){
+    var mesh = createBuildingMesh(new DataView(event.msg.buffer), event.buildingMetadata.tile);
+
+    meshToBuilding.set(mesh, {id: event.msg.id, metadata: event.buildingMetadata}); 
+    scene.add(mesh);
+
+    buildingMap[event.msg.id] = {mesh:mesh, visible:true};
+
+    _3dviz.render();
+
+})

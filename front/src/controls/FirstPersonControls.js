@@ -44,7 +44,7 @@ module.exports = function(camera, scene, domElement){
 
         camera.lookAt( lookAtPoint );
         rotation += alpha;
-        animationFrame = requestAnimationFrame(moveCamera)
+        // animationFrame = requestAnimationFrame(moveCamera)
     }
 
     function mouseMoveListener(e){
@@ -71,13 +71,15 @@ module.exports = function(camera, scene, domElement){
                     beta = -beta;
             } else { beta = 0}
 
-            if(!animationFrame)
-                animationFrame = requestAnimationFrame(moveCamera)
+            moveCamera();
+
+            // if(!animationFrame)
+            //     animationFrame = requestAnimationFrame(moveCamera)
         }
-        else{
-            cancelAnimationFrame(animationFrame);
-            animationFrame = undefined;
-        }
+        // else{
+        //     cancelAnimationFrame(animationFrame);
+        //     animationFrame = undefined;
+        // }
     }
 
 

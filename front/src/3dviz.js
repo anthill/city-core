@@ -71,19 +71,26 @@ renderer.setClearColorHex(0x333F47, 1);
 document.body.appendChild(renderer.domElement);
 
 // Renders the scene and updates the render as needed.
-(function animate() {
 
-    // Read more about requestAnimationFrame at http://www.paulirish.com/2011/requestanimationframe-for-smart-animating/
-    requestAnimationFrame(animate);
 
-    // Render the scene.
-    renderer.render(scene, camera);
+var frame;
 
-})();
+function render(){
+  if(!frame){
+      frame = requestAnimationFrame(function() {
+          renderer.render(scene, camera);
+          frame = undefined;
+      });
+  }
+}
+
+
+render();
 
 module.exports = {
     scene: scene,
     camera: CameraProxy(camera),
     light: sunlight,
-    renderer: renderer
+    renderer: renderer,
+    render: render
 };
