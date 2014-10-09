@@ -2,6 +2,7 @@
 
 //var THREE = require('three');
 var ee = require('event-emitter');
+var THREE = require('three');
 
 var VectorProxy = require('./VectorProxy.js');
 
@@ -41,9 +42,9 @@ module.exports = function(camera){
         
         scheduledChangeEvent = true;
     }
-    
-    
+
     var lookAtVector;
+    var directionVector = new THREE.Vector3(0,0,0);
     var positionProxy = VectorProxy(camera.position);
     positionProxy.on('change', scheduleChangeEvent);
     
@@ -60,12 +61,23 @@ module.exports = function(camera){
                 z: camera.up.z
             })
         },
+        get direction(){
+            return Object.freeze({
+                x: directionVector.x,
+                y: directionVector.y,
+                z: directionVector.z
+            })
+        },
         get position(){
             return positionProxy;
         }, 
         lookAt: function(v){
             camera.lookAt(v);
             lookAtVector = v;
+
+            directionVector.x = lookAtVector.x - camera.position.x;
+            directionVector.y = lookAtVector.y - camera.position.y;
+            directionVector.normalize();
             
             scheduleChangeEvent();
         },
