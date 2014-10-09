@@ -25,7 +25,7 @@ module.exports = function(camera, scene, domElement){
     
     var alpha;
     var beta;
-    // var animationFrame;
+    var animationFrame;
     var rotation = 0;
     
     var lookAtPoint;
@@ -70,6 +70,8 @@ module.exports = function(camera, scene, domElement){
                 if(deltaZ > 0)
                     beta = -beta;
             } else { beta = 0}
+
+            moveCamera();
 
             // if(!animationFrame)
             //     animationFrame = requestAnimationFrame(moveCamera)
