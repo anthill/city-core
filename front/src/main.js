@@ -60,6 +60,8 @@ function moveTo(place){
         var newPosition = geoConverter.toLambert(coords.lon, coords.lat);
         camera.position = new THREE.Vector3(newPosition.X, newPosition.Y, INITIAL_ALTITUDE);
         camera.lookAt( new THREE.Vector3(newPosition.X, newPosition.Y, 0) );
+        camera.up = new THREE.Vector3(0, 1, 0);
+        cityControls.switchToSkyView(newPosition.X, newPosition.Y, INITIAL_ALTITUDE);
     });
 }
 

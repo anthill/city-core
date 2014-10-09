@@ -44,7 +44,6 @@ module.exports = function(camera, scene, domElement){
 
         camera.lookAt( lookAtPoint );
         rotation += alpha;
-        // animationFrame = requestAnimationFrame(moveCamera)
     }
 
     function mouseMoveListener(e){
@@ -73,13 +72,8 @@ module.exports = function(camera, scene, domElement){
 
             moveCamera();
 
-            // if(!animationFrame)
-            //     animationFrame = requestAnimationFrame(moveCamera)
         }
-        // else{
-        //     cancelAnimationFrame(animationFrame);
-        //     animationFrame = undefined;
-        // }
+
     }
 
 
@@ -126,7 +120,7 @@ module.exports = function(camera, scene, domElement){
         var rayCasterPosition = camera.position;
         rayCasterPosition.z = 10000;
         var distanceToFloor = getFloorHeight(rayCasterPosition);
-        console.log('distance to floor', distanceToFloor, camera.position.z + HEIGHT - distanceToFloor)
+        // console.log('distance to floor', distanceToFloor, camera.position.z + HEIGHT - distanceToFloor)
         
         // init camera
         camera.position.x = x;
