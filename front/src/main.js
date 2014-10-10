@@ -12,6 +12,7 @@ var guiControls = gui.guiControls;
 //var parseGeometry = require('./parseGeometry.js');
 var rTree = require('./rTree.js');
 var geoCode = require('./geoCode.js');
+var metadata = require('./metadata.js');
 
 var _3dviz = require('./3dviz.js');
 var scene = _3dviz.scene;
@@ -65,25 +66,21 @@ function moveTo(place){
     });
 }
 
-
-serverCommunication.metadataP.then(function(metadata) {
-
-    Object.keys(metadata).forEach(function(id) {
-        var building = metadata[id];
-        var X = building.tile.X;
-        var Y = building.tile.Y;
-        var item = [
-            building.x + X*200,
-            building.y + (MAX_Y-Y)*200,
-            building.x + X*200,
-            building.y + (MAX_Y-Y)*200,
-            {id: id, X:X, Y:Y}
-        ];
-        rTree.insert(item);
-    });
-
-    moveTo(guiControls.address)
+Object.keys(metadata).forEach(function(id) {
+    var building = metadata[id];
+    var X = building.tile.X;
+    var Y = building.tile.Y;
+    var item = [
+        building.x + X*200,
+        building.y + (MAX_Y-Y)*200,
+        building.x + X*200,
+        building.y + (MAX_Y-Y)*200,
+        {id: id, X:X, Y:Y}
+    ];
+    rTree.insert(item);
 });
+
+moveTo(guiControls.address)
 
 gui.addressControler.onFinishChange(function(value) {
     moveTo(value);
