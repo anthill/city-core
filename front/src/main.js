@@ -12,6 +12,7 @@ var guiControls = gui.guiControls;
 //var parseGeometry = require('./parseGeometry.js');
 var rTree = require('./rTree.js');
 var geoCode = require('./geoCode.js');
+var metadata = require('./metadata.js');
 
 var _3dviz = require('./3dviz.js');
 var scene = _3dviz.scene;
@@ -60,28 +61,26 @@ function moveTo(place){
         var newPosition = geoConverter.toLambert(coords.lon, coords.lat);
         camera.position = new THREE.Vector3(newPosition.X, newPosition.Y, INITIAL_ALTITUDE);
         camera.lookAt( new THREE.Vector3(newPosition.X, newPosition.Y, 0) );
+        camera.up = new THREE.Vector3(0, 1, 0);
+        cityControls.switchToSkyView(newPosition.X, newPosition.Y, INITIAL_ALTITUDE);
     });
 }
 
-
-serverCommunication.metadataP.then(function(metadata) {
-
-    Object.keys(metadata).forEach(function(id) {
-        var building = metadata[id];
-        var X = building.tile.X;
-        var Y = building.tile.Y;
-        var item = [
-            building.x + X*200,
-            building.y + (MAX_Y-Y)*200,
-            building.x + X*200,
-            building.y + (MAX_Y-Y)*200,
-            {id: id, X:X, Y:Y}
-        ];
-        rTree.insert(item);
-    });
-
-    moveTo(guiControls.address)
+Object.keys(metadata).forEach(function(id) {
+    var building = metadata[id];
+    var X = building.tile.X;
+    var Y = building.tile.Y;
+    var item = [
+        building.x + X*200,
+        building.y + (MAX_Y-Y)*200,
+        building.x + X*200,
+        building.y + (MAX_Y-Y)*200,
+        {id: id, X:X, Y:Y}
+    ];
+    rTree.insert(item);
 });
+
+moveTo(guiControls.address)
 
 gui.addressControler.onFinishChange(function(value) {
     moveTo(value);
@@ -101,6 +100,14 @@ camera.on('cameraviewchange', function(){
 serverCommunication.on('buildingOk', function(event){
     var mesh = createBuildingMesh(new DataView(event.msg.buffer), event.buildingMetadata.tile);
 
+    if(event.buildingMetadata.type === "building"){
+        mesh.castShadow = true;
+        mesh.receiveShadow = false;
+    } else {
+        mesh.castShadow = false;
+        mesh.receiveShadow = true;
+    }
+    
     meshToBuilding.set(mesh, {id: event.msg.id, metadata: event.buildingMetadata}); 
     scene.add(mesh);
 

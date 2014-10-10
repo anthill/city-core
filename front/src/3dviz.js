@@ -21,17 +21,28 @@ var uniforms = {
   texture: { type: 't', value: THREE.ImageUtils.loadTexture('../img/sky.jpg') }
 };
 
-var material = new THREE.ShaderMaterial( {
+var skymaterial = new THREE.ShaderMaterial( {
   uniforms:       uniforms,
   vertexShader:   document.getElementById('sky-vertex').textContent,
   fragmentShader: document.getElementById('sky-fragment').textContent
 });
 
-var skyBox = new THREE.Mesh(geometry, material);
+var skyBox = new THREE.Mesh(geometry, skymaterial);
 skyBox.scale.set(-1, 1, 1);
 skyBox.eulerOrder = 'XZY';
 skyBox.renderDepth = 1000.0;
 scene.add(skyBox);
+
+// add a box so we don't see the little gaps in the floor
+var planeGeom = new THREE.PlaneGeometry( 500000, 500000 );
+var material = new THREE.MeshLambertMaterial({
+    color: 0xaaaaaa,
+    wireframe: false,
+    shading: THREE.FlatShading
+});
+var plane = new THREE.Mesh( planeGeom, material );
+plane.position.set(0, 0, -100);
+scene.add( plane );
 
 // Create a camera, zoom it out from the model a bit, and add it to the scene.
 var camera = new THREE.PerspectiveCamera( 60, WIDTH / HEIGHT, 1, 500000 );
