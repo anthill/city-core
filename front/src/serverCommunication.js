@@ -8,7 +8,7 @@ var socket = io();
 var metadataP = new Promise(function(resolve){
     socket.on('metadata', function(msg){
         var transportedMetadata = JSON.parse(msg.metadata);
-        console.log("received metadata", transportedMetadata);
+        // console.log("received metadata", transportedMetadata);
         
         // transported data are optimized for transport, not for use.
         // one-time transform for easier use. Changing from tile-centered to object-centered representation.
