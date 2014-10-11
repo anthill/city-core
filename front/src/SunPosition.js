@@ -20,13 +20,13 @@ function computeDirection(date){
 }
 
 
-module.exports = function(light){
+module.exports = function(sunlight, ambientLight){
     
     function applyLightTargetAtHour(hour){
         date.setHours(hour);
         vec = computeDirection(date);
-        var pos = light.position;
-        light.target.position.set(pos.x + vec[0], pos.y + vec[1], 0);
+        var pos = sunlight.position;
+        sunlight.target.position.set(pos.x + vec[0], pos.y + vec[1], 0);
         _3dviz.render();
     }
     
