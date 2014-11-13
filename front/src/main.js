@@ -17,7 +17,7 @@ var metadata = require('./metadata.js');
 var _3dviz = require('./3dviz.js');
 var scene = _3dviz.scene;
 var camera = _3dviz.camera;
-var light = _3dviz.light;
+var lights = _3dviz.lights;
 var renderer = _3dviz.renderer;
 
 var SunPosition = require('./SunPosition.js');
@@ -87,12 +87,13 @@ gui.addressControler.onFinishChange(function(value) {
 });
 
 camera.on('cameraviewchange', function(){ 
-    var pos = camera.position; 
-    light.position.x = pos.x;
-    light.position.y = pos.y;
-    light.position.z = 300;
-    var sunPos = SunPosition(light);
-    light.target.position.set(pos.x + sunPos[0], pos.y + sunPos[1], 0);
+    var pos = camera.position;
+    var sun = lights.sun;
+    sun.position.x = pos.x;
+    sun.position.y = pos.y;
+    sun.position.z = 300;
+    var sunPos = SunPosition(sun, lights.ambient);
+    sun.target.position.set(pos.x + sunPos[0], pos.y + sunPos[1], 0);
 
     _3dviz.render();
 });

@@ -101,7 +101,10 @@ render();
 module.exports = {
     scene: scene,
     camera: CameraProxy(camera),
-    light: sunlight,
+    lights: {
+      sun: sunlight,
+      ambient: ambientLight
+    },
     renderer: renderer,
     render: render
 };
