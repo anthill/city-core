@@ -6,7 +6,8 @@
   "main": "index.js",
   "scripts": {
     "build": "browserify front/src/main.js -o front/app.js -d",
-    "start": "node index.js",
+    "start-dev": "node index.js dev",
+    "start-prod": "node index.js prod",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "watchify front/src/main.js -o front/app.js -d -v"
   },

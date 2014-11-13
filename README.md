@@ -22,7 +22,7 @@ It should take about 5 minutes in normal hardware. This will extract all the bui
 
 ```bash
 npm run build
-npm start
+npm start-dev
 ```
 
 1. Open http://localhost:3000

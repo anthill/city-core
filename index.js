@@ -9,16 +9,26 @@ var Promise = require('es6-promise').Promise;
 
 var app = require('express')();
 var http = require('http').createServer(app);
+var https = require('https');
 
 var io = require('socket.io')(http);
 var express = require('express');
 var compression = require('compression');
 
 // defs
-var PORT = 3000;
+
 var MAXY = 170;
 
 process.title = 'Bdx3d server';
+
+var mode = process.argv[2] || "dev";
+
+var config = require("./" + path.join("config", mode+".json"))
+
+var PORT = config.port;
+
+console.log('starting in mode', mode)
+
 
 function makeDocument(htmlFragment){
     return new Promise(function(resolve, reject){
@@ -91,7 +101,17 @@ Promise.all([indexP, metadataP]).then(function(results){
 
 }).catch(function(err){console.error(err)});
 
+if (!config.https) {
+    http.listen(PORT, function () {
+        console.log('listening http://localhost:' + PORT);
+    });
+} else {
+    var options = {
+        key: fs.readFileSync(config.keypath),
+        cert: fs.readFileSync(config.certpath)
+    };
 
-http.listen(PORT, function () {
-    console.log('listening http://localhost:'+PORT);
-});
+    https.createServer(options, app).listen(PORT, function () {
+        console.log('Server running on ' + PORT);
+    });
+}
