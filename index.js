@@ -8,18 +8,15 @@ var Map = require('es6-map');
 var Promise = require('es6-promise').Promise;
 
 var app = require('express')();
-var http = require('http').createServer(app);
+var http = require('http')
 var https = require('https');
 
-var io = require('socket.io')(http);
 var express = require('express');
 var compression = require('compression');
 
 // defs
 
 var MAXY = 170;
-
-process.title = 'Bdx3d server';
 
 var mode = process.argv[2] || "dev";
 
@@ -28,6 +25,25 @@ var config = require("./" + path.join("config", mode+".json"))
 var PORT = config.port;
 
 console.log('starting in mode', mode)
+
+var server;
+if(config.https){
+    var options = {
+        key: fs.readFileSync(config.keypath),
+        cert: fs.readFileSync(config.certpath)
+    };
+    
+    server = https.createServer(options, app);
+}
+else{
+    server = http.createServer(app);
+}
+
+var io = require('socket.io')(server);
+
+
+process.title = 'Bdx3d server';
+
 
 
 function makeDocument(htmlFragment){
@@ -101,17 +117,7 @@ Promise.all([indexP, metadataP]).then(function(results){
 
 }).catch(function(err){console.error(err)});
 
-if (!config.https) {
-    http.listen(PORT, function () {
-        console.log('listening http://localhost:' + PORT);
-    });
-} else {
-    var options = {
-        key: fs.readFileSync(config.keypath),
-        cert: fs.readFileSync(config.certpath)
-    };
+server.listen(PORT, function () {
+    console.log('Server running on ' + PORT);
+});
 
-    https.createServer(options, app).listen(PORT, function () {
-        console.log('Server running on ' + PORT);
-    });
-}

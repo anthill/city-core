@@ -2,7 +2,7 @@
 
 
 module.exports = function geoCode(address) {
-    var url = "http://maps.googleapis.com/maps/api/geocode/json?address=";
+    var url = "https://maps.googleapis.com/maps/api/geocode/json?address=";
 
     return new Promise(function(resolve) {
         var xhr = new XMLHttpRequest();
