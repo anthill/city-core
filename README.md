@@ -25,7 +25,7 @@ npm run build
 npm start-dev
 ```
 
-1. Open http://localhost:3000
+1. Open http://localhost:9000
 
 # Dev
 
