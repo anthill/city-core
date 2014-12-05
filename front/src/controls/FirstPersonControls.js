@@ -123,7 +123,7 @@ module.exports = function(camera, scene, domElement){
 
 
     var moveAnimationFrame;
-    var SPEED = 0.05;
+    var SPEED = 0.5;
 
     function mouseDownListener(){
 
