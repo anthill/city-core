@@ -32,23 +32,6 @@ module.exports = function(camera, scene, domElement){
     var rotation = 0;
     
     var lookAtPoint;
-    
-    // function moveCamera(){
-    //     var newx = camera.position.x +
-    //         ((lookAtPoint.x - camera.position.x)*cos(alpha) - (lookAtPoint.y - camera.position.y)*sin(alpha));
-    //     var newy = camera.position.y +
-    //         ((lookAtPoint.x - camera.position.x)*sin(alpha) + (lookAtPoint.y - camera.position.y)*cos(alpha));
-    //     var newz = camera.position.z + 20*DISTANCE_TO_LOOK_AT * Math.sin(beta);
-    //     // console.log("beta", beta, "alpha", alpha, "newz", newz)
-
-    //     lookAtPoint.x = newx;
-    //     lookAtPoint.y = newy;
-    //     lookAtPoint.z = newz;
-
-    //     camera.lookAt( lookAtPoint );
-    //     rotation += alpha;
-    //     // animationFrame = requestAnimationFrame(moveCamera)
-    // }
 
     function mouseMoveListener(e){
         var canvasBoundingRect = domElement.getBoundingClientRect();
@@ -58,28 +41,6 @@ module.exports = function(camera, scene, domElement){
 
         if(Math.abs(deltaX) > canvasBoundingRect.width/10 || Math.abs(deltaZ) > canvasBoundingRect.height/20){
 
-            // if (Math.abs(deltaX) > canvasBoundingRect.width/10){
-            //     alpha = MAX_HORI_SPEED *
-            //         (Math.abs(deltaX) - canvasBoundingRect.width/10)/
-            //         (canvasBoundingRect.width/2 - canvasBoundingRect.width/10);
-            //     if(deltaX > 0)
-            //         alpha = -alpha;
-            // } else {alpha = 0}
-
-            // if (Math.abs(deltaZ) > canvasBoundingRect.height/20){
-            //     beta = MAX_VERTI_SPEED *
-            //         (Math.abs(deltaZ) - canvasBoundingRect.height/20)/
-            //         (canvasBoundingRect.height/2 - canvasBoundingRect.height/20);
-            //     if(deltaZ > 0)
-            //         beta = -beta;
-            // } else { beta = 0}
-
-            // moveCamera();
-
-
-            // // Get mouse differential movements
-            // var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
-            // var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
 
             // Create pitch axis
             var axis = new THREE.Vector3();
