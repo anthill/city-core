@@ -6,27 +6,30 @@
   "main": "index.js",
   "scripts": {
     "build": "browserify front/src/main.js -o front/app.js -d",
-    "start": "node index.js",
+    "start-dev": "node index.js dev",
+    "start-prod": "node index.js prod",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "watchify front/src/main.js -o front/app.js -d -v"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "browserify": "^5.0.0",
+    "compression": "^1.1.0",
     "dat-gui": "^0.5.0",
     "es6-map": "^0.1.0",
-    "browserify": "^5.0.0",
     "es6-promise": "^1.0.0",
     "es6-promisify": "^1.1.1",
+    "es6-set": "~0.1.0",
     "event-emitter": "^0.3.1",
     "express": "^4.8.3",
+    "jsdom": "^1.0.1",
     "rbush": "^1.3.2",
     "socket.io": "^1.0.6",
     "socket.io-client": "^1.0.6",
     "suncalc": "^1.5.2",
-    "xmldom": "^0.1.19",
     "three": "^0.68.0",
-    "es6-set": "~0.1.0"
+    "xmldom": "^0.1.19"
   },
   "devDependencies": {
     "grunt": "^0.4.5",

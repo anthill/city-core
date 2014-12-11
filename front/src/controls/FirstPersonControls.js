@@ -33,22 +33,21 @@ module.exports = function(camera, scene, domElement){
     
     var lookAtPoint;
     
-    // function moveCamera(){
-    //     var newx = camera.position.x +
-    //         ((lookAtPoint.x - camera.position.x)*cos(alpha) - (lookAtPoint.y - camera.position.y)*sin(alpha));
-    //     var newy = camera.position.y +
-    //         ((lookAtPoint.x - camera.position.x)*sin(alpha) + (lookAtPoint.y - camera.position.y)*cos(alpha));
-    //     var newz = camera.position.z + 20*DISTANCE_TO_LOOK_AT * Math.sin(beta);
-    //     // console.log("beta", beta, "alpha", alpha, "newz", newz)
+    function moveCamera(){
+        var newx = camera.position.x +
+            ((lookAtPoint.x - camera.position.x)*cos(alpha) - (lookAtPoint.y - camera.position.y)*sin(alpha));
+        var newy = camera.position.y +
+            ((lookAtPoint.x - camera.position.x)*sin(alpha) + (lookAtPoint.y - camera.position.y)*cos(alpha));
+        var newz = camera.position.z + 20*DISTANCE_TO_LOOK_AT * Math.sin(beta);
+        // console.log("beta", beta, "alpha", alpha, "newz", newz)
 
-    //     lookAtPoint.x = newx;
-    //     lookAtPoint.y = newy;
-    //     lookAtPoint.z = newz;
+        lookAtPoint.x = newx;
+        lookAtPoint.y = newy;
+        lookAtPoint.z = newz;
 
-    //     camera.lookAt( lookAtPoint );
-    //     rotation += alpha;
-    //     // animationFrame = requestAnimationFrame(moveCamera)
-    // }
+        camera.lookAt( lookAtPoint );
+        rotation += alpha;
+    }
 
     function mouseMoveListener(e){
         var canvasBoundingRect = domElement.getBoundingClientRect();
@@ -112,13 +111,8 @@ module.exports = function(camera, scene, domElement){
             // But if so, the lookAt behaviour is odd... for now camera.lookAt() stays here.
             camera.lookAt(lookAtPoint);
 
-            // if(!animationFrame)
-            //     animationFrame = requestAnimationFrame(moveCamera)
         }
-        // else{
-        //     cancelAnimationFrame(animationFrame);
-        //     animationFrame = undefined;
-        // }
+
     }
 
 
@@ -165,7 +159,7 @@ module.exports = function(camera, scene, domElement){
         var rayCasterPosition = camera.position;
         rayCasterPosition.z = 10000;
         var distanceToFloor = getFloorHeight(rayCasterPosition);
-        console.log('distance to floor', distanceToFloor, camera.position.z + HEIGHT - distanceToFloor)
+        // console.log('distance to floor', distanceToFloor, camera.position.z + HEIGHT - distanceToFloor)
         
         // init camera
         camera.position.x = x;
