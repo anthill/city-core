@@ -29,7 +29,6 @@ module.exports = function(camera){
     if(existingProxy)
         return existingProxy;
     
-    
     var scheduledChangeEvent = false;
     function scheduleChangeEvent(){
         if(scheduledChangeEvent)
@@ -42,11 +41,15 @@ module.exports = function(camera){
         
         scheduledChangeEvent = true;
     }
-
-    var lookAtVector;
+    
+    
+    var lookAtVector = new THREE.Vector3(0,0,0);
     var directionVector = new THREE.Vector3(0,0,0);
     var positionProxy = VectorProxy(camera.position);
+    var rotationProxy = VectorProxy(camera.rotation);
+
     positionProxy.on('change', scheduleChangeEvent);
+    rotationProxy.on('change', scheduleChangeEvent);
     
     var proxy = ee({
         get lookAtVector(){ return lookAtVector ? Object.freeze({
@@ -71,6 +74,9 @@ module.exports = function(camera){
         get position(){
             return positionProxy;
         }, 
+        get rotation(){
+            return rotationProxy;
+        }, 
         lookAt: function(v){
             camera.lookAt(v);
             lookAtVector = v;
@@ -78,7 +84,7 @@ module.exports = function(camera){
             directionVector.x = lookAtVector.x - camera.position.x;
             directionVector.y = lookAtVector.y - camera.position.y;
             directionVector.normalize();
-            
+
             scheduleChangeEvent();
         },
         set up(v){
@@ -92,6 +98,19 @@ module.exports = function(camera){
             camera.position.z = v.z;
             
             scheduleChangeEvent();
+        },
+        translateX: function(d){
+            camera.translateX(d);
+        },
+        translateY: function(d){
+            camera.translateY(d);
+        },
+        translateZ: function(d){
+            camera.translateZ(d);
+        },
+        translateOnAxis: function(axis, d){
+            console.log('translate');
+            camera.translateOnAxis(axis, d);
         },
         
         /* other properties proxying */
