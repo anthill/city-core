@@ -2,12 +2,29 @@
 
 A project to visualize Bordeaux and the CUB in 3D. Based on [Open Data](http://data.lacub.fr/data.php?themes=1&layer=344).
 
+This project is the core of Bordeaux3D.
+It contains the core features:
+* Tools to process the raw data and prepare it for efficient server->client transport
+* Server-side serving the 3D objects (using socket.io currently)
+* index.html file
+* Three.js scene creation
+* Client-side scripts to load the data for the 3D objects and add them to the Three.js scene
+* Client-side API
+
+
+Everything else should be features added that interact with the client-side API.
+* Lights
+* Shadows
+* Cameras
+
+
 
 # How to make this all work
 
 1. Get the 3D data
 
-Right now the data has to be downloaded via the [dedicated GUI](http://data.lacub.fr/graphic_downloader.php?layer=344&format=76). Once you have it, put it somewhere. It should be a .zip archive named `BATI3D_NT.zip` or equivalent.
+* Right now the 3D data has to be downloaded via the [dedicated GUI](http://data.lacub.fr/graphic_downloader.php?layer=344&format=76). Once you have it, put it somewhere. It should be a .zip archive named `BATI3D_NT.zip` or equivalent.
+* Altitude data in CSV format can be found in the [CUB data website](http://data.lacub.fr/data.php?themes=1&layer=344) (under "découpage des dalles 3D"). They should be put under `data/DALLAGE_3D.csv`.
 
 1. `git clone` the project
 1. `npm install`
