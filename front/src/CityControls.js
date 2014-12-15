@@ -1,7 +1,9 @@
 'use strict';
 
-var SkyViewControls = require('./controls/SkyViewControls.js');
-var FirstPersonControls = require('./controls/FirstPersonControls.js');
+var SkyViewControls = require('./controls/RTS_SkyView.js');
+var FirstPersonControls = require('./controls/FPS_PointerLock.js');
+// var SkyViewControls = require('./controls/SkyViewControls.js');
+// var FirstPersonControls = require('./controls/FirstPersonControls.js');
 var loadObjects = require('./loadObjects.js');
 var meshToBuilding = require('./meshToBuilding');
 

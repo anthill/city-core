@@ -15,9 +15,12 @@ var cos = Math.cos,
 
 var HEIGHT = 6;
 
+var YAW_SPEED = 0.00005;
+var PITCH_SPEED = 0.00005;
+
 var DISTANCE_TO_LOOK_AT = 20;
-var MAX_HORI_SPEED = Math.PI/100;
-var MAX_VERTI_SPEED = Math.PI/120;
+// var MAX_HORI_SPEED = Math.PI/100;
+// var MAX_VERTI_SPEED = Math.PI/120;
 
 module.exports = function(camera, scene, domElement){
     
@@ -29,22 +32,6 @@ module.exports = function(camera, scene, domElement){
     var rotation = 0;
     
     var lookAtPoint;
-    
-    function moveCamera(){
-        var newx = camera.position.x +
-            ((lookAtPoint.x - camera.position.x)*cos(alpha) - (lookAtPoint.y - camera.position.y)*sin(alpha));
-        var newy = camera.position.y +
-            ((lookAtPoint.x - camera.position.x)*sin(alpha) + (lookAtPoint.y - camera.position.y)*cos(alpha));
-        var newz = camera.position.z + 20*DISTANCE_TO_LOOK_AT * Math.sin(beta);
-        // console.log("beta", beta, "alpha", alpha, "newz", newz)
-
-        lookAtPoint.x = newx;
-        lookAtPoint.y = newy;
-        lookAtPoint.z = newz;
-
-        camera.lookAt( lookAtPoint );
-        rotation += alpha;
-    }
 
     function mouseMoveListener(e){
         var canvasBoundingRect = domElement.getBoundingClientRect();
@@ -54,23 +41,37 @@ module.exports = function(camera, scene, domElement){
 
         if(Math.abs(deltaX) > canvasBoundingRect.width/10 || Math.abs(deltaZ) > canvasBoundingRect.height/20){
 
-            if (Math.abs(deltaX) > canvasBoundingRect.width/10){
-                alpha = MAX_HORI_SPEED *
-                    (Math.abs(deltaX) - canvasBoundingRect.width/10)/
-                    (canvasBoundingRect.width/2 - canvasBoundingRect.width/10);
-                if(deltaX > 0)
-                    alpha = -alpha;
-            } else {alpha = 0}
 
-            if (Math.abs(deltaZ) > canvasBoundingRect.height/20){
-                beta = MAX_VERTI_SPEED *
-                    (Math.abs(deltaZ) - canvasBoundingRect.height/20)/
-                    (canvasBoundingRect.height/2 - canvasBoundingRect.height/20);
-                if(deltaZ > 0)
-                    beta = -beta;
-            } else { beta = 0}
+            // Create pitch axis
+            var axis = new THREE.Vector3();
+            axis.crossVectors(camera.direction, camera.up);
 
-            moveCamera();
+            // Create quaternions for pitch and yaw, then combine them
+            var yawQuat = new THREE.Quaternion(0,0,0,1);
+            var pitchQuat = new THREE.Quaternion(0,0,0,1);
+            var combinedQuat = new THREE.Quaternion(0,0,0,1);
+
+            yawQuat.setFromAxisAngle( camera.up, -deltaX * YAW_SPEED);
+            pitchQuat.setFromAxisAngle( axis, -deltaZ * PITCH_SPEED);
+
+            combinedQuat.multiplyQuaternions(yawQuat, pitchQuat);
+
+            // Apply rotation to camera's direction vector
+            var direction = new THREE.Vector3(0,0,0);
+            direction.subVectors(camera.lookAtVector, camera.position);
+            direction.normalize();
+            direction.applyQuaternion(combinedQuat);
+
+            // Create new LookAt point
+            var newLookAt = new THREE.Vector3(0,0,0);
+            newLookAt.addVectors(camera.position, direction);
+
+            lookAtPoint = newLookAt;
+
+            // WARNING:
+            // camera.lookAt() should be inside updateCamera() for later requestAnimationFrame optimization purpose.
+            // But if so, the lookAt behaviour is odd... for now camera.lookAt() stays here.
+            camera.lookAt(lookAtPoint);
 
         }
 
@@ -78,7 +79,7 @@ module.exports = function(camera, scene, domElement){
 
 
     var moveAnimationFrame;
-    var SPEED = 0.05;
+    var SPEED = 0.5;
 
     function mouseDownListener(){
 

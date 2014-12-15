@@ -2,6 +2,7 @@
 
 //var THREE = require('three');
 var ee = require('event-emitter');
+var THREE = require('three');
 
 var VectorProxy = require('./VectorProxy.js');
 
@@ -28,7 +29,6 @@ module.exports = function(camera){
     if(existingProxy)
         return existingProxy;
     
-    
     var scheduledChangeEvent = false;
     function scheduleChangeEvent(){
         if(scheduledChangeEvent)
@@ -43,9 +43,13 @@ module.exports = function(camera){
     }
     
     
-    var lookAtVector;
+    var lookAtVector = new THREE.Vector3(0,0,0);
+    var directionVector = new THREE.Vector3(0,0,0);
     var positionProxy = VectorProxy(camera.position);
+    var rotationProxy = VectorProxy(camera.rotation);
+
     positionProxy.on('change', scheduleChangeEvent);
+    rotationProxy.on('change', scheduleChangeEvent);
     
     var proxy = ee({
         get lookAtVector(){ return lookAtVector ? Object.freeze({
@@ -60,13 +64,27 @@ module.exports = function(camera){
                 z: camera.up.z
             })
         },
+        get direction(){
+            return Object.freeze({
+                x: directionVector.x,
+                y: directionVector.y,
+                z: directionVector.z
+            })
+        },
         get position(){
             return positionProxy;
+        }, 
+        get rotation(){
+            return rotationProxy;
         }, 
         lookAt: function(v){
             camera.lookAt(v);
             lookAtVector = v;
-            
+
+            directionVector.x = lookAtVector.x - camera.position.x;
+            directionVector.y = lookAtVector.y - camera.position.y;
+            directionVector.normalize();
+
             scheduleChangeEvent();
         },
         set up(v){
@@ -80,6 +98,19 @@ module.exports = function(camera){
             camera.position.z = v.z;
             
             scheduleChangeEvent();
+        },
+        translateX: function(d){
+            camera.translateX(d);
+        },
+        translateY: function(d){
+            camera.translateY(d);
+        },
+        translateZ: function(d){
+            camera.translateZ(d);
+        },
+        translateOnAxis: function(axis, d){
+            console.log('translate');
+            camera.translateOnAxis(axis, d);
         },
         
         /* other properties proxying */
