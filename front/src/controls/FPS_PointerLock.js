@@ -31,7 +31,6 @@ module.exports = function(camera, scene, domElement){
     
     
     var getFloorHeight = _getFloorHeight(scene);
-    var moveAnimationFrame;
     var lookAtPoint;
     var prevTime;
     var deltaPosition = new THREE.Vector3(0,0,0);
@@ -51,7 +50,9 @@ module.exports = function(camera, scene, domElement){
         // Position camera above the closest floor
         // causes problems for lookAt behaviour when jumping on buildings roofs
         if(distanceToFloor !== undefined){
+            console.log('distanceToFloor :', distanceToFloor);
             camera.position.z += HEIGHT - distanceToFloor;
+            // lookAtPoint.z += HEIGHT - distanceToFloor;
         }
 
         deltaPosition.multiplyScalar(BODY_SPEED * delta);
@@ -61,7 +62,7 @@ module.exports = function(camera, scene, domElement){
 
         // console.log("Position: x " + camera.position.x + " | y " + camera.position.y + " | z " + camera.position.z);
         console.log("Direction: x " + camera.direction.x + " | y " + camera.direction.y + " | z " + camera.direction.z);
-        // console.log("lookAt Z: " + camera.lookAtVector.z);
+        console.log("lookAt Z: " + camera.lookAtVector.z);
 
         prevTime = time;
         deltaPosition.x = 0;
@@ -69,8 +70,6 @@ module.exports = function(camera, scene, domElement){
 
         // See headMovement commentaries
         // camera.lookAt(lookAtPoint);
-
-        moveAnimationFrame = requestAnimationFrame(updateCamera);
     }
 
 
@@ -110,6 +109,7 @@ module.exports = function(camera, scene, domElement){
         // camera.lookAt() should be inside updateCamera() for later requestAnimationFrame optimization purpose.
         // But if so, the lookAt behaviour is odd... for now camera.lookAt() stays here.
         camera.lookAt(lookAtPoint);
+        updateCamera();
     }
 
     function bodyMovement(dir){
@@ -128,20 +128,7 @@ module.exports = function(camera, scene, domElement){
         if (moveLeft) deltaPosition.sub(t);
         if (moveRight) deltaPosition.add(t);
 
-        // switch (dir) {
-        // case 'left':
-        //     deltaPosition.sub(t);
-        //     break;
-        // case 'right':
-        //     deltaPosition.add(t);
-        //     break;
-        // case 'up':
-        //     deltaPosition.add(t);
-        //     break;
-        // case 'down':
-        //     deltaPosition.sub(t);
-        //     break;
-        // }
+        updateCamera();
     }
 
     var onKeyDown = function ( event ) {
@@ -239,9 +226,6 @@ module.exports = function(camera, scene, domElement){
         lookAtPoint = new THREE.Vector3( camera.position.x, camera.position.y + DISTANCE_TO_LOOK_AT, camera.position.z )
         camera.lookAt( lookAtPoint );
 
-        if(!moveAnimationFrame)
-            moveAnimationFrame = requestAnimationFrame(updateCamera);
-
         window.addEventListener('keydown', onKeyDown);
         window.addEventListener('keyup', onKeyUp);
         document.body.addEventListener("mousemove", headMovement, false);
@@ -259,8 +243,6 @@ module.exports = function(camera, scene, domElement){
             document.body.removeEventListener("mousemove", headMovement, false);
             document.exitPointerLock();
 
-            cancelAnimationFrame(moveAnimationFrame);
-            moveAnimationFrame = undefined;
         };
     }
     
