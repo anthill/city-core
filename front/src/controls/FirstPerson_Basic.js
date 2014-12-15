@@ -67,7 +67,7 @@ module.exports = function(camera, scene, domElement){
 
 			lookAtPoint = newLookAt;
 
-			// WARNING:
+			// WARNING FROM FPS_PointerLock.js, not really applicable here since there is no updateCamera():
 			// camera.lookAt() should be inside updateCamera() for later requestAnimationFrame optimization purpose.
 			// But if so, the lookAt behaviour is odd... for now camera.lookAt() stays here.
 			camera.lookAt(lookAtPoint);
@@ -78,6 +78,7 @@ module.exports = function(camera, scene, domElement){
 
 
 	var moveAnimationFrame;
+	var previousDistanceToFloor;
 	var SPEED = 0.5;
 
 	function mouseDownListener(){
@@ -97,8 +98,13 @@ module.exports = function(camera, scene, domElement){
 			rayCasterPosition.z = 10000;
 			var distanceToFloor = getFloorHeight(rayCasterPosition);
 			if(distanceToFloor !== undefined){
-				camera.position.z += HEIGHT - distanceToFloor;
-			}
+            camera.position.z += HEIGHT - distanceToFloor;
+            if (previousDistanceToFloor !== undefined){
+                var deltaHeight = distanceToFloor - previousDistanceToFloor;
+                lookAtPoint.z -= deltaHeight;
+            }
+            previousDistanceToFloor = distanceToFloor;
+        }
 			
 			moveAnimationFrame = requestAnimationFrame(moveForward);
 		});

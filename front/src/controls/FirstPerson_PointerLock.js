@@ -51,11 +51,10 @@ module.exports = function(camera, scene, domElement){
         // Position camera above the closest floor
         // causes problems for lookAt behaviour when jumping on buildings roofs
         if(distanceToFloor !== undefined){
-            console.log('distanceToFloor :', distanceToFloor);
             camera.position.z += HEIGHT - distanceToFloor;
             if (previousDistanceToFloor !== undefined){
                 var deltaHeight = distanceToFloor - previousDistanceToFloor;
-                // lookAtPoint.z += deltaHeight;
+                lookAtPoint.z -= deltaHeight;
             }
         }
 
@@ -74,7 +73,7 @@ module.exports = function(camera, scene, domElement){
         previousDistanceToFloor = distanceToFloor;
 
         // See headMovement commentaries
-        // camera.lookAt(lookAtPoint);
+        camera.lookAt(lookAtPoint);
     }
 
 
@@ -110,10 +109,6 @@ module.exports = function(camera, scene, domElement){
 
         lookAtPoint = newLookAt;
 
-        // WARNING:
-        // camera.lookAt() should be inside updateCamera() for later requestAnimationFrame optimization purpose.
-        // But if so, the lookAt behaviour is odd... for now camera.lookAt() stays here.
-        camera.lookAt(lookAtPoint);
         updateCamera();
     }
 
