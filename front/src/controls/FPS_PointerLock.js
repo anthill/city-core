@@ -35,6 +35,7 @@ module.exports = function(camera, scene, domElement){
     var prevTime;
     var deltaPosition = new THREE.Vector3(0,0,0);
     var movementX, movementY;
+    var previousDistanceToFloor;
 
 
     function updateCamera(){
@@ -52,7 +53,10 @@ module.exports = function(camera, scene, domElement){
         if(distanceToFloor !== undefined){
             console.log('distanceToFloor :', distanceToFloor);
             camera.position.z += HEIGHT - distanceToFloor;
-            // lookAtPoint.z += HEIGHT - distanceToFloor;
+            if (previousDistanceToFloor !== undefined){
+                var deltaHeight = distanceToFloor - previousDistanceToFloor;
+                // lookAtPoint.z += deltaHeight;
+            }
         }
 
         deltaPosition.multiplyScalar(BODY_SPEED * delta);
@@ -67,6 +71,7 @@ module.exports = function(camera, scene, domElement){
         prevTime = time;
         deltaPosition.x = 0;
         deltaPosition.y = 0;
+        previousDistanceToFloor = distanceToFloor;
 
         // See headMovement commentaries
         // camera.lookAt(lookAtPoint);

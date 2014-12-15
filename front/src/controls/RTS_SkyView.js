@@ -17,6 +17,7 @@ module.exports = function(camera, domElement){
 
     var alpha;
     var beta;
+    var moveAnimationFrame;
 
     function pan ( direction ) {
         var camx = camera.position.x + direction.x*userPanSpeed;
@@ -57,6 +58,8 @@ module.exports = function(camera, domElement){
         camera.position.x = camera.position.x + alpha;
         camera.position.y = camera.position.y + beta;
         // console.log("beta", beta, "alpha", alpha, "newz", newz)
+
+        moveAnimationFrame = requestAnimationFrame(moveCamera);
     }
     
     function mouseMoveListener(e){
@@ -92,9 +95,16 @@ module.exports = function(camera, domElement){
             //         beta = -beta;
             }
             else {beta = 0;}
+
+            if(!moveAnimationFrame)
+                moveAnimationFrame = requestAnimationFrame(moveCamera)
         }
 
-        moveCamera();
+        // moveCamera();
+        else{
+            cancelAnimationFrame(moveAnimationFrame);
+            moveAnimationFrame = undefined;
+        }
     }
 
     var ZOOM_BY_DELTA = 25;
@@ -138,6 +148,8 @@ module.exports = function(camera, domElement){
             window.removeEventListener( 'keydown', onKeyDown );
             window.removeEventListener( 'wheel', onScroll );
             window.removeEventListener( 'mousemove', mouseMoveListener );
+            cancelAnimationFrame(moveAnimationFrame);
+            moveAnimationFrame = undefined;
         };
     }    
 };
