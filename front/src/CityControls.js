@@ -1,9 +1,8 @@
 'use strict';
 
-var SkyViewControls = require('./controls/SkyView_RTS.js');
-var FirstPersonControls = require('./controls/FirstPerson_PointerLock.js');
-// var SkyViewControls = require('./controls/SkyView_Basic.js');
-// var FirstPersonControls = require('./controls/FirstPerson_Basic.js');
+var SkyViewControls = require('bordeaux3d-blocks/controls/SkyView_Basic.js');
+var FirstPersonControls = require('bordeaux3d-blocks/controls/FirstPerson_Basic.js');
+
 var loadObjects = require('./loadObjects.js');
 var meshToBuilding = require('./meshToBuilding');
 

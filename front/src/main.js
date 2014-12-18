@@ -6,12 +6,10 @@ var serverCommunication = require('./serverCommunication.js');
 var createBuildingMesh = require('./createBuildingMesh.js');
 var buildingMap = require('./buildingMap.js');
 var meshToBuilding = require('./meshToBuilding.js');
-var gui = require('./gui.js');
-var guiControls = gui.guiControls;
+
 
 //var parseGeometry = require('./parseGeometry.js');
 var rTree = require('./rTree.js');
-var geoCode = require('./geoCode.js');
 var metadata = require('./metadata.js');
 
 var _3dviz = require('./3dviz.js');
@@ -20,9 +18,9 @@ var camera = _3dviz.camera;
 var lights = _3dviz.lights;
 var renderer = _3dviz.renderer;
 
-var SunPosition = require('./SunPosition.js');
+var SunPosition = require('bordeaux3d-blocks/utils/SunPosition.js');
 
-var raycasting = require('./raycasting.js')(camera, scene, renderer.domElement);
+var raycasting = require('bordeaux3d-blocks/utils/ray/raycasting.js')(camera, scene, renderer.domElement);
 
 var INITIAL_ALTITUDE = 200;
 
@@ -32,7 +30,7 @@ cityControls.switchToSkyView(24541.22, 11167.65, INITIAL_ALTITUDE);
 
 var MAX_Y = require('./MAX_Y.js');
 
-var GeoConverter = require('./geoConverter.js');
+var GeoConverter = require('bordeaux3d-blocks/utils/geo/geoConverter.js');
 
 
 // TODO change values on resize
@@ -80,11 +78,6 @@ Object.keys(metadata).forEach(function(id) {
     rTree.insert(item);
 });
 
-moveTo(guiControls.address)
-
-gui.addressControler.onFinishChange(function(value) {
-    moveTo(value);
-});
 
 camera.on('cameraviewchange', function(){ 
     var pos = camera.position;
