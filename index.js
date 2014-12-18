@@ -11,7 +11,6 @@ module.exports = function(container, options){
     // Need a way to expose building to modify them (paint)
     // Interaction with geoloc
     
-    // Give the ability to 
     return {
         addLight: function(light/*: THREE.Light*/){
             throw 'TODO';

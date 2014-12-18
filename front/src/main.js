@@ -112,8 +112,12 @@ serverCommunication.on('buildingOk', function(event){
     meshToBuilding.set(mesh, {id: event.msg.id, metadata: event.buildingMetadata}); 
     scene.add(mesh);
 
-    buildingMap[event.msg.id] = {mesh:mesh, visible:true};
+    buildingMap.set(event.msg.id, {mesh:mesh, visible:true});
 
     _3dviz.render();
+});
 
-})
+
+
+
+

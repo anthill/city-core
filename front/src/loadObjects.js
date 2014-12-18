@@ -14,15 +14,15 @@ module.exports = function loadObjects(south, north, east, west) {
     var results = rTree.search([west, south, east, north]);
     
     var objectToDisplayIds = new Set(results.map(function(r){ return r[4].id; }));
-    var displayedObjectIds = new Set(Object.keys(buildingMap).filter(function(k){ return buildingMap[k].visible; }));
+    var displayedObjectIds = new Set(buildingMap.keys().filter(function(id){ return buildingMap.get(id).visible; }));
     
     // add objects which should be visible but aren't
     objectToDisplayIds.forEach(function(id){
-        if(!(id in buildingMap)){
+        if(!buildingMap.has(id)){
             fetchCityObject(id); // object will be added to scene in serverCommunication.js, which is a terrible place, yes.
         }
         else{
-            var entry = buildingMap[id]
+            var entry = buildingMap.get(id);
             
             if(!entry.visible){
                 scene.add(entry.mesh);
@@ -34,7 +34,7 @@ module.exports = function loadObjects(south, north, east, west) {
     // hide objects which are visible, but shouldn't
     displayedObjectIds.forEach(function(id){
         if(!objectToDisplayIds.has(id)){
-            var object = buildingMap[id];
+            var object = buildingMap.get(id);
             object.visible = false;
             scene.remove(object.mesh);
         }    
