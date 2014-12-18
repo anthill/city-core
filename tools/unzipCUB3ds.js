@@ -14,14 +14,10 @@ var computeMeshVolume = require('../src/computeMeshVolume.js');
 var _3dsFormatToAntsBinaryBuffer = require('../src/3dsFormatToAntsBinaryBuffer.js');
 var parse3ds = require('../src/parse3ds.js');
 
-var tilesAltitudes;
+var getTileAltitudes = require('./getTileAltitudes.js');
+var tileAltitudesP = getTileAltitudes(path.resolve(process.cwd(), './data/DALLAGE_3D.csv'));
 
-try{
-    tilesAltitudes = require('../data/tilesAltitudes.json');
-}
-catch(e){
-    console.warn('missing data/tilesAltitudes.json file', e);
-}
+
 
 function tmpdir(){
     var def = Q.defer();
@@ -149,9 +145,7 @@ function extractBuildings(_3dsPath, x, y){
         }
 
 
-        if(tilesAltitudes){
-            // correct altitude
-
+        tileAltitudesP.then(function(tilesAltitudes){
             var key = _3dsPath.match(/x\d{1,4}y\d{1,4}/)[0];
 
             var deltaZ = tilesAltitudes[key];
@@ -161,82 +155,84 @@ function extractBuildings(_3dsPath, x, y){
                     v.z += deltaZ;
                 });
             });
-        }
+            
+            // Find tile bounding box
+            var containingCubes = meshes.map(containingCube);
+            // create a fake mesh based on the cubes descriptions
+            var fakeCombiningMesh = {
+                vertices: containingCubes.reduce(function(acc, cubeDesc){
+                    acc.push({
+                        x: cubeDesc.minX,
+                        y: cubeDesc.minY,
+                        z: cubeDesc.minZ,
+                    });
+                    acc.push({
+                        x: cubeDesc.maxX,
+                        y: cubeDesc.maxY,
+                        z: cubeDesc.maxZ,
+                    });
 
-
-        // Find tile bounding box
-        var containingCubes = meshes.map(containingCube);
-        // create a fake mesh based on the cubes descriptions
-        var fakeCombiningMesh = {
-            vertices: containingCubes.reduce(function(acc, cubeDesc){
-                acc.push({
-                    x: cubeDesc.minX,
-                    y: cubeDesc.minY,
-                    z: cubeDesc.minZ,
-                });
-                acc.push({
-                    x: cubeDesc.maxX,
-                    y: cubeDesc.maxY,
-                    z: cubeDesc.maxZ,
-                });
-
-                return acc;
-            }, [])
-        };
-        var tileContainingCube = containingCube(fakeCombiningMesh);
-
-        var minZ = Math.floor(tileContainingCube.minZ);
-        var maxZ = Math.ceil(tileContainingCube.maxZ);
-        if(minZ === maxZ){ // happens for flat floor objects
-            maxZ = minZ + 1;
-        }
-
-        // integer approximation
-        var tileMetadata = {
-            X: x,
-            Y: y,
-            minX: Math.floor(tileContainingCube.minX),
-            maxX: Math.ceil(tileContainingCube.maxX),
-            minY: Math.floor(tileContainingCube.minY),
-            maxY: Math.ceil(tileContainingCube.maxY),
-            minZ: minZ,
-            maxZ: maxZ,
-            objects: Object.create(null)
-        };
-
-        var buildingBuffers = Object.create(null);
-        meshes.forEach(function(m, i){
-            try{
-            buildingBuffers[m.id] = _3dsFormatToAntsBinaryBuffer(m, tileMetadata);
-            }
-            catch(e){
-                console.error('compacting error', x, y, e)
-            }
-        });
-
-        meshes.forEach(function(m){
-
-            // we get the type (either building or terrain)
-            var objectType;
-            if (m.id[0] == "x"){
-                objectType = "terrain";
-            } else {
-                objectType = "building"
-            }
-            // for recentering
-            var objectCube = containingCube(m);
-
-            tileMetadata.objects[m.id] = {
-                x: Math.round( (objectCube.minX + objectCube.maxX)/2 ),
-                y: Math.round( (objectCube.minY + objectCube.maxY)/2 ),
-                type: objectType
+                    return acc;
+                }, [])
             };
-        });
+            var tileContainingCube = containingCube(fakeCombiningMesh);
 
-        def.resolve({
-            buildingBuffers: buildingBuffers,
-            tileMetadata : tileMetadata
-        })
+            var minZ = Math.floor(tileContainingCube.minZ);
+            var maxZ = Math.ceil(tileContainingCube.maxZ);
+            if(minZ === maxZ){ // happens for flat floor objects
+                maxZ = minZ + 1;
+            }
+
+            // integer approximation
+            var tileMetadata = {
+                X: x,
+                Y: y,
+                minX: Math.floor(tileContainingCube.minX),
+                maxX: Math.ceil(tileContainingCube.maxX),
+                minY: Math.floor(tileContainingCube.minY),
+                maxY: Math.ceil(tileContainingCube.maxY),
+                minZ: minZ,
+                maxZ: maxZ,
+                objects: Object.create(null)
+            };
+
+            var buildingBuffers = Object.create(null);
+            meshes.forEach(function(m, i){
+                try{
+                buildingBuffers[m.id] = _3dsFormatToAntsBinaryBuffer(m, tileMetadata);
+                }
+                catch(e){
+                    console.error('compacting error', x, y, e)
+                }
+            });
+
+            meshes.forEach(function(m){
+
+                // we get the type (either building or terrain)
+                var objectType;
+                if (m.id[0] == "x"){
+                    objectType = "terrain";
+                } else {
+                    objectType = "building"
+                }
+                // for recentering
+                var objectCube = containingCube(m);
+
+                tileMetadata.objects[m.id] = {
+                    x: Math.round( (objectCube.minX + objectCube.maxX)/2 ),
+                    y: Math.round( (objectCube.minY + objectCube.maxY)/2 ),
+                    type: objectType
+                };
+            });
+
+            def.resolve({
+                buildingBuffers: buildingBuffers,
+                tileMetadata : tileMetadata
+            });
+            
+            
+        });
+        
 
     });
 

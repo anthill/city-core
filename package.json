@@ -6,8 +6,9 @@
   "main": "index.js",
   "scripts": {
     "build": "browserify front/src/main.js -o front/app.js -d",
-    "start-dev": "node index.js dev",
-    "start-prod": "node index.js prod",
+    "start": "node server.js dev",
+    "start-dev": "node server.js dev",
+    "start-prod": "node server.js prod",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "watchify front/src/main.js -o front/app.js -d -v"
   },
@@ -29,7 +30,8 @@
     "socket.io-client": "^1.0.6",
     "suncalc": "^1.5.2",
     "three": "^0.68.0",
-    "xmldom": "^0.1.19"
+    "xmldom": "^0.1.19",
+    "csv-parse": "0.0.6"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
