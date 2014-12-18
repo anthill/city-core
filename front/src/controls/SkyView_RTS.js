@@ -59,7 +59,7 @@ module.exports = function(camera, domElement){
         camera.position.y = camera.position.y + beta;
         // console.log("beta", beta, "alpha", alpha, "newz", newz)
 
-        moveAnimationFrame = requestAnimationFrame(moveCamera)
+        moveAnimationFrame = requestAnimationFrame(moveCamera);
     }
     
     function mouseMoveListener(e){
@@ -99,6 +99,8 @@ module.exports = function(camera, domElement){
             if(!moveAnimationFrame)
                 moveAnimationFrame = requestAnimationFrame(moveCamera)
         }
+
+        // moveCamera();
         else{
             cancelAnimationFrame(moveAnimationFrame);
             moveAnimationFrame = undefined;
