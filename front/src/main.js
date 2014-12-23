@@ -12,21 +12,21 @@ var guiControls = gui.guiControls;
 //var parseGeometry = require('./parseGeometry.js');
 var rTree = require('./rTree.js');
 var geoCode = require('./geoCode.js');
-var metadata = require('./metadata.js');
+var metadataP = require('./metadataP.js');
 
-var _3dviz = require('./3dviz.js');
-var scene = _3dviz.scene;
-var camera = _3dviz.camera;
-var lights = _3dviz.lights;
-var renderer = _3dviz.renderer;
+var threeBundle = require('./createThreeBundle.js')(document.body);
+var scene = threeBundle.scene;
+var camera = threeBundle.camera;
+var lights = threeBundle.lights;
+var renderer = threeBundle.renderer;
 
 var SunPosition = require('./SunPosition.js');
 
-var raycasting = require('./raycasting.js')(camera, scene, renderer.domElement);
+var raycasting = require('./raycasting.js')(camera, scene, threeBundle.domElement);
 
 var INITIAL_ALTITUDE = 200;
 
-var cityControls = require('./CityControls.js')(camera, scene, renderer.domElement);
+var cityControls = require('./CityControls.js')(camera, scene, threeBundle.domElement);
 cityControls.switchToSkyView(24541.22, 11167.65, INITIAL_ALTITUDE);
 
 
@@ -66,56 +66,63 @@ function moveTo(place){
     });
 }
 
-Object.keys(metadata).forEach(function(id) {
-    var building = metadata[id];
-    var X = building.tile.X;
-    var Y = building.tile.Y;
-    var item = [
-        building.x + X*200,
-        building.y + (MAX_Y-Y)*200,
-        building.x + X*200,
-        building.y + (MAX_Y-Y)*200,
-        {id: id, X:X, Y:Y}
-    ];
-    rTree.insert(item);
-});
-
-moveTo(guiControls.address)
-
-gui.addressControler.onFinishChange(function(value) {
-    moveTo(value);
-});
-
-camera.on('cameraviewchange', function(){ 
-    var pos = camera.position;
-    var sun = lights.sun;
-    sun.position.x = pos.x;
-    sun.position.y = pos.y;
-    sun.position.z = 300;
-    var sunPos = SunPosition(sun, lights.ambient);
-    sun.target.position.set(pos.x + sunPos[0], pos.y + sunPos[1], 0);
-
-    _3dviz.render();
-});
-
-serverCommunication.on('buildingOk', function(event){
-    var mesh = createBuildingMesh(new DataView(event.msg.buffer), event.buildingMetadata.tile);
-
-    if(event.buildingMetadata.type === "building"){
-        mesh.castShadow = true;
-        mesh.receiveShadow = false;
-    } else {
-        mesh.castShadow = false;
-        mesh.receiveShadow = true;
-    }
+metadataP.then(function(metadata){
+    Object.keys(metadata).forEach(function(id) {
+        var building = metadata[id];
+        var X = building.tile.X;
+        var Y = building.tile.Y;
+        var item = [
+            building.x + X*200,
+            building.y + (MAX_Y-Y)*200,
+            building.x + X*200,
+            building.y + (MAX_Y-Y)*200,
+            {id: id, X:X, Y:Y}
+        ];
+        rTree.insert(item);
+    });
     
-    meshToBuilding.set(mesh, {id: event.msg.id, metadata: event.buildingMetadata}); 
-    scene.add(mesh);
+    moveTo(guiControls.address)
 
-    buildingMap.set(event.msg.id, {mesh:mesh, visible:true});
+    gui.addressControler.onFinishChange(function(value) {
+        moveTo(value);
+    });
 
-    _3dviz.render();
-});
+    camera.on('cameraviewchange', function(){ 
+        console.log('cam', camera.position.x, camera.position.y);
+        
+        var pos = camera.position;
+        var sun = lights.sun;
+        sun.position.x = pos.x;
+        sun.position.y = pos.y;
+        sun.position.z = 300;
+        var sunPos = SunPosition(sun, lights.ambient, threeBundle.render);
+        sun.target.position.set(pos.x + sunPos[0], pos.y + sunPos[1], 0);
+
+        threeBundle.render();
+    });
+
+    serverCommunication.on('buildingOk', function(event){
+        var mesh = createBuildingMesh(new DataView(event.msg.buffer), event.buildingMetadata.tile);
+
+        if(event.buildingMetadata.type === "building"){
+            mesh.castShadow = true;
+            mesh.receiveShadow = false;
+        } else {
+            mesh.castShadow = false;
+            mesh.receiveShadow = true;
+        }
+
+        meshToBuilding.set(mesh, {id: event.msg.id, metadata: event.buildingMetadata}); 
+        scene.add(mesh);
+
+        buildingMap.set(event.msg.id, {mesh:mesh, visible:true});
+
+        threeBundle.render();
+    });
+
+})
+
+
 
 
 

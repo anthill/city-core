@@ -5,13 +5,13 @@ var Set = require('es6-set');
 var rTree = require('./rTree.js');
 var buildingMap = require('./buildingMap.js');
 var fetchCityObject = require('./serverCommunication.js').getCityObject;
-var scene = require('./3dviz.js').scene;
 
 
-module.exports = function loadObjects(south, north, east, west) {
-    //console.log("query", south, north, east, west);
+module.exports = function loadObjects(scene, south, north, east, west) {
+    console.log("loadObjects", south, north, east, west);
     // query the rtree to know what building are needed
     var results = rTree.search([west, south, east, north]);
+    console.log('results', results.length);
     
     var objectToDisplayIds = new Set(results.map(function(r){ return r[4].id; }));
     var displayedObjectIds = new Set(buildingMap.keys().filter(function(id){ return buildingMap.get(id).visible; }));

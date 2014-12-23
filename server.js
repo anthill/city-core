@@ -14,11 +14,13 @@ var https = require('https');
 var express = require('express');
 var compression = require('compression');
 
-// defs
-
+// arguments
 var mode = process.argv[2] || "dev";
+var config = require("./" + path.join("config", mode+".json")); // will throw if file not found
 
-var config = require("./" + path.join("config", mode+".json"))
+var indexDir = process.argv[3] || "front";
+var indexHTML = fs.readFileSync(path.join(__dirname, indexDir, 'index.html'),'utf8'); // will throw if not found;
+
 
 var PORT = config.port;
 
@@ -43,7 +45,6 @@ var io = require('socket.io')(server);
 process.title = 'Bdx3d server';
 
 
-
 function makeDocument(htmlFragment){
     return new Promise(function(resolve, reject){
         jsdom.env(htmlFragment, function(err, window){
@@ -53,16 +54,6 @@ function makeDocument(htmlFragment){
     })
 }
 
-// get the index.html
-var indexP = new Promise(function(resolve, reject){
-    fs.readFile("front/index.html", 'utf8', function (err, data){
-        if(err){
-            reject(err);
-            return;
-        }        
-        resolve(makeDocument(data));
-    });
-});
 
 // get the metadata
 var metadataP = new Promise(function(resolve, reject){
@@ -76,15 +67,17 @@ var metadataP = new Promise(function(resolve, reject){
 });
 
 
+var indexDocP = makeDocument(indexHTML)
+
 // once the json is readed, we can start the service and send index.html
-Promise.all([indexP, metadataP]).then(function(results){
+Promise.all([indexDocP, metadataP]).then(function(results){
     var indexDocument = results[0];
     var metadataString = results[1];
-    var metaSpace = indexDocument.querySelector('script#metadata');
-    metaSpace.textContent = metadataString;
+    
+    /*var metaSpace = indexDocument.querySelector('script#metadata');
+    metaSpace.textContent = metadataString;*/
     var indexHtml = '<!doctype html>\n' + indexDocument.documentElement.outerHTML;
 
-    // websocket: when a user connects we create a token
     // gzip/deflate outgoing responses
     app.use(compression())
     app.use("/polyfills", express.static(__dirname + '/front/src/polyfills'));
@@ -94,9 +87,17 @@ Promise.all([indexP, metadataP]).then(function(results){
       res.send(indexHtml);
     });
     app.get('/app.js', function(req, res){
-      res.sendFile(path.join(__dirname, 'front/app.js'));
+      res.sendFile(path.join(__dirname, indexDir, 'app.js'));
     });
 
+    app.get('/metadata', function(req, res){
+        console.log('/metadata', req.query);
+        
+        // TODO support query a rtree with the metadata
+        
+        res.sendFile(path.join(__dirname, 'front/data/metadata.json'));
+    });
+    
     io.on('connection', function (socket) {
 
         //when receiving queries send back the data

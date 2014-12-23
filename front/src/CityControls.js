@@ -28,7 +28,7 @@ module.exports = function(camera, scene, domElement){
         east += 200;
         north += 200;
 
-        loadObjects(south, north, east, west);
+        loadObjects(scene, south, north, east, west);
     }
 
     function onCameraViewChangeFirstPerson(){
@@ -37,7 +37,7 @@ module.exports = function(camera, scene, domElement){
         var west = camera.position.x - 300;
         var east = camera.position.x + 300;
 
-        loadObjects(south, north, east, west);
+        loadObjects(scene, south, north, east, west);
     }
     
     function onMeshClicked(event){

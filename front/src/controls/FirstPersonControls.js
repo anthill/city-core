@@ -8,6 +8,7 @@
 
 var THREE = require('three');
 var _getFloorHeight = require('../distanceToFloor.js');
+var loadObjects = require('../loadObjects.js');
 
 var cos = Math.cos,
     sin = Math.sin,
@@ -20,16 +21,16 @@ var MAX_HORI_SPEED = Math.PI/100;
 var MAX_VERTI_SPEED = Math.PI/120;
 
 module.exports = function(camera, scene, domElement){
-    
+
     var getFloorHeight = _getFloorHeight(scene);
-    
+
     var alpha;
     var beta;
     var animationFrame;
     var rotation = 0;
-    
+
     var lookAtPoint;
-    
+
     function moveCamera(){
         var newx = camera.position.x +
             ((lookAtPoint.x - camera.position.x)*cos(alpha) - (lookAtPoint.y - camera.position.y)*sin(alpha));
@@ -80,6 +81,18 @@ module.exports = function(camera, scene, domElement){
     var moveAnimationFrame;
     var SPEED = 0.05;
 
+    function onCameraViewChangeFirstPerson(){
+        console.log('onCameraViewChangeFirstPerson');
+        
+        var south = camera.position.y - 300;
+        var north = camera.position.y + 300;
+        var west = camera.position.x - 300;
+        var east = camera.position.x + 300;
+
+        loadObjects(scene, south, north, east, west);
+    }
+    
+    
     function mouseDownListener(){
 
         moveAnimationFrame = requestAnimationFrame(function moveForward(){
@@ -92,36 +105,36 @@ module.exports = function(camera, scene, domElement){
             lookAtPoint.x     += SPEED*moveVector.x;
             camera.position.y += SPEED*moveVector.y;
             lookAtPoint.y     += SPEED*moveVector.y;
-            
+
             var rayCasterPosition = camera.position;
             rayCasterPosition.z = 10000;
             var distanceToFloor = getFloorHeight(rayCasterPosition);
             if(distanceToFloor !== undefined){
                 camera.position.z += HEIGHT - distanceToFloor;
             }
-            
+
             moveAnimationFrame = requestAnimationFrame(moveForward);
         });
-        
-        
+
+
     }
 
     function mouseUpListener(){
         cancelAnimationFrame(moveAnimationFrame);
         moveAnimationFrame = undefined;
     }
-    
-    
+
+
     return function(x, y){
         camera.up = new THREE.Vector3(0, 0, 1);
         camera.near = 1;
         camera.far = 50;
-        
+
         var rayCasterPosition = camera.position;
         rayCasterPosition.z = 10000;
         var distanceToFloor = getFloorHeight(rayCasterPosition);
         // console.log('distance to floor', distanceToFloor, camera.position.z + HEIGHT - distanceToFloor)
-        
+
         // init camera
         camera.position.x = x;
         camera.position.y = y;
@@ -134,14 +147,16 @@ module.exports = function(camera, scene, domElement){
         domElement.addEventListener('mousemove', mouseMoveListener);
         domElement.addEventListener('mousedown', mouseDownListener);
         domElement.addEventListener('mouseup', mouseUpListener);
+        camera.on('cameraviewchange', onCameraViewChangeFirstPerson);
 
         return function desactivate(){
             domElement.removeEventListener('mousemove', mouseMoveListener);
             domElement.removeEventListener('mousedown', mouseDownListener);
             domElement.removeEventListener('mouseup', mouseUpListener);
+            camera.off('cameraviewchange', onCameraViewChangeFirstPerson);
             cancelAnimationFrame(moveAnimationFrame);
             moveAnimationFrame = undefined;
         };
     }
-    
+
 };

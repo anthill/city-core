@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
     <head>
-        <title>bordeaux3d</title>
+        <title>bordeaux3d-core client</title>
         <meta charset="utf-8">
 
         <style>
@@ -11,9 +11,6 @@
         *, *:before, *:after {
             box-sizing: border-box;
             /* if you really care about older browsers, add prefixed versions at your own risks */
-
-            /* commented out because of dat.gui*/
-            /*overflow: auto; /* http://bocoup.com/weblog/new-overflow-default/ */
         }
 
         /*
@@ -63,15 +60,6 @@
             padding: 0;
         }
 
-        /* empty divs being invisible is an annoying default */
-        div:empty{
-          width: 300px;
-          height: 100px;
-
-          background-color: rgb(224, 174, 224);
-        }
-
-
         /*
           fairly classic thing to do
         */
@@ -112,10 +100,76 @@
               gl_FragColor = vec4(sample.xyz, sample.w);
             }
         </script>
+    
         
         <script defer src="polyfills/harmony-collections.js"></script>
+        <script defer src="https://rawgit.com/DavidBruant/tiretbas-natives/master/tiretbas-natives.js"></script>
+        
+        
         <script defer src="app.js"></script>
+
+        <script id="metadata" type="application/json"></script>
+        
+        
+        <style>
+            body{
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            menu{
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            menu button{
+                font-family: "DejaVu Serif";
+                padding: 1em 2em;
+                background-color: white;
+                margin: 0.5em;
+
+                cursor: pointer;
+
+                text-transform: uppercase;
+
+                width: 20%;
+
+                text-align: center;
+            }
+
+            menu button:disabled{
+                background-color: #AAA;
+                color: white;
+
+                text-decoration: line-through;
+
+                cursor:default;
+            }
+            
+            #view{
+                width: 60%;
+                height: 60%;
+                
+                background-color: indianred;
+            }
+            
+        </style>
+        
     </head>
     <body>
+        <menu>
+            <button id="#light">Add random light</button>
+            <button id="#mesh">Add random mesh</button>
+            <button id="#controls">switch controls</button>
+        </menu>
+        
+        <div id="view"></div>
     </body>
 </html>
