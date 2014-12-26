@@ -5,10 +5,12 @@ var createThreeBundle = require('./createThreeBundle.js');
 var server = require('./serverCommunication.js');
 var rTree = require('./rTree.js');
 var metadataP = require('./metadataP.js');
+var MAX_Y = require('./MAX_Y');
+var createBuildingMesh = require('./createBuildingMesh.js');
+var meshToBuilding = require('./meshToBuilding.js');
+var buildingMap = require('./buildingMap.js');
 
 metadataP.then(function(metadata){
-    console.log('metadata', metadata);
-    
     Object.keys(metadata).forEach(function(id) {
         var building = metadata[id];
         var X = building.tile.X;
