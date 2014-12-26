@@ -1,6 +1,7 @@
 "use strict";
 
-var defaultControls = require('./controls/FirstPersonControls.js');
+var defaultControls = require('bordeaux3d-blocks/controls/FirstPerson_Basic.js');
+
 var createThreeBundle = require('./createThreeBundle.js');
 var server = require('./serverCommunication.js');
 var rTree = require('./rTree.js');
@@ -9,6 +10,7 @@ var MAX_Y = require('./MAX_Y');
 var createBuildingMesh = require('./createBuildingMesh.js');
 var meshToBuilding = require('./meshToBuilding.js');
 var buildingMap = require('./buildingMap.js');
+var loadObjects = require('./loadObjects.js');
 
 metadataP.then(function(metadata){
     Object.keys(metadata).forEach(function(id) {
@@ -24,6 +26,8 @@ metadataP.then(function(metadata){
         ];
         rTree.insert(item);
     });
+}).catch(function(err){
+    console.error('error getting metadata or filling rtree', err);
 });
     
 
@@ -75,8 +79,8 @@ module.exports = function(container, options){
     camera.position.x = 24341.22;
     camera.position.y = 10967.65;
 
-    var currentControlsDesactivate = defaultControls(camera, scene, domElement)(24341.22, 10967.65); // not empty
-
+    var currentControlsDesactivate = defaultControls(camera, scene, domElement, loadObjects)(24341.22, 10967.65); // not empty
+ 
     return {
         addLight: function(light /*: THREE.Light */){
             throw 'TODO';

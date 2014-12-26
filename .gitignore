@@ -3,6 +3,7 @@ front/data
 node_modules
 
 front/app.js
+core-client/app.js
 
 notes.md
 
@@ -14,3 +15,6 @@ XML.zip
 *mrDoob*
 
 config/prod.json
+
+3DS/
+tools/data/

@@ -35,6 +35,9 @@ module.exports = function(vector){
         
         distanceTo: function(){
             return vector.distanceTo.apply(vector, arguments);
+        },
+        add: function(v){
+            vector.add(v);
         }
     });
     
