@@ -3,6 +3,7 @@ front/data
 node_modules
 
 front/app.js
+core-client/app.js
 
 notes.md
 

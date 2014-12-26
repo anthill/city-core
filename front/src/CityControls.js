@@ -29,16 +29,7 @@ module.exports = function(camera, scene, domElement){
         east += 200;
         north += 200;
 
-        loadObjects(south, north, east, west);
-    }
-
-    function onCameraViewChangeFirstPerson(){
-        var south = camera.position.y - 300;
-        var north = camera.position.y + 300;
-        var west = camera.position.x - 300;
-        var east = camera.position.x + 300;
-
-        loadObjects(south, north, east, west);
+        loadObjects(scene, south, north, east, west);
     }
     
     function onMeshClicked(event){
@@ -63,7 +54,6 @@ module.exports = function(camera, scene, domElement){
             desactivateCurrentControls();
             window.removeEventListener('meshClicked', onMeshClicked);
             camera.off('cameraviewchange', onCameraViewChangeSky);
-            camera.on('cameraviewchange', onCameraViewChangeFirstPerson);
             document.addEventListener('keydown', onKeyPressFirstPerson);
             
             lastAltitude = camera.position.z;
@@ -73,7 +63,6 @@ module.exports = function(camera, scene, domElement){
         switchToSkyView: function(x, y, altitude){
             desactivateCurrentControls();
             window.addEventListener( 'meshClicked', onMeshClicked);
-            camera.off('cameraviewchange', onCameraViewChangeFirstPerson);
             camera.on('cameraviewchange', onCameraViewChangeSky);
             document.removeEventListener('keydown', onKeyPressFirstPerson);
             
