@@ -26,6 +26,12 @@ var raycasting = require('./raycasting.js')(camera, scene, renderer.domElement);
 
 var INITIAL_ALTITUDE = 200;
 
+var splashScreen = document.body.querySelector("#splash-screen");
+
+splashScreen.addEventListener('click', function(){
+    splashScreen.style.display = "none";
+});
+
 var cityControls = require('./CityControls.js')(camera, scene, renderer.domElement);
 cityControls.switchToSkyView(24541.22, 11167.65, INITIAL_ALTITUDE);
 

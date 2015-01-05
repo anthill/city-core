@@ -61,6 +61,16 @@ module.exports = function(camera, domElement){
 
         moveAnimationFrame = requestAnimationFrame(moveCamera);
     }
+
+    function activateMouseMove(){
+        window.addEventListener( 'mousemove', mouseMoveListener );
+    }
+
+    function deactivateMouseMove(){
+        alpha = 0;
+        beta = 0;
+        window.removeEventListener( 'mousemove', mouseMoveListener );
+    }
     
     function mouseMoveListener(e){
 
@@ -69,10 +79,10 @@ module.exports = function(camera, domElement){
         var deltaX = e.clientX - canvasBoundingRect.width/2;
         var deltaZ = e.clientY - canvasBoundingRect.height/2;
 
-        var thresX = canvasBoundingRect.width*3/10;
-        var normX = canvasBoundingRect.width/2 - canvasBoundingRect.width*3/10;
-        var thresZ = canvasBoundingRect.height*3/10;
-        var normZ = canvasBoundingRect.height/2 - canvasBoundingRect.height*3/10;
+        var thresX = canvasBoundingRect.width*49/100;
+        var normX = canvasBoundingRect.width/2 - canvasBoundingRect.width*49/100;
+        var thresZ = canvasBoundingRect.height*45/100;
+        var normZ = canvasBoundingRect.height/2 - canvasBoundingRect.height*45/100;
 
         if(Math.abs(deltaX) > thresX || Math.abs(deltaZ) > thresZ){
 
@@ -142,12 +152,16 @@ module.exports = function(camera, domElement){
         window.addEventListener( 'keydown', onKeyDown );
         window.addEventListener( 'wheel', onScroll );
         window.addEventListener( 'mousemove', mouseMoveListener );
+        window.addEventListener('mouseout', deactivateMouseMove);
+        window.addEventListener('mouseover', activateMouseMove);
 
         return function desactivate(){
             // In Chrome listening to keypress doesn't work for whatever reason
             window.removeEventListener( 'keydown', onKeyDown );
             window.removeEventListener( 'wheel', onScroll );
             window.removeEventListener( 'mousemove', mouseMoveListener );
+            window.removeEventListener('mouseout', deactivateMouseMove);
+            window.removeEventListener('mouseover', activateMouseMove);
             cancelAnimationFrame(moveAnimationFrame);
             moveAnimationFrame = undefined;
         };
