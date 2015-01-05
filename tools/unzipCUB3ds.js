@@ -254,6 +254,15 @@ function unzipInTmpDir(pathToZip){
             def.resolve(tmpDir);
         });
 
+        extractWriteStream.on('error', function(err){
+            def.reject(err);
+        });
+
+        extractWriteStream.on('finish', function(e){ // 'close' event, unlike 'finish' guarantees all writes to disk are finished
+            console.log('finish', pathToZip, tmpDir);
+            extractWriteStream.end();
+        });
+
         return def.promise;
     });
 }
