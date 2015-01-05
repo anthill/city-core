@@ -1,6 +1,7 @@
 .DS_Store
 front/data
 node_modules
+core-client/
 
 front/app.js
 
