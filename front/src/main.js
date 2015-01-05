@@ -30,6 +30,7 @@ var splashScreen = document.body.querySelector("#splash-screen");
 
 splashScreen.addEventListener('click', function(){
     splashScreen.style.opacity = 0;
+    splashScreen.style.visibility = 'hidden';
     console.log("click");
 });
 
