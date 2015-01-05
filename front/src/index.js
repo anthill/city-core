@@ -83,7 +83,8 @@ module.exports = function(container, options){
  
     return {
         addLight: function(light /*: THREE.Light */){
-            throw 'TODO';
+            scene.add(light);
+            // throw 'TODO';
         },
         removeLight: function(light /*: THREE.Light */){
             throw 'TODO';
@@ -91,7 +92,14 @@ module.exports = function(container, options){
 
         // functions to add tramway or another building
         addMesh: function(mesh /*: THREE.Mesh */){
-            throw 'TODO';
+            var pos = {
+                x: camera.position.x + 3*camera.direction.x,
+                y: camera.position.y + 3*camera.direction.y,
+                z: camera.position.z + 3*camera.direction.z
+            };
+            mesh.position.set(pos.x, pos.y, pos.z);
+            scene.add(mesh);
+            // throw 'TODO';
         },
         removeMesh: function(mesh /*: THREE.Mesh */){
             throw 'TODO';
