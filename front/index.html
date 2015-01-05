@@ -43,6 +43,7 @@
             width: 100vw;
             height: 100vh;
             overflow: hidden;
+            position: relative;
         }
             
         /*
@@ -86,6 +87,75 @@
             vertical-align: top;
         }
 
+        /* Splash-screen */
+
+        #splash-screen {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+
+            background-color: rgb(50, 50, 50);
+            opacity: 0.9;
+            z-index: 1;
+            color: white;
+            font-size: 1em;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 300;
+
+            -webkit-transition: opacity 3s;
+            -moz-transition: opacity 3s;
+            -o-transition: opacity 3s;
+            transition: opacity 3s;
+        }
+
+        .hidden {
+            visibility: hidden;
+        }
+
+        #instructions{
+            width: 40%;
+            margin: 13% auto;
+            text-align: justify;
+        }
+
+        p {
+            font-size: 0.8em;
+        }
+
+        h1 {
+            text-shadow: 0 0 10px #DBB460;
+            text-align: center;
+            font-size: 2.5em;
+            color: white;
+        }
+
+        h2 {
+            font-size: 1em;
+            font-weight:300;
+            text-decoration: underline;
+        }
+
+        strong{
+            font-weight: 300;
+            color: #DBB460;
+        }
+
+        .centered{
+            text-align: center;
+            font-size: 1.2em;
+        }
+
+        #intro{
+            font-size: 1.2;
+        }
+
+        #enter {
+            text-shadow: 0 0 5px #DBB460;
+        }
+
         * {
             border-collapse: collapse;
         }
@@ -119,5 +189,29 @@
         <script id="metadata" type="application/json"></script>
     </head>
     <body>
+        <div id="splash-screen">
+            <a href="https://github.com/anthill/city-core"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://camo.githubusercontent.com/c6286ade715e9bea433b4705870de482a654f78a/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f77686974655f6666666666662e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_white_ffffff.png"></a>
+            <section id="instructions">
+                <h1>Welcome to CITY !</h1>
+                <p id="intro" class="centered">
+                    You've reached Ants' <strong>C</strong>ollaborative <strong>I</strong>nterface <strong>T</strong>ool (<strong>Y</strong>eah!) for the 3D visualization of cities through browsers.<br/>
+                    This is still a work in progress. Please feel free to contribute !
+                </p>
+                <br/>
+                <h2> Sky View Controls </h2>
+                <p> Move your <strong>mouse</strong> to go left/right/up/down.<br/>
+                    <strong>Scroll</strong> to zoom in and out. <br/>
+                    <strong>Click</strong> a spot and you'll enter First Person View. 
+                </p>
+                <h2> First Person Controls </h2>
+                <p> Move your <strong>mouse</strong> to look around.<br/>
+                    Use <strong>W-A-S-D</strong> keys to move (or Z-Q-S-D for AZERTY keyboards). <br/>
+                    <strong>Double escape</strong> to switch back to Sky View.
+                </p>
+                <br/>
+                <br/>
+                <p id="enter" class="centered"> Now you're all set. Click to enter CITY ! </p>
+            </section>
+        </div>
     </body>
 </html>

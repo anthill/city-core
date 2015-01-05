@@ -15,6 +15,9 @@ module.exports = function(camera, domElement){
     var keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
     var userPanSpeed = 50.0;
 
+    var SPEED = 1.5;
+
+    var moveActive = true;
     var alpha;
     var beta;
     var moveAnimationFrame;
@@ -61,6 +64,19 @@ module.exports = function(camera, domElement){
 
         moveAnimationFrame = requestAnimationFrame(moveCamera);
     }
+
+    function activateMouseMove(){
+        console.log('Enter');
+        window.addEventListener( 'mousemove', mouseMoveListener );
+        window.removeEventListener('mouseenter', activateMouseMove);
+    }
+
+    function deactivateMouseMove(){
+        alpha = 0;
+        beta = 0;
+        window.addEventListener('mouseenter', activateMouseMove);
+        window.removeEventListener( 'mousemove', mouseMoveListener );
+    }
     
     function mouseMoveListener(e){
 
@@ -69,30 +85,22 @@ module.exports = function(camera, domElement){
         var deltaX = e.clientX - canvasBoundingRect.width/2;
         var deltaZ = e.clientY - canvasBoundingRect.height/2;
 
-        var thresX = canvasBoundingRect.width*3/10;
-        var normX = canvasBoundingRect.width/2 - canvasBoundingRect.width*3/10;
-        var thresZ = canvasBoundingRect.height*3/10;
-        var normZ = canvasBoundingRect.height/2 - canvasBoundingRect.height*3/10;
+        var thresX = canvasBoundingRect.width*49/100;
+        var normX = canvasBoundingRect.width/2 - canvasBoundingRect.width*49/100;
+        var thresZ = canvasBoundingRect.height*45/100;
+        var normZ = canvasBoundingRect.height/2 - canvasBoundingRect.height*45/100;
 
         if(Math.abs(deltaX) > thresX || Math.abs(deltaZ) > thresZ){
 
             if (Math.abs(deltaX) > thresX){
-                alpha = (Math.abs(deltaX)-thresX)*(Math.abs(deltaX)-thresX) / (normX*normX) * sign(deltaX) * camera.position.z/15;
-            //     alpha = MAX_HORI_SPEED *
-            //         (Math.abs(deltaX) - canvasBoundingRect.width/10)/
-            //         (canvasBoundingRect.width/2 - canvasBoundingRect.width/10);
-            //     if(deltaX > 0)
-            //         alpha = -alpha;
+                alpha = SPEED * sign(deltaX) * camera.position.z/15;
+                // alpha = (Math.abs(deltaX)-thresX)*(Math.abs(deltaX)-thresX) / (normX*normX) * sign(deltaX) * camera.position.z/15;
             }
             else {alpha = 0;}
 
             if (Math.abs(deltaZ) > thresZ){
-                beta = - (Math.abs(deltaZ)-thresZ)*(Math.abs(deltaZ)-thresZ) / (normZ*normZ) * sign(deltaZ) * camera.position.z/15;
-            //     beta = MAX_VERTI_SPEED *
-            //         (Math.abs(deltaZ) - canvasBoundingRect.height/20)/
-            //         (canvasBoundingRect.height/2 - canvasBoundingRect.height/20);
-            //     if(deltaZ > 0)
-            //         beta = -beta;
+                beta = - SPEED * sign(deltaZ) * camera.position.z/15;
+                // beta = - (Math.abs(deltaZ)-thresZ)*(Math.abs(deltaZ)-thresZ) / (normZ*normZ) * sign(deltaZ) * camera.position.z/15;
             }
             else {beta = 0;}
 
@@ -139,15 +147,18 @@ module.exports = function(camera, domElement){
         camera.lookAt( new THREE.Vector3( x, y, 0 ) );
         // looking North (y=1)
         
-        window.addEventListener( 'keydown', onKeyDown );
-        window.addEventListener( 'wheel', onScroll );
-        window.addEventListener( 'mousemove', mouseMoveListener );
+        window.addEventListener('keydown', onKeyDown );
+        window.addEventListener('wheel', onScroll );
+        // window.addEventListener('mouseout', deactivateMouseMove);
+        window.addEventListener('mousemove', mouseMoveListener);
 
         return function desactivate(){
             // In Chrome listening to keypress doesn't work for whatever reason
-            window.removeEventListener( 'keydown', onKeyDown );
-            window.removeEventListener( 'wheel', onScroll );
-            window.removeEventListener( 'mousemove', mouseMoveListener );
+            window.removeEventListener('keydown', onKeyDown );
+            window.removeEventListener('wheel', onScroll );
+            window.removeEventListener('mousemove', mouseMoveListener);
+            // window.removeEventListener('mouseout', deactivateMouseMove);
+            // window.removeEventListener('mouseover', activateMouseMove);
             cancelAnimationFrame(moveAnimationFrame);
             moveAnimationFrame = undefined;
         };
