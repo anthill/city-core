@@ -29,7 +29,8 @@ var INITIAL_ALTITUDE = 200;
 var splashScreen = document.body.querySelector("#splash-screen");
 
 splashScreen.addEventListener('click', function(){
-    splashScreen.style.display = "none";
+    splashScreen.style.opacity = 0;
+    console.log("click");
 });
 
 var cityControls = require('./CityControls.js')(camera, scene, renderer.domElement);

@@ -15,7 +15,7 @@ module.exports = function(camera, domElement){
     var keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
     var userPanSpeed = 50.0;
 
-    var SPEED = 2.5;
+    var SPEED = 1.5;
 
     var moveActive = true;
     var alpha;
