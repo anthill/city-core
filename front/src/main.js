@@ -30,9 +30,12 @@ var splashScreen = document.body.querySelector("#splash-screen");
 
 splashScreen.addEventListener('click', function(){
     splashScreen.style.opacity = 0;
-    splashScreen.style.visibility = 'hidden';
     console.log("click");
 });
+splashScreen.addEventListener('transitionend', function(){
+    splashScreen.remove();
+    // splashScreen.parentNode.removeChild(splashScreen);
+})
 
 var cityControls = require('./CityControls.js')(camera, scene, renderer.domElement);
 cityControls.switchToSkyView(24541.22, 11167.65, INITIAL_ALTITUDE);

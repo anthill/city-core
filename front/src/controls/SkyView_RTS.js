@@ -17,7 +17,6 @@ module.exports = function(camera, domElement){
 
     var SPEED = 1.5;
 
-    var moveActive = true;
     var alpha;
     var beta;
     var moveAnimationFrame;
@@ -63,19 +62,6 @@ module.exports = function(camera, domElement){
         // console.log("beta", beta, "alpha", alpha, "newz", newz)
 
         moveAnimationFrame = requestAnimationFrame(moveCamera);
-    }
-
-    function activateMouseMove(){
-        console.log('Enter');
-        window.addEventListener( 'mousemove', mouseMoveListener );
-        window.removeEventListener('mouseenter', activateMouseMove);
-    }
-
-    function deactivateMouseMove(){
-        alpha = 0;
-        beta = 0;
-        window.addEventListener('mouseenter', activateMouseMove);
-        window.removeEventListener( 'mousemove', mouseMoveListener );
     }
     
     function mouseMoveListener(e){
@@ -149,7 +135,6 @@ module.exports = function(camera, domElement){
         
         window.addEventListener('keydown', onKeyDown );
         window.addEventListener('wheel', onScroll );
-        // window.addEventListener('mouseout', deactivateMouseMove);
         window.addEventListener('mousemove', mouseMoveListener);
 
         return function desactivate(){
@@ -157,8 +142,6 @@ module.exports = function(camera, domElement){
             window.removeEventListener('keydown', onKeyDown );
             window.removeEventListener('wheel', onScroll );
             window.removeEventListener('mousemove', mouseMoveListener);
-            // window.removeEventListener('mouseout', deactivateMouseMove);
-            // window.removeEventListener('mouseover', activateMouseMove);
             cancelAnimationFrame(moveAnimationFrame);
             moveAnimationFrame = undefined;
         };
