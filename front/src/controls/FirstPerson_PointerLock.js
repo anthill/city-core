@@ -195,17 +195,15 @@ module.exports = function(camera, scene, domElement){
     
     return function(x, y){
 
-        var canvas = document.body.querySelector('canvas'); // canvas should be selected by ID, but it's ok for now
+        var havePointerLock = 'pointerLockElement' in domElement ||
+        'mozPointerLockElement' in domElement ||
+        'webkitPointerLockElement' in domElement;
 
-        var havePointerLock = 'pointerLockElement' in canvas ||
-        'mozPointerLockElement' in canvas ||
-        'webkitPointerLockElement' in canvas;
-
-        canvas.requestPointerLock = canvas.requestPointerLock ||
-            canvas.mozRequestPointerLock ||
-            canvas.webkitRequestPointerLock;
+        domElement.requestPointerLock = domElement.requestPointerLock ||
+            domElement.mozRequestPointerLock ||
+            domElement.webkitRequestPointerLock;
         // Ask the browser to lock the pointer
-        canvas.requestPointerLock();
+        domElement.requestPointerLock();
 
         
 
@@ -232,7 +230,7 @@ module.exports = function(camera, scene, domElement){
         
         window.addEventListener('keydown', onKeyDown);
         window.addEventListener('keyup', onKeyUp);
-        canvas.addEventListener("mousemove", headMovement, false);
+        domElement.addEventListener("mousemove", headMovement, false);
 
         return function desactivate(){
 
@@ -244,7 +242,7 @@ module.exports = function(camera, scene, domElement){
             window.removeEventListener('keydown', onKeyDown);
             window.removeEventListener('keyup', onKeyUp);
 
-            canvas.removeEventListener("mousemove", headMovement, false);
+            domElement.removeEventListener("mousemove", headMovement, false);
             // canvas.exitPointerLock();
 
         };

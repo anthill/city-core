@@ -138,13 +138,13 @@ module.exports = function(camera, scene, domElement){
 		camera.lookAt( lookAtPoint );
 
 		domElement.addEventListener('mousemove', mouseMoveListener);
-		domElement.addEventListener('mousedown', mouseDownListener);
-		domElement.addEventListener('mouseup', mouseUpListener);
+		window.addEventListener('mousedown', mouseDownListener);
+		window.addEventListener('mouseup', mouseUpListener);
 
 		return function desactivate(){
 			domElement.removeEventListener('mousemove', mouseMoveListener);
-			domElement.removeEventListener('mousedown', mouseDownListener);
-			domElement.removeEventListener('mouseup', mouseUpListener);
+			window.removeEventListener('mousedown', mouseDownListener);
+			window.removeEventListener('mouseup', mouseUpListener);
 			cancelAnimationFrame(moveAnimationFrame);
 			moveAnimationFrame = undefined;
 		};
