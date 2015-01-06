@@ -31,5 +31,5 @@ meshButton.addEventListener('click', function(){
 });
 
 controlsButton.addEventListener('click', function(){
-	bordeaux.changeControls();
+    // TODO
 });
