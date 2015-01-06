@@ -17,7 +17,7 @@ module.exports = function(camera, domElement){
 
     var SPEED = 1.5;
 
-    var moveActive = true;
+    var moveActivated = false;
     var alpha;
     var beta;
     var moveAnimationFrame;
@@ -68,13 +68,13 @@ module.exports = function(camera, domElement){
     function activateMouseMove(){
         console.log('Enter');
         window.addEventListener( 'mousemove', mouseMoveListener );
-        window.removeEventListener('mouseenter', activateMouseMove);
+        // window.removeEventListener('mouseenter', activateMouseMove);
     }
 
     function deactivateMouseMove(){
         alpha = 0;
         beta = 0;
-        window.addEventListener('mouseenter', activateMouseMove);
+        // window.addEventListener('mouseenter', activateMouseMove);
         window.removeEventListener( 'mousemove', mouseMoveListener );
     }
     
@@ -150,7 +150,21 @@ module.exports = function(camera, domElement){
         window.addEventListener('keydown', onKeyDown );
         window.addEventListener('wheel', onScroll );
         // window.addEventListener('mouseout', deactivateMouseMove);
-        window.addEventListener('mousemove', mouseMoveListener);
+        window.addEventListener('mouseover', function (){
+            if (!moveActivated){
+                console.log('Enter');
+                window.addEventListener( 'mousemove', mouseMoveListener );
+                moveActivated = !moveActivated;
+            }
+        });
+        window.addEventListener('mouseout', function (){
+            if (moveActivated){
+                console.log('Exit');
+                window.removeEventListener( 'mousemove', mouseMoveListener );
+                moveActivated = !moveActivated;
+            }
+        });
+        // window.addEventListener('mousemove', mouseMoveListener);
 
         return function desactivate(){
             // In Chrome listening to keypress doesn't work for whatever reason
