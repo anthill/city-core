@@ -194,15 +194,18 @@ module.exports = function(camera, scene, domElement){
     };
     
     return function(x, y){
-        var havePointerLock = 'pointerLockElement' in document ||
-        'mozPointerLockElement' in document ||
-        'webkitPointerLockElement' in document;
 
-        document.body.requestPointerLock = document.body.requestPointerLock ||
-            document.body.mozRequestPointerLock ||
-            document.body.webkitRequestPointerLock;
+        var canvas = document.body.querySelector('canvas'); // canvas should be selected by ID, but it's ok for now
+
+        var havePointerLock = 'pointerLockElement' in canvas ||
+        'mozPointerLockElement' in canvas ||
+        'webkitPointerLockElement' in canvas;
+
+        canvas.requestPointerLock = canvas.requestPointerLock ||
+            canvas.mozRequestPointerLock ||
+            canvas.webkitRequestPointerLock;
         // Ask the browser to lock the pointer
-        document.body.requestPointerLock();
+        canvas.requestPointerLock();
 
         
 
@@ -226,9 +229,10 @@ module.exports = function(camera, scene, domElement){
         lookAtPoint = new THREE.Vector3( camera.position.x, camera.position.y + DISTANCE_TO_LOOK_AT, camera.position.z )
         camera.lookAt( lookAtPoint );
 
+        
         window.addEventListener('keydown', onKeyDown);
         window.addEventListener('keyup', onKeyUp);
-        document.body.addEventListener("mousemove", headMovement, false);
+        canvas.addEventListener("mousemove", headMovement, false);
 
         return function desactivate(){
 
@@ -240,8 +244,8 @@ module.exports = function(camera, scene, domElement){
             window.removeEventListener('keydown', onKeyDown);
             window.removeEventListener('keyup', onKeyUp);
 
-            document.body.removeEventListener("mousemove", headMovement, false);
-            document.exitPointerLock();
+            canvas.removeEventListener("mousemove", headMovement, false);
+            // canvas.exitPointerLock();
 
         };
     }

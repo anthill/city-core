@@ -65,7 +65,7 @@ module.exports = function(camera, scene, domElement){
             window.removeEventListener('meshClicked', onMeshClicked);
             camera.off('cameraviewchange', onCameraViewChangeSky);
             camera.on('cameraviewchange', onCameraViewChangeFirstPerson);
-            document.addEventListener('keydown', onKeyPressFirstPerson);
+            window.addEventListener('keydown', onKeyPressFirstPerson);
             
             lastAltitude = camera.position.z;
             
@@ -76,7 +76,7 @@ module.exports = function(camera, scene, domElement){
             window.addEventListener( 'meshClicked', onMeshClicked);
             camera.off('cameraviewchange', onCameraViewChangeFirstPerson);
             camera.on('cameraviewchange', onCameraViewChangeSky);
-            document.removeEventListener('keydown', onKeyPressFirstPerson);
+            window.removeEventListener('keydown', onKeyPressFirstPerson);
             
             desactivateCurrentControls = skyViewControls(x, y, altitude || lastAltitude);
         }

@@ -133,15 +133,16 @@ module.exports = function(camera, domElement){
         camera.lookAt( new THREE.Vector3( x, y, 0 ) );
         // looking North (y=1)
         
-        window.addEventListener('keydown', onKeyDown );
-        window.addEventListener('wheel', onScroll );
-        window.addEventListener('mousemove', mouseMoveListener);
+        var canvas = document.body.querySelector('canvas'); // canvas should be selected by ID, but it's ok for now
+        canvas.addEventListener('keydown', onKeyDown );
+        canvas.addEventListener('wheel', onScroll );
+        canvas.addEventListener('mousemove', mouseMoveListener);
 
         return function desactivate(){
             // In Chrome listening to keypress doesn't work for whatever reason
-            window.removeEventListener('keydown', onKeyDown );
-            window.removeEventListener('wheel', onScroll );
-            window.removeEventListener('mousemove', mouseMoveListener);
+            canvas.removeEventListener('keydown', onKeyDown );
+            canvas.removeEventListener('wheel', onScroll );
+            canvas.removeEventListener('mousemove', mouseMoveListener);
             cancelAnimationFrame(moveAnimationFrame);
             moveAnimationFrame = undefined;
         };
