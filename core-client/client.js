@@ -1,7 +1,6 @@
 "use strict";
 
-// watchify core-client/client.js -o core-client/app.js -d -v
-// node server.js dev core-client
+var THREE = require('three');
 
 var bordeaux3dCore = require('../front/src/index.js');
 
@@ -12,6 +11,8 @@ var FirstPersonControls = require('city-blocks/controls/FirstPerson_Basic.js');
 var bordeaux3D = bordeaux3dCore(document.querySelector('#view'));
 
 
+var lightButton = document.querySelector('#light');
+var meshButton = document.querySelector('#mesh');
 var controlsButton = document.querySelector('button#controls');
 
 
@@ -60,3 +61,22 @@ toggleControls();
 
 
 controlsButton.addEventListener('click', toggleControls);
+
+
+// Add event listeners
+lightButton.addEventListener('click', function(){
+	var greenLight = new THREE.AmbientLight("#004400"); 
+	bordeaux3D.addLight(greenLight);
+});
+
+meshButton.addEventListener('click', function(){
+	var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+    var material = new THREE.MeshLambertMaterial({
+        color: 0xAA0000,
+        wireframe: false,
+        shading: THREE.FlatShading
+    });
+    var cube = new THREE.Mesh(geometry, material);
+	bordeaux3D.addMesh(cube);
+});
+
