@@ -1,6 +1,6 @@
 "use strict";
 
-var defaultControls = require('bordeaux3d-blocks/controls/FirstPerson_Basic.js');
+var defaultControls = require('city-blocks/controls/FirstPerson_Basic.js');
 
 var createThreeBundle = require('./createThreeBundle.js');
 var server = require('./serverCommunication.js');
@@ -73,17 +73,14 @@ module.exports = function(container, options){
 
         threeBundle.render();
     });
-    
-    var INITIAL_ALTITUDE = 200;
 
-    camera.position.x = 24341.22;
-    camera.position.y = 10967.65;
-
-    var currentControlsDesactivate = defaultControls(camera, scene, domElement, loadObjects)(24341.22, 10967.65); // not empty
+    var currentControlsDesactivate = defaultControls(camera, scene, domElement, loadObjects);
  
+
     return {
         addLight: function(light /*: THREE.Light */){
-            throw 'TODO';
+            scene.add(light);
+            // throw 'TODO';
         },
         removeLight: function(light /*: THREE.Light */){
             throw 'TODO';
@@ -91,15 +88,31 @@ module.exports = function(container, options){
 
         // functions to add tramway or another building
         addMesh: function(mesh /*: THREE.Mesh */){
-            throw 'TODO';
+            var pos = {
+                x: camera.position.x + 3*camera.direction.x,
+                y: camera.position.y + 3*camera.direction.y,
+                z: camera.position.z + 3*camera.direction.z
+            };
+            mesh.position.set(pos.x, pos.y, pos.z);
+            scene.add(mesh);
+            // throw 'TODO';
         },
         removeMesh: function(mesh /*: THREE.Mesh */){
             throw 'TODO';
         },
 
-        changeControls: function(controls){
+        changeControls: function(controls, position){
             currentControlsDesactivate();
-            currentControlsDesactivate = controls(camera, scene, domElement);
+            
+            console.log('about to change controls', camera.position.x, camera.position.y, camera.position.z, position);
+            
+            if(position){
+                camera.position.x = 'x' in position ? position.x : camera.position.x;
+                camera.position.y = 'y' in position ? position.y : camera.position.y;
+                camera.position.z = 'z' in position ? position.z : camera.position.z;
+            }
+            
+            currentControlsDesactivate = controls(camera, scene, domElement, loadObjects);
         },
         // trigger a render
         render: threeBundle.render,
@@ -113,7 +126,8 @@ module.exports = function(container, options){
             buildingIds.forEach(function(id){
                 server.getCityObject(id);
             });
-        }
+        },
+        camera : camera
 
     };
 }
