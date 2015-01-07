@@ -210,10 +210,11 @@ function extractBuildings(_3dsPath, x, y){
 
                 // we get the type (either building or terrain)
                 var objectType;
-                if (m.id[0] == "x"){
+                // TODO with regexp
+                if (m.id[0] === "x"){
                     objectType = "terrain";
                 } else {
-                    objectType = "building"
+                    objectType = "building";
                 }
                 // for recentering
                 var objectCube = containingCube(m);
