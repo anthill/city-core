@@ -13,8 +13,25 @@ function zFrom8bitsInt(z, MIN_Z, MAX_Z){
     return z*(MAX_Z - MIN_Z)/(((1 << 8)-1)) + MIN_Z;
 }
 
+var intToMeshType = {
+    0: 'floor',
+    1: 'building' 
+};
+
+var meshColor = {
+    'floor': 0x00aa00, // green
+    'building': 0xaaaaaa // gray
+};
+
 /*
     Parses a buffer with binary data describing an object to be added to the scene
+
+    buffer: | nbVertices(2) | v1(4) | v2(4) | ... | vn(4) | nbFaces(2) | f1(6) | f2(6) | ... | fn(6) | meshType(2)
+    
+    nbVertices : number of vertices uint16 (64k max)
+    nbFaces : number of vertices uint16 (64k max)
+    vi : | x(12 bits) | y(12 bits)| z(8 bits) |
+    fi : | a(16 bits) | b(16 bits)| c(16 bits) | // indices in vertices array
     
     data is a DataView
     @returns a THREE.Mesh
@@ -62,9 +79,12 @@ module.exports = function createBuildingMesh(buffer, tile, options) {
     }
 
     geometry.computeFaceNormals();
-    
+
+    var meshType = intToMeshType[buffer.getUint8(offset)];
+    offset++;
+
     var mesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({
-        color: 0xaaaaaa,
+        color: meshColor[meshType],
         wireframe: false
     }));
     
