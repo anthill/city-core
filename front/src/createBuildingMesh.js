@@ -13,10 +13,7 @@ function zFrom8bitsInt(z, MIN_Z, MAX_Z){
     return z*(MAX_Z - MIN_Z)/(((1 << 8)-1)) + MIN_Z;
 }
 
-var intToMeshType = {
-    0: 'floor',
-    1: 'building' 
-};
+var meshTypeToString = require('../../src/meshType.js').intToString;
 
 var meshColor = {
     'floor': 0x00aa00, // green
@@ -80,7 +77,7 @@ module.exports = function createBuildingMesh(buffer, tile, options) {
 
     geometry.computeFaceNormals();
 
-    var meshType = intToMeshType[buffer.getUint8(offset)];
+    var meshType = meshTypeToString[buffer.getUint8(offset)];
     offset++;
 
     var mesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({

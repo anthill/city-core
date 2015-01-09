@@ -1,5 +1,7 @@
 'use strict';
 
+var meshTypeToInt = require('./meshType.js').stringToInt;
+
 function xTo12bitsInt(x, MIN_X, MAX_X){
     if(x < MIN_X || x > MAX_X)
         throw new RangeError( ['x should be between', MIN_X, 'and', MAX_X, '(',x.toFixed(2),')'].join(' ')  );
@@ -18,7 +20,6 @@ function zTo8bitsInt(z, MIN_Z, MAX_Z){
     
     return Math.round( (z - MIN_Z) * ((1 << 8)-1) / (MAX_Z - MIN_Z));
 }
-
 
 /*
     x, y, z: float
@@ -108,9 +109,9 @@ module.exports = function(_3dsObject, boundingBox){
 
     // we get the type (either building or terrain)
     if (_3dsObject.id.match(/x\d{1,4}y\d{1,4}/)){
-        buffer.writeUInt8(0x00, offset); // 'floor' is coded 0
+        buffer.writeUInt8(meshTypeToInt('floor', offset);
     } else {
-        buffer.writeUInt8(0x01, offset); // other than 'floor' is 'building' (for now), and is coded 1
+        buffer.writeUInt8(meshTypeToInt('building', offset);
     }
     offset += 1; // useful for eventual future info to be written into buffer
     
