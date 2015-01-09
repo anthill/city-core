@@ -6,7 +6,7 @@
 var THREE = require('three');
 var bordeaux3dCore = require('../index.js');
 
-var bordeaux = bordeaux3dCore(document.querySelector('#view'));
+var bordeaux3D = bordeaux3dCore(document.querySelector('#view'));
 
 // Get buttons
 var lightButton = document.querySelector('#light');
@@ -16,7 +16,7 @@ var controlsButton = document.querySelector('#controls');
 // Add event listeners
 lightButton.addEventListener('click', function(){
 	var greenLight = new THREE.AmbientLight("#004400"); 
-	bordeaux.addLight(greenLight);
+	bordeaux3D.addLight(greenLight);
 });
 
 meshButton.addEventListener('click', function(){
@@ -27,7 +27,13 @@ meshButton.addEventListener('click', function(){
         shading: THREE.FlatShading
     });
     var cube = new THREE.Mesh(geometry, material);
-	bordeaux.addMesh(cube);
+    var pos = {
+        x: bordeaux3D.camera.position.x + 3*bordeaux3D.camera.direction.x,
+        y: bordeaux3D.camera.position.y + 3*bordeaux3D.camera.direction.y,
+        z: bordeaux3D.camera.position.z + 3*bordeaux3D.camera.direction.z
+    };
+    cube.position.set(pos.x, pos.y, pos.z);
+	bordeaux3D.addMesh(cube);
 });
 
 controlsButton.addEventListener('click', function(){
