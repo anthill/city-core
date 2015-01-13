@@ -207,21 +207,12 @@ function extractBuildings(_3dsPath, x, y){
             });
 
             meshes.forEach(function(m){
-
-                // we get the type (either building or terrain)
-                var objectType;
-                if (m.id[0] == "x"){
-                    objectType = "terrain";
-                } else {
-                    objectType = "building"
-                }
                 // for recentering
                 var objectCube = containingCube(m);
 
                 tileMetadata.objects[m.id] = {
                     x: Math.round( (objectCube.minX + objectCube.maxX)/2 ),
                     y: Math.round( (objectCube.minY + objectCube.maxY)/2 ),
-                    type: objectType
                 };
             });
 

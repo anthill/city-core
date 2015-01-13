@@ -1,5 +1,7 @@
 'use strict';
 
+var meshTypeToInt = require('./meshType.js').stringToInt;
+
 function xTo12bitsInt(x, MIN_X, MAX_X){
     if(x < MIN_X || x > MAX_X)
         throw new RangeError( ['x should be between', MIN_X, 'and', MAX_X, '(',x.toFixed(2),')'].join(' ')  );
@@ -18,7 +20,6 @@ function zTo8bitsInt(z, MIN_Z, MAX_Z){
     
     return Math.round( (z - MIN_Z) * ((1 << 8)-1) / (MAX_Z - MIN_Z));
 }
-
 
 /*
     x, y, z: float
@@ -43,7 +44,7 @@ function encodeVertex(x, y, z){
 
     returns a Buffer encoded as :
     
-    object : | nbVertices(2) | v1(4) | v2(4) | ... | vn(4) | nbFaces(2) | f1(6) | f2(6) | ... | fn(6) |
+    object : | nbVertices(2) | v1(4) | v2(4) | ... | vn(4) | nbFaces(2) | f1(6) | f2(6) | ... | fn(6) | meshType(2)
     
     nbVertices : number of vertices uint16 (64k max)
     nbFaces : number of vertices uint16 (64k max)
@@ -65,7 +66,7 @@ module.exports = function(_3dsObject, boundingBox){
     if(nbVertices > ((1 << 2*8) - 1) || nbFaces > ((1 << 2*8) - 1))
         throw new RangeError(nbVertices + ', ' + nbFaces);
 
-    var bufferSize = 2 + 4*nbVertices + 2 + (2*3)*nbFaces;
+    var bufferSize = 2 + 4*nbVertices + 2 + (2*3)*nbFaces + 2;
     
     //console.log('bufferSize', bufferSize)
     
@@ -105,14 +106,17 @@ module.exports = function(_3dsObject, boundingBox){
         buffer.writeUInt16BE(f.c, offset);
         offset += 2;
     });
+
+    // we get the type (either building or terrain)
+    if (_3dsObject.id.match(/x\d{1,4}y\d{1,4}/)){
+        buffer.writeUInt8(meshTypeToInt['floor'], offset);
+    } else {
+        buffer.writeUInt8(meshTypeToInt['building'], offset);
+    }
+    offset += 1; // useful for eventual future info to be written into buffer
     
-    return buffer;
-    
+    return buffer;    
 };
-
-
-
-
 
 
 

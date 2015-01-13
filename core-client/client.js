@@ -77,6 +77,12 @@ meshButton.addEventListener('click', function(){
         shading: THREE.FlatShading
     });
     var cube = new THREE.Mesh(geometry, material);
+    var pos = {
+        x: bordeaux3D.camera.position.x + 3*bordeaux3D.camera.direction.x,
+        y: bordeaux3D.camera.position.y + 3*bordeaux3D.camera.direction.y,
+        z: bordeaux3D.camera.position.z + 3*bordeaux3D.camera.direction.z
+    };
+    cube.position.set(pos.x, pos.y, pos.z);
 	bordeaux3D.addMesh(cube);
 });
 
