@@ -1,5 +1,5 @@
 .DS_Store
-front/data
+front-data/*
 node_modules
 
 front/app.js

@@ -42,7 +42,7 @@ else{
 var io = require('socket.io')(server);
 
 
-process.title = 'Bdx3d server';
+process.title = 'City-core server';
 
 
 function makeDocument(htmlFragment){
@@ -57,7 +57,7 @@ function makeDocument(htmlFragment){
 
 // get the metadata
 var metadataP = new Promise(function(resolve, reject){
-    fs.readFile("front/data/metadata.json", 'utf8', function (err, data){
+    fs.readFile("front-data/metadata.json", 'utf8', function (err, data){
         if(err){
             reject(err);
             return;
@@ -91,21 +91,25 @@ Promise.all([indexDocP, metadataP]).then(function(results){
     });
 
     app.get('/metadata', function(req, res){
-        console.log('/metadata', req.query);
-        
         // TODO support query a rtree with the metadata
+        // console.log('/metadata', req.query);
         
-        res.sendFile(path.join(__dirname, 'front/data/metadata.json'));
+        res.sendFile(path.join(__dirname, 'front-data/metadata.json'));
     });
     
     io.on('connection', function (socket) {
 
         //when receiving queries send back the data
         socket.on('object', function (msg) {
-            var path = "front/data/" + msg.id;
+            var baseBinariesPath = path.join(__dirname, "front-data");
+            var p = path.resolve(baseBinariesPath, msg.id);
+            
+            var relativeObjectPath = path.relative(baseBinariesPath, p);
+            
+            
           
             //console.log('asked object', msg.id);
-            fs.readFile(path, function (err, data) {
+            fs.readFile(p, function (err, data) {
                 socket.emit("building", {id : msg.id, buffer : data});
             });
 
