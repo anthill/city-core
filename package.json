@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "description": "A simple implementation of the backend for the bordeaux3d project",
   "repository": "https://github.com/anthill/bordeaux3d-core",
-  "main": "index.js",
+  "main": "front/src/index.js",
   "scripts": {
-    "build": "browserify core-client/client.js -o core-client/app.js -d -v",
+    "build": "browserify core-client/client.js -o core-client/app.js -d",
     "start": "node server.js dev core-client",
     "start-dev": "node server.js dev core-client",
-    "start-prod": "node server.js prod",
+    "start-prod": "node server.js prod core-client",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "watchify core-client/client.js -o core-client/app.js -d -v"
   },
@@ -32,7 +32,7 @@
     "three": "^0.68.0",
     "xmldom": "^0.1.19",
     "csv-parse": "0.0.6",
-    "bordeaux3d-blocks": "git://github.com/anthill/bordeaux3d-blocks.git"
+    "city-blocks": "git://github.com/anthill/city-blocks.git"
   },
   "devDependencies": {
     "grunt": "^0.4.5",

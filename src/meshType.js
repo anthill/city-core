@@ -1,15 +1,18 @@
 'use strict';
 
-var intToString = {
-    0: 'floor',
-    1: 'building' 
-};
+var stringToInt = Object.freeze({
+	'floor': 0x00,
+	'building': 0x01
+});
 
-var stringToInt = {
-	'floor': 0,
-	'building': 1
-};
+var intToString = {};
 
+Object.keys(stringToInt).forEach(function(k){
+    var v = stringToInt[k];
+    intToString[v] = k;
+});
+
+Object.freeze(intToString);
 
 module.exports = {
 	intToString: intToString,

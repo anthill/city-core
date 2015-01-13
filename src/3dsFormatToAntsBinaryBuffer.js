@@ -109,19 +109,14 @@ module.exports = function(_3dsObject, boundingBox){
 
     // we get the type (either building or terrain)
     if (_3dsObject.id.match(/x\d{1,4}y\d{1,4}/)){
-        buffer.writeUInt8(meshTypeToInt('floor', offset);
+        buffer.writeUInt8(meshTypeToInt['floor'], offset);
     } else {
-        buffer.writeUInt8(meshTypeToInt('building', offset);
+        buffer.writeUInt8(meshTypeToInt['building'], offset);
     }
     offset += 1; // useful for eventual future info to be written into buffer
     
-    return buffer;
-    
+    return buffer;    
 };
-
-
-
-
 
 
 
