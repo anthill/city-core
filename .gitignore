@@ -1,17 +1,11 @@
 .DS_Store
-front/data
 node_modules
 
-front/app.js
-core-client/app.js
+example/app.js
+example/data/*
 
 notes.md
 
-
-private*
-
-XML.zip
-*.geoxml
 *mrDoob*
 
 config/prod.json

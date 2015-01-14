@@ -13,7 +13,7 @@ function zFrom8bitsInt(z, MIN_Z, MAX_Z){
     return z*(MAX_Z - MIN_Z)/(((1 << 8)-1)) + MIN_Z;
 }
 
-var meshTypeToString = require('../../src/meshType.js').intToString;
+var meshTypeToString = require('../common/meshType.js').intToString;
 
 var meshColor = {
     'floor': 0x00aa00, // green

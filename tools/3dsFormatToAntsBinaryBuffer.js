@@ -1,6 +1,6 @@
 'use strict';
 
-var meshTypeToInt = require('./meshType.js').stringToInt;
+var meshTypeToInt = require('../common/meshType.js').stringToInt;
 
 function xTo12bitsInt(x, MIN_X, MAX_X){
     if(x < MIN_X || x > MAX_X)

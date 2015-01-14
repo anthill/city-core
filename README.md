@@ -18,6 +18,16 @@ Everything else should be features added that interact with the client-side API.
 * Cameras
 
 
+# Entry points
+
+There are three main entry points to this project:
+* `tools/unzipCUB3ds.js` a batch script to unzip and process the 3D open data in .3ds format (explanations below)
+** exposed as `unzipCUB3ds` binary in package.json
+* `server/index.js` server-side of city-core (handling both HTTP and websockets endpoints)
+** exposed as `city-server` binary in package.json
+* `front/index.js` client-side library to be used by city-core clients to interact with the server and the 3D WebGL scene
+** exposed as `main` in package.json (to be `require()`'d)
+
 
 # How to make this all work
 
@@ -32,7 +42,7 @@ Everything else should be features added that interact with the client-side API.
 1. Extract all the buildings and metadata in `front/data`:
 
 ```bash
-node tools/unzipCUB3ds.js --out front/data/ --zip path/to/3Ddata/BATI3D_NT.zip
+node tools/unzipCUB3ds.js --out example/data --zip path/to/3Ddata/BATI3D_NT.zip
 ```
 
 It should take about 5 minutes in normal hardware. This will extract all the buildings and other 3d objects from the open data in [.3ds format](http://en.wikipedia.org/wiki/.3ds). It will create thousands of binary files in `front/data/` as well as a file names `metadata.json`.
@@ -44,10 +54,37 @@ npm start-dev
 
 1. Open http://localhost:9000
 
+# TODO 
+
+* explain client-side hard dependencies :
+** ES6 Map, Set and WeakMap are hard dependencies. The client-side library won't work without them.
+Either require a browser with them or use a polyfill like [harmony-collections](https://github.com/Benvie/harmony-collections)
+** need to hardcode a couple of `glsl` framents inline in the HTML with ids `sky-vertex` and `sky-fragment`.
+** Hardcoded front/img/sky.jpg file
+
+Reorg:
+* common/
+** things in common, like meshType.js
+* data/
+** altitude data
+* example/
+** example of code using this repo
+* front/
+* img/
+** for sky.jpg for now
+* test/
+* tools/
+* server/
+
+
+
+
+
 # Dev
 
 ```bash
 npm run watch
+npm start
 ```
 
 # Licence

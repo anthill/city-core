@@ -9,13 +9,13 @@ var tmp = require('tmp');
 var Q = require('q');
 var Map = require('es6-map');
 
-var containingCube = require('../src/containingCube.js');
-var computeMeshVolume = require('../src/computeMeshVolume.js');
-var _3dsFormatToAntsBinaryBuffer = require('../src/3dsFormatToAntsBinaryBuffer.js');
-var parse3ds = require('../src/parse3ds.js');
+var containingCube = require('./containingCube.js');
+var computeMeshVolume = require('./computeMeshVolume.js');
+var _3dsFormatToAntsBinaryBuffer = require('./3dsFormatToAntsBinaryBuffer.js');
+var parse3ds = require('./parse3ds.js');
 
 var getTileAltitudes = require('./getTileAltitudes.js');
-var tileAltitudesP = getTileAltitudes(path.resolve(process.cwd(), './data/DALLAGE_3D.csv'));
+var tileAltitudesP = getTileAltitudes(path.resolve(__dirname, '../data/DALLAGE_3D.csv'));
 
 
 
