@@ -1,7 +1,7 @@
 'use strict';
 
 var fs = require('fs');
-var parse3ds = require('../src/parse3ds.js')
+var parse3ds = require('./parse3ds.js')
 
 
 parse3ds('./data/buggyTiles/tile_x127y84.3ds', function(err, data){

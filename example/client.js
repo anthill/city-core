@@ -2,7 +2,7 @@
 
 var THREE = require('three');
 
-var bordeaux3dCore = require('../front/src/index.js');
+var bordeaux3dCore = require('../front/index.js');
 
 var SkyViewControls = require('city-blocks/controls/SkyView_Basic.js');
 var FirstPersonControls = require('city-blocks/controls/FirstPerson_Basic.js');
