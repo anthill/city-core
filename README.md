@@ -23,9 +23,9 @@ Everything else should be features added that interact with the client-side API.
 There are three main entry points to this project:
 * `tools/unzipCUB3ds.js` a batch script to unzip and process the 3D open data in .3ds format (explanations below)
 ** exposed as `unzipCUB3ds` binary in package.json
-* `server.js` server-side of city-core (handling both HTTP and websockets endpoints)
+* `server/index.js` server-side of city-core (handling both HTTP and websockets endpoints)
 ** exposed as `city-server` binary in package.json
-* `front/src/index.js` client-side library to be used by city-core clients to interact with the server and the 3D WebGL scene
+* `front/index.js` client-side library to be used by city-core clients to interact with the server and the 3D WebGL scene
 ** exposed as `main` in package.json (to be `require()`'d)
 
 
