@@ -49,7 +49,7 @@ It should take about 2-3 minutes per exported "dalle" in normal hardware. This w
 
 ```bash
 npm run build
-npm start-dev
+npm run start-dev
 ```
 
 1. Open http://localhost:9000
