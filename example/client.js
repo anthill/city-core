@@ -7,7 +7,7 @@ var bordeaux3dCore = require('../front/index.js');
 var SkyViewControls = require('city-blocks/controls/SkyView_Basic.js');
 var FirstPersonControls = require('city-blocks/controls/FirstPerson_Basic.js');
 
-var cityAPIOrigin = "http://127.100.0.25:9000";
+var cityAPIOrigin = "http://localhost:9000";
 
 var bordeaux3DP = bordeaux3dCore(document.querySelector('#view'), cityAPIOrigin);
 
