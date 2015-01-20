@@ -3,12 +3,3 @@ node_modules
 
 example/app.js
 example/data/*
-
-notes.md
-
-*mrDoob*
-
-config/prod.json
-
-3DS/
-tools/data/
