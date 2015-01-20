@@ -120,7 +120,7 @@ metadataP.then(function(metadataString){
 
 }).catch(function(err){console.error(err)});
 
-server.listen(PORT, HOST, function () {
+server.listen(PORT/*, HOST*/, function () {
     console.log('Server running on', [
         config.https ? 'https://' : 'http://',
         HOST + ':',
