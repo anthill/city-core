@@ -33,10 +33,6 @@ var baseBinariesPath = path.join(mainDir, 'data');
 
 
 var PORT = config.port || 80;
-var HOST = config.host;
-if(!HOST)
-    throw 'missing host in config';
-
 
 var server;
 if(config.https){
