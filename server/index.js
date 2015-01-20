@@ -2,16 +2,16 @@
 
 var path = require('path');
 var fs = require("fs");
-var jsdom = require('jsdom');
 
 var Map = require('es6-map');
 var Promise = require('es6-promise').Promise;
 
-var app = require('express')();
-var http = require('http')
+var express = require('express');
+
+var app = express();
+var http = require('http');
 var https = require('https');
 
-var express = require('express');
 var compression = require('compression');
 
 // arguments
@@ -26,26 +26,16 @@ if(!mainDirRelative){
     throw 'missing process.argv[3]';
 }
 
-/*
-    Directory where can be found the following:
-    * index.html file serving the CITY app
-    * data/ directory where there is
-    ** metadata.json
-    ** binary files representing buildings
-    * app.js file with the app built upon the city-core lib
-*/
 var mainDir = path.join(process.cwd(), mainDirRelative);
 
-var indexHTMLPath = path.join(mainDir, 'index.html');
-var appJSPath = path.join(mainDir, 'app.js');
 var metadataPath = path.join(mainDir, 'data', 'metadata.json');
 var baseBinariesPath = path.join(mainDir, 'data');
 
 
-var indexHTML = fs.readFileSync(indexHTMLPath, 'utf8'); // will throw if not found;
-
-
-var PORT = config.port;
+var PORT = config.port || 80;
+var HOST = config.host;
+if(!HOST)
+    throw 'missing host in config';
 
 
 var server;
@@ -67,18 +57,8 @@ var io = require('socket.io')(server);
 process.title = 'City-core server';
 
 
-function makeDocument(htmlFragment){
-    return new Promise(function(resolve, reject){
-        jsdom.env(htmlFragment, function(err, window){
-            if(err) reject(err);
-            else resolve(window.document);
-        });
-    })
-}
-
-
 // get the metadata
-/*var metadataP = new Promise(function(resolve, reject){
+var metadataP = new Promise(function(resolve, reject){
     fs.readFile(metadataPath, 'utf8', function (err, data){
         if(err){
             reject(err);
@@ -86,31 +66,23 @@ function makeDocument(htmlFragment){
         }        
         resolve(data);
     });
-});*/
+});
 
-
-var indexDocP = makeDocument(indexHTML)
 
 // once the json is readed, we can start the service and send index.html
-Promise.all([indexDocP/*, metadataP*/]).then(function(results){
-    var indexDocument = results[0];
-    var metadataString = results[1];
-    
-    /*var metaSpace = indexDocument.querySelector('script#metadata');
-    metaSpace.textContent = metadataString;*/
-    var indexHtml = '<!doctype html>\n' + indexDocument.documentElement.outerHTML;
+metadataP.then(function(metadataString){
 
     // gzip/deflate outgoing responses
-    app.use(compression())
-    app.use("/polyfills", express.static(__dirname + '/front/polyfills'));
-    app.use("/img", express.static(path.join(__dirname, '..', 'img')));
+    app.use(compression());
     
-    app.get('/', function(req, res){
-      res.send(indexHtml);
+    // Allow CORS headers since it's an API
+    app.use(function(req, res, next) {
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "Origin, Content-Type, Accept");
+        next();
     });
-    app.get('/app.js', function(req, res){
-      res.sendFile(appJSPath);
-    });
+    
+    app.use("/img", express.static(path.join(__dirname, '..', 'img')));
 
     app.get('/metadata', function(req, res){
         // TODO support query a rtree with the metadata
@@ -118,6 +90,10 @@ Promise.all([indexDocP/*, metadataP*/]).then(function(results){
         
         res.sendFile(metadataPath);
     });
+    
+    // for cross-origin requests
+    // http://stackoverflow.com/questions/15771805/how-to-set-socket-io-origins-to-restrict-connections-to-one-url/21711242#21711242
+    io.set('origins', '*:*');
     
     io.on('connection', function(socket) {
 
@@ -142,10 +118,13 @@ Promise.all([indexDocP/*, metadataP*/]).then(function(results){
 
     });
 
-
 }).catch(function(err){console.error(err)});
 
-server.listen(PORT, function () {
-    console.log('Server running on ' + PORT);
+server.listen(PORT, HOST, function () {
+    console.log('Server running on', [
+        config.https ? 'https://' : 'http://',
+        HOST + ':',
+        PORT
+    ].join(''));
 });
 

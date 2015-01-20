@@ -11,8 +11,9 @@
   "scripts": {
     "build": "browserify example/client.js -o example/app.js -d",
     "start": "node server/index.js dev example",
-    "start-dev": "node server/index.js dev example",
-    "start-prod": "node server/index.js prod example",
+    "start-app": "node example/server.js",
+    "start-api-dev": "node server/index.js dev example",
+    "start-api-prod": "node server/index.js prod example",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "watchify example/client.js -o example/app.js -d -v"
   },

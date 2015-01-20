@@ -4,7 +4,7 @@ var THREE = require('three');
 
 var CameraProxy = require('./CameraProxy');
 
-module.exports = function(container){
+module.exports = function(container, skyImageURL){
     container = container || document.body;
     
     var containerBoundingRect = container.getBoundingClientRect();
@@ -21,8 +21,12 @@ module.exports = function(container){
     
     // skysphere
     var geometry = new THREE.SphereGeometry(100000, 60, 40);
+    
+    var imgUtils = THREE.ImageUtils;
+    imgUtils.crossOrigin = 'anonymous';
+    
     var uniforms = {
-      texture: { type: 't', value: THREE.ImageUtils.loadTexture('../img/sky.jpg') }
+      texture: { type: 't', value: imgUtils.loadTexture(skyImageURL) }
     };
 
     var skymaterial = new THREE.ShaderMaterial( {
