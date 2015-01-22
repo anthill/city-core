@@ -128,7 +128,8 @@ module.exports = function(container, buildingServerOrigin, options){
                     server.getCityObject(id);
                 });
             },
-            camera : camera
+            camera : camera,
+            scene: scene
         };
     });
     
