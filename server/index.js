@@ -20,16 +20,13 @@ var config = require(path.join("..", "config", mode+".json")); // will throw if 
 console.log('starting in mode', mode);
 
 
-var mainDirRelative = process.argv[3];
-if(!mainDirRelative){
+var mainDirAbsolute = process.argv[3];
+if(!mainDirAbsolute){
     throw 'missing process.argv[3]';
 }
 
-var mainDir = path.join(process.cwd(), mainDirRelative);
-
-var metadataPath = path.join(mainDir, 'data', 'metadata.json');
-var baseBinariesPath = path.join(mainDir, 'data');
-
+var metadataPath = path.resolve(mainDirAbsolute, 'originals', 'metadata.json');
+var baseBinariesPath = path.resolve(mainDirAbsolute, 'originals');
 
 
 var PORT = config.port || 80;
@@ -106,8 +103,7 @@ metadataP.then(function(metadataString){
 
 server.listen(PORT, function () {
     console.log('Server running on', [
-        config.https ? 'https://' : 'http://',
+        'http://localhost:',
         PORT
     ].join(''));
 });
-
