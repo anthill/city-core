@@ -67,14 +67,6 @@ module.exports = function(container, buildingServerOrigin, options){
         console.log('building');
         var mesh = createBuildingMesh(new DataView(event.msg.buffer), event.buildingMetadata.tile);
 
-        if(event.buildingMetadata.type === "building"){
-            mesh.castShadow = true;
-            mesh.receiveShadow = false;
-        } else {
-            mesh.castShadow = false;
-            mesh.receiveShadow = true;
-        }
-
         meshToBuilding.set(mesh, {id: event.msg.id, metadata: event.buildingMetadata}); 
         scene.add(mesh);
 

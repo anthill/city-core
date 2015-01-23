@@ -20,8 +20,6 @@ var meshColor = {
     'building': 0xd4cfb0 // sand
 };
 
-console.log('Colors: ', meshColor.'floor', meshColor.'building');
-
 /*
     Parses a buffer with binary data describing an object to be added to the scene
 
@@ -84,8 +82,12 @@ module.exports = function createBuildingMesh(buffer, tile, options) {
 
     var mesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({
         color: meshColor[meshType],
-        wireframe: false
+        wireframe: false,
+        shading: THREE.FlatShading
     }));
+
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
     
     mesh.position.set(tile.X*200, (MAXY - tile.Y)*200, 0);
     
