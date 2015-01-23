@@ -1,8 +1,8 @@
 ECHO_SUCCESS=@echo " \033[1;32m✔\033[0m  "
 
-all: server
+all: startcontainer
 
-server:
+startcontainer:
 	@mkdir docker/.tmp
 	@cp -r common docker/.tmp/
 	@cp -r config docker/.tmp/
