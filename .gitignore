@@ -3,3 +3,4 @@ node_modules
 
 example/app.js
 example/originals/*
+example/data/*

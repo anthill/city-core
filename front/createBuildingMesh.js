@@ -16,9 +16,11 @@ function zFrom8bitsInt(z, MIN_Z, MAX_Z){
 var meshTypeToString = require('../common/meshType.js').intToString;
 
 var meshColor = {
-    'floor': 0x00aa00, // green
-    'building': 0xaaaaaa // gray
+    'floor': 0x8d7a63, // maroon
+    'building': 0xd4cfb0 // sand
 };
+
+console.log('Colors: ', meshColor.'floor', meshColor.'building');
 
 /*
     Parses a buffer with binary data describing an object to be added to the scene

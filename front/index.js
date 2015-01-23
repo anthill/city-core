@@ -64,7 +64,7 @@ module.exports = function(container, buildingServerOrigin, options){
     });
 
     server.on('buildingOk', function(event){
-        console.log('building')
+        console.log('building');
         var mesh = createBuildingMesh(new DataView(event.msg.buffer), event.buildingMetadata.tile);
 
         if(event.buildingMetadata.type === "building"){
