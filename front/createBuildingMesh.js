@@ -16,8 +16,8 @@ function zFrom8bitsInt(z, MIN_Z, MAX_Z){
 var meshTypeToString = require('../common/meshType.js').intToString;
 
 var meshColor = {
-    'floor': 0x00aa00, // green
-    'building': 0xaaaaaa // gray
+    'floor': 0x8d7a63, // maroon
+    'building': 0xd4cfb0 // sand
 };
 
 /*
@@ -82,8 +82,12 @@ module.exports = function createBuildingMesh(buffer, tile, options) {
 
     var mesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({
         color: meshColor[meshType],
-        wireframe: false
+        wireframe: false,
+        shading: THREE.FlatShading
     }));
+
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
     
     mesh.position.set(tile.X*200, (MAXY - tile.Y)*200, 0);
     

@@ -1,5 +1,8 @@
 .DS_Store
 node_modules
 
+config
+
 example/app.js
 example/originals/*
+example/data/*
