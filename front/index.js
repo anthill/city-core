@@ -64,16 +64,8 @@ module.exports = function(container, buildingServerOrigin, options){
     });
 
     server.on('buildingOk', function(event){
-        console.log('building')
+        console.log('building');
         var mesh = createBuildingMesh(new DataView(event.msg.buffer), event.buildingMetadata.tile);
-
-        if(event.buildingMetadata.type === "building"){
-            mesh.castShadow = true;
-            mesh.receiveShadow = false;
-        } else {
-            mesh.castShadow = false;
-            mesh.receiveShadow = true;
-        }
 
         meshToBuilding.set(mesh, {id: event.msg.id, metadata: event.buildingMetadata}); 
         scene.add(mesh);
@@ -128,7 +120,8 @@ module.exports = function(container, buildingServerOrigin, options){
                     server.getCityObject(id);
                 });
             },
-            camera : camera
+            camera : camera,
+            scene: scene
         };
     });
     

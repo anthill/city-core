@@ -1,7 +1,7 @@
 "use strict";
 
 var path = require('path');
-var fs = require("fs");
+var fs = require("graceful-fs");
 
 var Map = require('es6-map');
 var Promise = require('es6-promise').Promise;
@@ -10,7 +10,6 @@ var express = require('express');
 
 var app = express();
 var http = require('http');
-var https = require('https');
 
 var compression = require('compression');
 
@@ -32,20 +31,10 @@ var metadataPath = path.join(mainDir, 'data', 'metadata.json');
 var baseBinariesPath = path.join(mainDir, 'data');
 
 
+
 var PORT = config.port || 80;
 
-var server;
-if(config.https){
-    var options = {
-        key: fs.readFileSync(config.keypath),
-        cert: fs.readFileSync(config.certpath)
-    };
-    
-    server = https.createServer(options, app);
-}
-else{
-    server = http.createServer(app);
-}
+var server = http.createServer(app);
 
 var io = require('socket.io')(server);
 
@@ -96,7 +85,6 @@ metadataP.then(function(metadataString){
         //when receiving queries send back the data
         socket.on('object', function(msg) {
             var p = path.resolve(baseBinariesPath, msg.id);
-            
             var relativeObjectPath = path.relative(baseBinariesPath, p);
             
             if(relativeObjectPath.indexOf('..') === 0){ 

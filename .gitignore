@@ -1,14 +1,8 @@
 .DS_Store
 node_modules
 
+config
+
 example/app.js
+example/originals/*
 example/data/*
-
-notes.md
-
-*mrDoob*
-
-config/prod.json
-
-3DS/
-tools/data/
