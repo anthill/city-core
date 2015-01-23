@@ -106,7 +106,7 @@ metadataP.then(function(metadataString){
 
 server.listen(PORT, function () {
     console.log('Server running on', [
-        'http://localhost:',
+        config.https ? 'https://' : 'http://',
         PORT
     ].join(''));
 });
