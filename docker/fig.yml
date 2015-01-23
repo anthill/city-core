@@ -1,7 +1,0 @@
-cityapi:
-  build: .
-  command: node server/index.js prod /data/city-core
-  ports:
-   - "9000:9000"
-  volumes:
-   - /data/city-core:/data/city-core
