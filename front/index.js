@@ -122,20 +122,10 @@ module.exports = function(container, buildingServerOrigin, options){
             },
             camera : camera,
             getMeshFromRay: function(ray){
+                console.log('Finding mesh');
                 var out = ray.intersectObjects(scene.children, false);
 
-                if (out.length != 0)
-                {
-                    var newEvent = new CustomEvent('meshFound', {
-                        detail:{
-                            'mesh': out[0].object,
-                            'point': out[0].point 
-                        }
-                    });
-                    container.dispatchEvent(newEvent);
-
-                    // return out[0].object;
-                }
+                return out[0];
             }
         };
     });

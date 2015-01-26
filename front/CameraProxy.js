@@ -83,6 +83,7 @@ module.exports = function(camera){
 
             directionVector.x = lookAtVector.x - camera.position.x;
             directionVector.y = lookAtVector.y - camera.position.y;
+            directionVector.z = lookAtVector.z - camera.position.z;
             directionVector.normalize();
 
             scheduleChangeEvent();
