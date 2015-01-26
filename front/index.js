@@ -121,7 +121,22 @@ module.exports = function(container, buildingServerOrigin, options){
                 });
             },
             camera : camera,
-            scene: scene
+            getMeshFromRay: function(ray){
+                var out = ray.intersectObjects(scene.children, false);
+
+                if (out.length != 0)
+                {
+                    var newEvent = new CustomEvent('meshFound', {
+                        detail:{
+                            'mesh': out[0].object,
+                            'point': out[0].point 
+                        }
+                    });
+                    container.dispatchEvent(newEvent);
+
+                    // return out[0].object;
+                }
+            }
         };
     });
     
