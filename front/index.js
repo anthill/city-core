@@ -65,7 +65,7 @@ module.exports = function(container, buildingServerOrigin, options){
 
     server.on('buildingOk', function(event){
         console.log('building');
-        var result = unpackBuilding(new DataView(event.msg.buffer), event.buildingMetadata.tile);
+        var result = unpackBuilding(event.msg.buffer, event.buildingMetadata.tile);
 
         meshToBuilding.set(result.mesh, {
             id: event.msg.id, 
