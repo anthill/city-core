@@ -8,7 +8,7 @@ var rTree = require('./rTree.js');
 var getMetadata = require('./getMetadata.js');
 var MAX_Y = require('./MAX_Y');
 var unpackBuilding = require('./unpackBuilding.js');
-var meshToBuilding = require('./meshToBuilding.js');
+var meshInfos = require('./meshInfos.js');
 var buildingMap = require('./buildingMap.js');
 var _loadObjects = require('./loadObjects.js');
 
@@ -67,7 +67,7 @@ module.exports = function(container, buildingServerOrigin, options){
         console.log('building');
         var result = unpackBuilding(event.msg.buffer, event.buildingMetadata.tile);
 
-        meshToBuilding.set(result.mesh, {
+        meshInfos.set(result.mesh, {
             id: event.msg.id, 
             metadata: event.buildingMetadata,
             type: result.type
@@ -130,7 +130,8 @@ module.exports = function(container, buildingServerOrigin, options){
                 var out = ray.intersectObjects(scene.children, false);
 
                 return out[0];
-            }
+            },
+            meshInfos: meshInfos
         };
     });
     
