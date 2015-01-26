@@ -7,7 +7,7 @@ var _server = require('./serverCommunication.js');
 var rTree = require('./rTree.js');
 var getMetadata = require('./getMetadata.js');
 var MAX_Y = require('./MAX_Y');
-var createBuildingMesh = require('./createBuildingMesh.js');
+var unpackBuilding = require('./unpackBuilding.js');
 var meshToBuilding = require('./meshToBuilding.js');
 var buildingMap = require('./buildingMap.js');
 var _loadObjects = require('./loadObjects.js');
@@ -65,12 +65,16 @@ module.exports = function(container, buildingServerOrigin, options){
 
     server.on('buildingOk', function(event){
         console.log('building');
-        var mesh = createBuildingMesh(new DataView(event.msg.buffer), event.buildingMetadata.tile);
+        var result = unpackBuilding(new DataView(event.msg.buffer), event.buildingMetadata.tile);
 
-        meshToBuilding.set(mesh, {id: event.msg.id, metadata: event.buildingMetadata}); 
-        scene.add(mesh);
+        meshToBuilding.set(result.mesh, {
+            id: event.msg.id, 
+            metadata: event.buildingMetadata,
+            type: result.type
+        }); 
+        scene.add(result.mesh);
 
-        buildingMap.set(event.msg.id, {mesh:mesh, visible:true});
+        buildingMap.set(event.msg.id, {mesh: result.mesh, visible: true});
 
         threeBundle.render();
     });
