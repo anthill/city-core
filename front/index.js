@@ -9,6 +9,7 @@ var getMetadata = require('./getMetadata.js');
 var MAX_Y = require('./MAX_Y');
 var unpackBuilding = require('./unpackBuilding.js');
 var meshInfos = require('./meshInfos.js');
+var meshColor = require('../common/meshDefaultColor.js');
 var buildingMap = require('./buildingMap.js');
 var _loadObjects = require('./loadObjects.js');
 
@@ -71,7 +72,10 @@ module.exports = function(container, buildingServerOrigin, options){
             id: event.msg.id, 
             metadata: event.buildingMetadata,
             type: result.type
-        }); 
+        });
+
+        result.mesh.material.color.setHex(meshColor[result.type]);
+
         scene.add(result.mesh);
 
         buildingMap.set(event.msg.id, {mesh: result.mesh, visible: true});
