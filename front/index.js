@@ -74,8 +74,6 @@ module.exports = function(container, buildingServerOrigin, options){
             type: result.type
         });
 
-        result.mesh.material.color.setHex(meshColor[result.type]);
-
         scene.add(result.mesh);
 
         buildingMap.set(event.msg.id, {mesh: result.mesh, visible: true});

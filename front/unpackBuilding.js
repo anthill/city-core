@@ -20,6 +20,11 @@ module.exports = function (buffer, tile, options){
 
 	mesh.material.color.setHex(meshColor[type]);
 
+	if (type === 'building')
+		mesh.castShadow = true;
+	else
+		mesh.receiveShadow = true;
+
 	return {
 		type: type,
 		mesh: mesh
