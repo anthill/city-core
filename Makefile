@@ -16,7 +16,7 @@ startcontainer:
 	@cp package.json docker/.tmp/
 	@cd docker && docker build -t ants/citycore:v1 .
 	@rm -rf docker/.tmp
-	@docker run -d -p 9000:9000 -v /data/city-core:/data/city-core ants/citycore:v1
+	@docker run -d -e VIRTUAL_HOST=city-api.ants.builders -e VIRTUAL_PORT=9000 -p 9000:9000 -v /data/city-core:/data/city-core ants/citycore:v1
 	$(ECHO_SUCCESS) "Succesfully launched city-core api container."
 
 
