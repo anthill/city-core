@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>bordeaux3d-core client</title>
+        <meta charset="utf-8">
+
+        <style>
+        /*
+          http://www.paulirish.com/2012/box-sizing-border-box-ftw/
+        */
+        *, *:before, *:after {
+            box-sizing: border-box;
+            /* if you really care about older browsers, add prefixed versions at your own risks */
+        }
+
+        /*
+          Repeating the background mostly makes sense in the <body>. Otherwise, people usually want the image and preferably its center (not the top-right corner)
+        */
+        *:not(body) {
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: cover;
+        }
+
+        /*
+          Makes the hidden attribute works even when an element is styled display: flex
+          http://lists.whatwg.org/pipermail/whatwg-whatwg.org/2014-May/254198.html
+        */
+        [hidden] {
+            display: none !important;
+        }
+
+
+        html, body {
+            padding: 0;
+            margin: 0;
+        }
+
+        body{
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+            
+        /*
+          In applications, there can be lists but HTML lists have bullet points and a bunch of useless styling attributes 
+        */
+        ul, ol, menu {
+            margin: 0;
+            padding: 0;
+
+        }
+
+        ul, menu {
+            list-style: none;
+        }
+
+        li {
+            margin: 0;
+            padding: 0;
+        }
+
+        /*
+          fairly classic thing to do
+        */
+        .table-layout {
+            display: table;
+        }
+        .table-layout > *, .table-row-layout {
+            display: table-row;
+        }
+        .table-layout > * > *, table-row-layout > * {
+            display: table-cell;
+            vertical-align: top;
+        }
+
+        * {
+            border-collapse: collapse;
+        }
+
+        </style>
+
+        <!-- used for skysphere -->
+        <script type="application/x-glsl" id="sky-vertex">
+            varying vec2 vUV;
+
+            void main() {
+              vUV = uv;
+              vec4 pos = vec4(position, 1.0);
+              gl_Position = projectionMatrix * modelViewMatrix * pos;
+            }
+        </script>
+
+        <script type="application/x-glsl" id="sky-fragment">
+            uniform sampler2D texture;
+            varying vec2 vUV;
+
+            void main() {
+              vec4 sample = texture2D(texture, vUV);
+              gl_FragColor = vec4(sample.xyz, sample.w);
+            }
+        </script>
+    
+        
+        <script defer src="polyfills/harmony-collections.js"></script>
+        
+        
+        <script defer src="app.js"></script>
+        
+        
+        <style>
+            body{
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            menu{
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            menu button{
+                font-family: "DejaVu Serif";
+                padding: 1em 2em;
+                background-color: white;
+                margin: 0.5em;
+
+                cursor: pointer;
+
+                text-transform: uppercase;
+
+                width: 20%;
+
+                text-align: center;
+            }
+
+            menu button:disabled{
+                background-color: #AAA;
+                color: white;
+
+                text-decoration: line-through;
+
+                cursor:default;
+            }
+            
+            #view{
+                width: 60%;
+                height: 60%;
+                
+                background-color: indianred;
+            }
+            
+        </style>
+        
+    </head>
+    <body>
+        <menu>
+            <button id="light">Add green light</button>
+            <button id="mesh">Add red cube mesh</button>
+            <button id="controls">Switch to first person controls</button>
+        </menu>
+        
+        <div id="view"></div>
+    </body>
+</html>
