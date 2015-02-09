@@ -2,16 +2,15 @@
 
 var defaultControls = require('city-blocks/controls/FirstPerson_Basic.js');
 
-var createThreeBundle = require('./createThreeBundle.js');
 var _server = require('./serverCommunication.js');
 var rTree = require('./rTree.js');
 var getMetadata = require('./getMetadata.js');
 var MAX_Y = require('./MAX_Y');
-var unpackBuilding = require('./unpackBuilding.js');
-var meshInfos = require('./meshInfos.js');
-var meshColor = require('../common/meshDefaultColor.js');
-var buildingMap = require('./buildingMap.js');
+var infosFromMesh = require('./infosFromMesh.js');
+var meshFromId = require('./meshFromId.js');
+var meshColor = require('./meshDefaultColor.js');
 var _loadObjects = require('./loadObjects.js');
+var createThreeBundle = require('./createThreeBundle.js');
 
 /*
     * créer une API pour les metadata côté serveur
@@ -65,19 +64,6 @@ module.exports = function(container, buildingServerOrigin, options){
     });
 
     server.on('buildingOk', function(event){
-        console.log('building');
-        var result = unpackBuilding(event.msg.buffer, event.buildingMetadata.tile);
-
-        meshInfos.set(result.mesh, {
-            id: event.msg.id, 
-            metadata: event.buildingMetadata,
-            type: result.type
-        });
-
-        scene.add(result.mesh);
-
-        buildingMap.set(event.msg.id, {mesh: result.mesh, visible: true});
-
         threeBundle.render();
     });
 
@@ -89,7 +75,7 @@ module.exports = function(container, buildingServerOrigin, options){
                 scene.add(light);
             },
             removeLight: function(light /*: THREE.Light */){
-                throw 'TODO';
+                scene.remove(light);
             },
 
             // functions to add tramway or another building
@@ -97,7 +83,8 @@ module.exports = function(container, buildingServerOrigin, options){
                 scene.add(mesh);
             },
             removeMesh: function(mesh /*: THREE.Mesh */){
-                throw 'TODO';
+                console.log('Remove building');
+                scene.remove(mesh);
             },
 
             changeControls: function(controls, position){
@@ -133,7 +120,8 @@ module.exports = function(container, buildingServerOrigin, options){
 
                 return out[0];
             },
-            meshInfos: meshInfos
+            meshFromId: meshFromId,
+            infosFromMesh: infosFromMesh
         };
     });
     

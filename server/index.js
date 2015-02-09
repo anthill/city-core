@@ -83,7 +83,7 @@ metadataP.then(function(metadataString){
     io.on('connection', function(socket) {
 
         //when receiving queries send back the data
-        socket.on('object', function(msg) {
+        socket.on('objectNeeded', function(msg) {
             var p = path.resolve(baseBinariesPath, msg.id);
             var relativeObjectPath = path.relative(baseBinariesPath, p);
             
@@ -95,7 +95,7 @@ metadataP.then(function(metadataString){
           
             //console.log('asked object', msg.id);
             fs.readFile(p, function (err, data) {
-                socket.emit("building", {id : msg.id, buffer : data});
+                socket.emit("objectServed", {id : msg.id, buffer : data});
             });
 
         });

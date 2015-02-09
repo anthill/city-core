@@ -42,6 +42,11 @@ module.exports = function(maxEntries){
         },
         keys: function(){
             return Object.keys(map);
+        },
+        remove: function(key){
+            if (keys.indexOf(key) !== -1)
+                delete map[key];
+            else console.log('Key not in map');
         }
     }
 };

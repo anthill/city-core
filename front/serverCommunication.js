@@ -3,7 +3,11 @@
 var io = require('socket.io-client');
 var ee = require('event-emitter');
 var getMetadata = require('./getMetadata.js');
+// var LimitedEntryMap = require('./LimitedEntryMap.js');
 
+// {id: string, buffer: ArrayBuffer, metadata: Metadata}
+// var buildingCache = new LimitedEntryMap(10000);
+var buildingCache = require('./buildingCache.js');
 
 module.exports = function(origin){
     
@@ -11,21 +15,37 @@ module.exports = function(origin){
     var socket = io(origin);
     var metadataP = getMetadata(origin);
 
+    var resolveById = new Map();
+
     function getCityObject(id){
-        socket.emit('object', {id : id});
+        if(buildingCache.has(id))
+            return Promise.resolve(buildingCache.get(id));
+        else{
+            return new Promise(function(resolve, reject){
+                socket.emit('objectNeeded', {id : id});
+                resolveById.set(id, resolve);
+            });
+        }
     }
 
-    // when receiving a building parse it
-    socket.on('building', function(msg){  
+    socket.on('objectServed', function(msg){
         metadataP.then(function(metadata){
-            var buildingMetadata = metadata[msg.id];
+            var id = msg.id;
+            var buildingMetadata = metadata[id];
+            var resolve = resolveById.get(id);
+
             if(msg.buffer){
-                var data = {
-                    msg: msg,
-                    buildingMetadata: buildingMetadata
+                // console.log('Building Received');
+                var buildingData = {
+                    id: id,
+                    buffer: msg.buffer,
+                    metadata: buildingMetadata
                 };
 
-                ret.emit('buildingOk', data);
+                resolve(buildingData);
+                buildingCache.set(id, buildingData);
+
+                ret.emit('buildingOk', buildingData);
 
                 msg = undefined; // loose references to the binary buffer
             }
