@@ -13,12 +13,6 @@ var http = require('http');
 
 var compression = require('compression');
 
-// arguments
-var mode = process.argv[2] || "dev";
-var config = require(path.join("..", "config", mode+".json")); // will throw if file not found
-
-console.log('starting in mode', mode);
-
 
 var mainDirAbsolute = process.argv[3];
 if(!mainDirAbsolute){
@@ -29,12 +23,11 @@ var metadataPath = path.resolve(mainDirAbsolute, 'originals', 'metadata.json');
 var baseBinariesPath = path.resolve(mainDirAbsolute, 'originals');
 
 
-var PORT = config.port || 80;
+var PORT = 9000;
 
 var server = http.createServer(app);
 
 var io = require('socket.io')(server);
-
 
 process.title = 'City-core server';
 
