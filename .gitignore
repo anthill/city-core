@@ -6,3 +6,4 @@ config
 example/app.js
 example/originals/*
 example/data/*
+example/*B3D*

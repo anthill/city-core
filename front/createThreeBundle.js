@@ -2,7 +2,16 @@
 
 var THREE = require('three');
 
+var meshFromId = require('./meshFromId.js');
+var infosFromMesh = require('./infosFromMesh.js');
 var CameraProxy = require('./CameraProxy');
+
+function poisonnedToString(){
+    throw 'Do not use toString';
+}
+
+var SKY_ID = Object.freeze({toString: poisonnedToString});
+var HELL_ID = Object.freeze({toString: poisonnedToString});
 
 module.exports = function(container, skyImageURL){
     container = container || document.body;
@@ -41,6 +50,15 @@ module.exports = function(container, skyImageURL){
     skyBox.renderDepth = 1000.0;
     scene.add(skyBox);
 
+
+
+    infosFromMesh.set(skyBox, {
+        id: SKY_ID,
+        metadata: undefined,
+        type: 'sky',
+    });
+    meshFromId.set(SKY_ID, skyBox);
+
     // add a box so we don't see the little gaps in the floor
     var planeGeom = new THREE.PlaneGeometry( 500000, 500000 );
     var material = new THREE.MeshLambertMaterial({
@@ -51,6 +69,13 @@ module.exports = function(container, skyImageURL){
     var plane = new THREE.Mesh( planeGeom, material );
     plane.position.set(0, 0, -100);
     scene.add( plane );
+
+    infosFromMesh.set(plane, {
+        id: HELL_ID,
+        metadata: undefined,
+        type: 'hell',
+    });
+    meshFromId.set(HELL_ID, plane);
 
     // Create a camera, zoom it out from the model a bit, and add it to the scene.
     var camera = new THREE.PerspectiveCamera( 60, WIDTH / HEIGHT, 1, 500000 );
@@ -105,6 +130,7 @@ module.exports = function(container, skyImageURL){
 
     render();
     
+    // Note to future selves: we should output an API that enables sky modifications
     return {
         scene: scene,
         camera: CameraProxy(camera),

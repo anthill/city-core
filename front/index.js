@@ -2,15 +2,15 @@
 
 var defaultControls = require('city-blocks/controls/FirstPerson_Basic.js');
 
-var createThreeBundle = require('./createThreeBundle.js');
 var _server = require('./serverCommunication.js');
 var rTree = require('./rTree.js');
 var getMetadata = require('./getMetadata.js');
 var MAX_Y = require('./MAX_Y');
-var createBuildingMesh = require('./createBuildingMesh.js');
-var meshToBuilding = require('./meshToBuilding.js');
-var buildingMap = require('./buildingMap.js');
-var _loadObjects = require('./loadObjects.js');
+var infosFromMesh = require('./infosFromMesh.js');
+var meshFromId = require('./meshFromId.js');
+var meshColor = require('./meshDefaultColor.js');
+var _loadFunctions = require('./loadFunctions.js');
+var createThreeBundle = require('./createThreeBundle.js');
 
 /*
     * créer une API pour les metadata côté serveur
@@ -55,43 +55,43 @@ module.exports = function(container, buildingServerOrigin, options){
     var scene = threeBundle.scene;
     var domElement = threeBundle.domElement;
 
-    var loadObjects = _loadObjects(server.getCityObject);
+    var loadFunctions = _loadFunctions(server.getCityObject);
     
     camera.on('cameraviewchange', function(){
         //console.log('cameraviewchange', camera.position.x, camera.position.y, camera.position.z );
-        
         threeBundle.render();
     });
 
     server.on('buildingOk', function(event){
-        console.log('building');
-        var mesh = createBuildingMesh(new DataView(event.msg.buffer), event.buildingMetadata.tile);
-
-        meshToBuilding.set(mesh, {id: event.msg.id, metadata: event.buildingMetadata}); 
-        scene.add(mesh);
-
-        buildingMap.set(event.msg.id, {mesh:mesh, visible:true});
-
         threeBundle.render();
     });
 
     return rtreeReadyP.then(function(){
-        var currentControlsDesactivate = defaultControls(camera, scene, domElement, loadObjects);
+        var currentControlsDesactivate = defaultControls(camera, scene, domElement, loadFunctions);
         
         return {
+
+            // TODO => maybe register lights in a map like we do for meshes?
             addLight: function(light /*: THREE.Light */){
                 scene.add(light);
             },
             removeLight: function(light /*: THREE.Light */){
-                throw 'TODO';
+                scene.remove(light);
             },
 
             // functions to add tramway or another building
             addMesh: function(mesh /*: THREE.Mesh */){
+
+                // TODO => we should probably fill in infosFromMesh and meshFromId, but how to ask for metadata infos ???
                 scene.add(mesh);
             },
             removeMesh: function(mesh /*: THREE.Mesh */){
-                throw 'TODO';
+                console.log('Remove building');
+
+                infosFromMesh.delete(mesh);
+                meshFromId.delete(id);
+                
+                scene.remove(mesh);
             },
 
             changeControls: function(controls, position){
@@ -105,23 +105,19 @@ module.exports = function(container, buildingServerOrigin, options){
                     camera.position.z = 'z' in position ? position.z : camera.position.z;
                 }
 
-                currentControlsDesactivate = controls(camera, scene, domElement, loadObjects);
+                currentControlsDesactivate = controls(camera, scene, domElement, loadFunctions);
+            },
+            getMeshFromRay: function(ray){
+                console.log('Finding mesh');
+                var out = ray.intersectObjects(scene.children, false);
+
+                return out[0];
             },
             // trigger a render
             render: threeBundle.render,
-            // loads the buildings as well as metadata
-            // used by custom controls
-            loadCityPortion: function(north, east, south, west){
-                throw 'TODO';
-            },        
-            loadBuildings: function(buildingIds){
-                // TODO redo server-protocol to send the array directly
-                buildingIds.forEach(function(id){
-                    server.getCityObject(id);
-                });
-            },
             camera : camera,
-            scene: scene
+            meshFromId: meshFromId,
+            infosFromMesh: infosFromMesh
         };
     });
     

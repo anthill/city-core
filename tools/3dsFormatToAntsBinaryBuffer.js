@@ -44,7 +44,7 @@ function encodeVertex(x, y, z){
 
     returns a Buffer encoded as :
     
-    object : | nbVertices(2) | v1(4) | v2(4) | ... | vn(4) | nbFaces(2) | f1(6) | f2(6) | ... | fn(6) | meshType(2)
+    object : meshType(2) | nbVertices(2) | v1(4) | v2(4) | ... | vn(4) | nbFaces(2) | f1(6) | f2(6) | ... | fn(6)
     
     nbVertices : number of vertices uint16 (64k max)
     nbFaces : number of vertices uint16 (64k max)
@@ -72,6 +72,15 @@ module.exports = function(_3dsObject, boundingBox){
     
     var buffer = new Buffer(bufferSize);
     var offset = 0;
+
+    // we get the type (either building or terrain)
+    if (_3dsObject.id.match(/x\d{1,4}y\d{1,4}/)){
+        buffer.writeUInt8(meshTypeToInt['floor'], offset);
+    } else {
+        buffer.writeUInt8(meshTypeToInt['building'], offset);
+    }
+
+    offset += 2;
     
     buffer.writeUInt16BE(nbVertices, offset);
     offset += 2;
@@ -106,14 +115,6 @@ module.exports = function(_3dsObject, boundingBox){
         buffer.writeUInt16BE(f.c, offset);
         offset += 2;
     });
-
-    // we get the type (either building or terrain)
-    if (_3dsObject.id.match(/x\d{1,4}y\d{1,4}/)){
-        buffer.writeUInt8(meshTypeToInt['floor'], offset);
-    } else {
-        buffer.writeUInt8(meshTypeToInt['building'], offset);
-    }
-    offset += 1; // useful for eventual future info to be written into buffer
     
     return buffer;    
 };

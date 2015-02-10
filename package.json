@@ -35,7 +35,7 @@
     "socket.io-client": "^1.0.6",
     "three": "^0.68.0",
     "csv-parse": "0.0.6",
-    "city-blocks": "git://github.com/anthill/city-blocks.git"
+    "city-blocks": "git://github.com/iOiurson/city-blocks.git#raycasting"
   },
   "devDependencies": {
     "unzip": "^0.1.9",
