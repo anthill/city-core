@@ -31,7 +31,6 @@ function csvParse(str){
         });
         // When we are done, test that the parsed output matched what expected
         parser.on('finish', function(){
-            console.log('finish');
             resolve(output);
         });
 
