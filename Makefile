@@ -5,6 +5,7 @@ all: startcontainer
 startcontainer:
 	@mkdir docker/.tmp
 	@cp -r common docker/.tmp/
+	@cp -r config docker/.tmp/
 	@cp -r data docker/.tmp/
 	@cp -r example docker/.tmp/
 	@cp -r front docker/.tmp/
