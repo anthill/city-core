@@ -9,7 +9,7 @@ var MAX_Y = require('./MAX_Y');
 var infosFromMesh = require('./infosFromMesh.js');
 var meshFromId = require('./meshFromId.js');
 var meshColor = require('./meshDefaultColor.js');
-var _loadObjects = require('./loadObjects.js');
+var _loadFunctions = require('./loadFunctions.js');
 var createThreeBundle = require('./createThreeBundle.js');
 
 /*
@@ -55,11 +55,10 @@ module.exports = function(container, buildingServerOrigin, options){
     var scene = threeBundle.scene;
     var domElement = threeBundle.domElement;
 
-    var loadObjects = _loadObjects(server.getCityObject);
+    var loadFunctions = _loadFunctions(server.getCityObject);
     
     camera.on('cameraviewchange', function(){
         //console.log('cameraviewchange', camera.position.x, camera.position.y, camera.position.z );
-        
         threeBundle.render();
     });
 
@@ -68,9 +67,11 @@ module.exports = function(container, buildingServerOrigin, options){
     });
 
     return rtreeReadyP.then(function(){
-        var currentControlsDesactivate = defaultControls(camera, scene, domElement, loadObjects);
+        var currentControlsDesactivate = defaultControls(camera, scene, domElement, loadFunctions);
         
         return {
+
+            // TODO => maybe register lights in a map like we do for meshes?
             addLight: function(light /*: THREE.Light */){
                 scene.add(light);
             },
@@ -80,10 +81,16 @@ module.exports = function(container, buildingServerOrigin, options){
 
             // functions to add tramway or another building
             addMesh: function(mesh /*: THREE.Mesh */){
+
+                // TODO => we should probably fill in infosFromMesh and meshFromId, but how to ask for metadata infos ???
                 scene.add(mesh);
             },
             removeMesh: function(mesh /*: THREE.Mesh */){
                 console.log('Remove building');
+
+                infosFromMesh.delete(mesh);
+                meshFromId.delete(id);
+                
                 scene.remove(mesh);
             },
 
@@ -98,28 +105,17 @@ module.exports = function(container, buildingServerOrigin, options){
                     camera.position.z = 'z' in position ? position.z : camera.position.z;
                 }
 
-                currentControlsDesactivate = controls(camera, scene, domElement, loadObjects);
+                currentControlsDesactivate = controls(camera, scene, domElement, loadFunctions);
             },
-            // trigger a render
-            render: threeBundle.render,
-            // loads the buildings as well as metadata
-            // used by custom controls
-            loadCityPortion: function(north, east, south, west){
-                throw 'TODO';
-            },        
-            loadBuildings: function(buildingIds){
-                // TODO redo server-protocol to send the array directly
-                buildingIds.forEach(function(id){
-                    server.getCityObject(id);
-                });
-            },
-            camera : camera,
             getMeshFromRay: function(ray){
                 console.log('Finding mesh');
                 var out = ray.intersectObjects(scene.children, false);
 
                 return out[0];
             },
+            // trigger a render
+            render: threeBundle.render,
+            camera : camera,
             meshFromId: meshFromId,
             infosFromMesh: infosFromMesh
         };

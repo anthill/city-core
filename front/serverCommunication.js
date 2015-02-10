@@ -3,11 +3,10 @@
 var io = require('socket.io-client');
 var ee = require('event-emitter');
 var getMetadata = require('./getMetadata.js');
-// var LimitedEntryMap = require('./LimitedEntryMap.js');
+var LimitedEntryMap = require('./LimitedEntryMap.js');
 
 // {id: string, buffer: ArrayBuffer, metadata: Metadata}
-// var buildingCache = new LimitedEntryMap(10000);
-var buildingCache = require('./buildingCache.js');
+var buildingCache = new LimitedEntryMap(10000);
 
 module.exports = function(origin){
     
