@@ -121,7 +121,12 @@ module.exports = function(container, buildingServerOrigin, options){
                 });
             },
             camera : camera,
-            scene: scene
+            getMeshFromRay: function(ray){
+                console.log('Finding mesh');
+                var out = ray.intersectObjects(scene.children, false);
+
+                return out[0];
+            }
         };
     });
     
