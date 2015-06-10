@@ -42,7 +42,7 @@ There are three main entry points to this project:
 1. Extract all the buildings and metadata in `front/data`:
 
 ```bash
-node tools/unzipCUB3ds.js --out example/data --zip path/to/3Ddata/BATI3D_NT.zip
+node tools/unzipCUB3ds.js --out front/data --zip path/to/3Ddata/BATI3D_NT.zip
 ```
 
 It should take about 2-3 minutes per exported "dalle" in normal hardware. This will extract all the buildings and other 3d objects from the open data in [.3ds format](http://en.wikipedia.org/wiki/.3ds). It will create thousands of binary files in `front/data/` as well as a file names `metadata.json`.

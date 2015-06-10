@@ -14,7 +14,7 @@ var https = require('https');
 
 var compression = require('compression');
 
-var PORT = 3457;
+var PORT = 9000;
 
 
 app.use(compression());
@@ -23,9 +23,5 @@ app.use("/", express.static(__dirname));
 
 
 app.listen(PORT, function () {
-    console.log('Server running on', [
-        'http://',
-        PORT
-    ].join(''));
+    console.log('Server running on http://localhost:'+PORT);
 });
-
