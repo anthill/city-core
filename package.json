@@ -12,6 +12,7 @@
     "build": "browserify example/client.js -o example/app.js -d",
     "start": "node server/index.js dev example",
     "start-app": "node example/server.js",
+    "start-dev": "node server/index.js dev ./example",
     "start-api-dev": "node server/index.js dev ./example",
     "start-api-prod": "node server/index.js prod /data/city-core",
     "test": "echo \"Error: no test specified\" && exit 1",

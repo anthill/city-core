@@ -14,13 +14,16 @@ var http = require('http');
 var compression = require('compression');
 
 
-var mainDirAbsolute = process.argv[3];
-if(!mainDirAbsolute){
+var mainDirRelative = process.argv[3];
+if(!mainDirRelative){
     throw 'missing process.argv[3]';
 }
 
-var metadataPath = path.resolve(mainDirAbsolute, 'originals', 'metadata.json');
-var baseBinariesPath = path.resolve(mainDirAbsolute, 'originals');
+var mainDir = path.join(process.cwd(), mainDirRelative);
+
+var metadataPath = path.join(mainDir, 'data', 'metadata.json');
+
+var baseBinariesPath =path.join(mainDir, 'data');
 
 
 var PORT = 9000;
@@ -62,8 +65,9 @@ metadataP.then(function(metadataString){
     app.get('/metadata', function(req, res){
         // TODO support query a rtree with the metadata
         // console.log('/metadata', req.query);
-        
-        res.sendFile(metadataPath);
+        console.log('/metadata', metadataPath);
+        res.sendFile(path.join(__dirname, 'front/data/metadata.json'));
+        //res.sendFile(metadataPath);
     });
     
     // for cross-origin requests
@@ -95,8 +99,5 @@ metadataP.then(function(metadataString){
 }).catch(function(err){console.error(err)});
 
 server.listen(PORT, function () {
-    console.log('Server running on', [
-        'http://localhost:',
-        PORT
-    ].join(''));
+    console.log('Server running on http://localhost:'+PORT);
 });
