@@ -48,7 +48,7 @@ node tools/unzipCUB3ds.js --out front/data --zip path/to/3Ddata/BATI3D_NT.zip
 It should take about 2-3 minutes per exported "dalle" in normal hardware. This will extract all the buildings and other 3d objects from the open data in [.3ds format](http://en.wikipedia.org/wiki/.3ds). It will create thousands of binary files in `front/data/` as well as a file names `metadata.json`.
 
 1. Build: `npm run build` 
-1. Start: `npm start-dev` 
+1. Start: `npm run start-dev` 
 
 The project will now be accessible via `localhost:9000`
 

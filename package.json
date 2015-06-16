@@ -10,7 +10,7 @@
   },
   "scripts": {
     "build": "browserify example/client.js -o example/app.js -d",
-    "start": "node server/index.js dev example",
+    "start": "node server/index.js dev /front",
     "start-app": "node example/server.js",
     "start-dev": "node server/index.js dev /front",
     "start-api-dev": "node server/index.js dev ./example",
