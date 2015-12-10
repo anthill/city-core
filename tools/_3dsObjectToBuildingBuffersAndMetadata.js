@@ -51,6 +51,8 @@ module.exports = function(data, x, y, deltaZ){
     var deltaX = 100 - xyContainingCube.maxX;
     var deltaY = 100 - xyContainingCube.maxY;
 
+    // modify HERE to cancel the position fix
+
     if(deltaX !== 0 || deltaY !== 0){
         // apply translation to all tile objects
         meshes.forEach(function(m){

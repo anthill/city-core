@@ -1,6 +1,6 @@
 "use strict";
 
 module.exports = {
-    'floor': 0x8d7a63, // maroon
-    'building': 0xd4cfb0 // sand
+    'floor': 0x3D3A33,
+    'building': 0x918F87
 };
