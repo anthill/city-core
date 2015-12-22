@@ -14,6 +14,10 @@ var http = require('http');
 var compression = require('compression');
 
 
+
+
+app.use(express.static(path.join(__dirname, '..','example') ));
+
 var mainDirRelative = process.argv[3];
 if(!mainDirRelative){
     throw 'missing process.argv[3]';
@@ -33,6 +37,8 @@ var server = http.createServer(app);
 var io = require('socket.io')(server);
 
 process.title = 'City-core server';
+
+
 
 
 // get the metadata
@@ -60,13 +66,14 @@ metadataP.then(function(metadataString){
         next();
     });
     
-    app.use("/img", express.static(path.join(__dirname, '..', 'img')));
+    app.use('/img', express.static( path.join(__dirname, '..','front','img')));
 
+    console.log(path.join(__dirname, '..' ,'img'));
+
+    app.use('/metadata', express.static(__dirname + 'data/metadata.json'));
     app.get('/metadata', function(req, res){
         // TODO support query a rtree with the metadata
-        // console.log('/metadata', req.query);
-        console.log('/metadata', metadataPath);
-        res.sendFile(path.join(__dirname, 'front/data/metadata.json'));
+        res.sendFile(path.join(__dirname,  '..' ,'front/data/metadata.json'));
         //res.sendFile(metadataPath);
     });
     
